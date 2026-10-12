@@ -60,7 +60,7 @@ const state = {
   ]),
   threads: store.get("threads", {
     nova: [
-      { from: "artist", text: "Bonjour ! Merci pour votre intérêt pour « Rose Protocol ». Une question sur l'œuvre ?" },
+      { from: "artist", text: "Bonjour ! Merci pour votre intérêt pour « Bordeaux Protocol ». Une question sur l'œuvre ?" },
     ],
     support: [{ from: "artist", text: "Bonjour, l'équipe ATYPIIK vous répond ici du lundi au vendredi, de 9 h à 18 h." }],
   }),
@@ -122,7 +122,7 @@ function updateChrome() {
   });
   const roles = { acheteur: "Acheteur", vendeur: "Artiste", admin: "Admin", attente: "En validation" };
   $("#user-pill").innerHTML = state.user
-    ? `<a href="#/profil" class="user-pill"><span class="role-dot" style="${state.user.role === "admin" ? "background:var(--pink)" : ""}"></span><span class="name">${esc(roles[state.user.role])}</span></a>`
+    ? `<a href="#/profil" class="user-pill"><span class="role-dot" style="${state.user.role === "admin" ? "background:var(--accent)" : ""}"></span><span class="name">${esc(roles[state.user.role])}</span></a>`
     : "";
   $("#cookie").hidden = state.cookies !== null;
 }
@@ -394,7 +394,7 @@ function refreshAvailability(w) {
   $("#availability").innerHTML = w.sold
     ? '<span class="ko">Cette œuvre a été vendue.</span>'
     : ok
-      ? `<span class="ok">● Disponible</span> — ${v.stock} exemplaire${v.stock > 1 ? "s" : ""} en « ${esc(v.label)} »`
+      ? `<span class="ok">✓ Disponible</span> — ${v.stock} exemplaire${v.stock > 1 ? "s" : ""} en « ${esc(v.label)} »`
       : `<span class="ko">● Rupture de stock pour « ${esc(v.label)} »</span>`;
   $("#add-cart").disabled = !ok;
   $("#buy-now").disabled = !ok;
@@ -570,7 +570,7 @@ function viewCheckout() {
             <div class="field"><label for="cc-cvc">CVC</label><input id="cc-cvc" required inputmode="numeric" placeholder="123" autocomplete="cc-csc" /></div>
           </div>
           <p class="hint">Démo : aucun paiement réel n'est effectué. En production, la saisie est gérée par Stripe et le montant est réparti automatiquement : 90 % à l'artiste, 10 % à ATYPIIK.</p>
-          <button class="btn btn-block btn-green">Payer ${euro(total + (total >= 150 ? 0 : 12))}</button>
+          <button class="btn btn-block">Payer ${euro(total + (total >= 150 ? 0 : 12))}</button>
         </form>`;
   return `
     <div class="page-head"><h1>Commande</h1></div>
@@ -1068,7 +1068,7 @@ function bindSeller() {
           return { label: l.value.trim() || "Original", stock: Math.max(0, +s.value || 0) };
         })
         .filter(Boolean);
-      const palette = ["#ff1f8f", "#07af4f", "#111111", "#c9ccd3", "#2b6bff", "#ffffff"];
+      const palette = ["#6d1a2a", "#d9c9b0", "#141111", "#c9ccd3", "#efe8dc", "#ffffff"];
       const pick = () => palette[Math.floor(Math.random() * palette.length)];
       const w = {
         id: "u" + Date.now(), title: $("#wk-title").value.trim(), artist: state.user.artistId, type: $("#wk-type").value,
@@ -1115,7 +1115,7 @@ function adminSpace() {
           .map(
             (p) => `<tr><td><strong>${esc(p.name)}</strong></td><td>${esc(p.email)}</td><td>${esc(p.city)}</td><td>${esc(p.discipline)}</td>
             <td><span class="tag ${p.status === "validé" ? "green" : p.status === "refusé" ? "grey" : "pink"}">${p.status}</span></td>
-            <td class="num">${p.status === "en attente" ? `<button class="btn btn-small btn-green" data-act="seller-ok" data-id="${p.id}">Valider</button><button class="btn btn-small btn-outline" data-act="seller-ko" data-id="${p.id}">Refuser</button>` : ""}</td></tr>`,
+            <td class="num">${p.status === "en attente" ? `<button class="btn btn-small" data-act="seller-ok" data-id="${p.id}">Valider</button><button class="btn btn-small btn-outline" data-act="seller-ko" data-id="${p.id}">Refuser</button>` : ""}</td></tr>`,
           )
           .join("")}</tbody></table></div>`
       : emptyBox("Aucune demande", "Les nouvelles candidatures d'artistes apparaîtront ici.");

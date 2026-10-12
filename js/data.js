@@ -3,8 +3,8 @@
 const ARTISTS = [
   {
     id: "nova", name: "Nova Lune", city: "Marseille", followers: 1840,
-    bio: "Peintre de l'aube numérique, entre néons et matières brutes.",
-    videos: ["Atelier : préparation des pigments fluo", "Making-of de Rose Protocol"],
+    bio: "Peintre de l'aube numérique, entre lumières urbaines et matières brutes.",
+    videos: ["Atelier : préparation des pigments", "Making-of de Bordeaux Protocol"],
     press: ["Dossier de presse 2026.pdf", "Article — Beaux Arts Magazine.pdf"],
   },
   {
@@ -36,9 +36,9 @@ const ARTISTS = [
 /* Chaque œuvre est « peinte » en CSS pour ne dépendre d'aucune image externe. */
 const ARTWORKS = [
   {
-    id: "a1", title: "Rose Protocol", artist: "nova", type: "Peinture", color: "rose", size: "M", price: 480,
-    technique: "Acrylique et pigments fluo sur toile", dims: "60 × 80 cm",
-    art: "radial-gradient(circle at 30% 30%, #ff2bd6, transparent 45%), radial-gradient(circle at 70% 70%, #ff1f8f, transparent 50%), linear-gradient(160deg, #1a0010, #3d0026)",
+    id: "a1", title: "Bordeaux Protocol", artist: "nova", type: "Peinture", color: "bordeaux", size: "M", price: 480,
+    technique: "Acrylique et pigments sur toile", dims: "60 × 80 cm",
+    art: "radial-gradient(circle at 30% 30%, #9b3446, transparent 45%), radial-gradient(circle at 70% 70%, #6d1a2a, transparent 50%), linear-gradient(160deg, #1d0a0e, #3a0f19)",
     variants: [{ label: "Original", stock: 1 }],
   },
   {
@@ -49,9 +49,9 @@ const ARTWORKS = [
     sold: true,
   },
   {
-    id: "a3", title: "Néon 3h du matin", artist: "ines", type: "Photographie", color: "rose", size: "S", price: 120,
+    id: "a3", title: "Néon 3 h du matin", artist: "ines", type: "Photographie", color: "bordeaux", size: "S", price: 120,
     technique: "Tirage fine art, papier baryté", dims: "30 × 40 cm",
-    art: "linear-gradient(180deg, #05050a 0%, #160822 45%, #ff1f8f 46%, #2a0b2e 48%, #05050a 100%)",
+    art: "linear-gradient(180deg, #05050a 0%, #1a0c10 45%, #6d1a2a 46%, #2b0d14 48%, #05050a 100%)",
     variants: [
       { label: "30 × 40 cm", stock: 4 },
       { label: "50 × 70 cm", stock: 2 },
@@ -59,9 +59,9 @@ const ARTWORKS = [
     ],
   },
   {
-    id: "a4", title: "Grille Infinie", artist: "milo", type: "Peinture", color: "vert", size: "M", price: 690,
+    id: "a4", title: "Grille Infinie", artist: "milo", type: "Peinture", color: "beige", size: "M", price: 690,
     technique: "Huile et feuille d'argent", dims: "70 × 70 cm",
-    art: "repeating-linear-gradient(45deg, #07af4f 0 14px, #0b0b12 14px 28px), linear-gradient(#07af4f, #0b0b12)",
+    art: "repeating-linear-gradient(45deg, #6d1a2a 0 14px, #141111 14px 28px), linear-gradient(#6d1a2a, #141111)",
     variants: [{ label: "Original", stock: 1 }],
   },
   {
@@ -70,19 +70,19 @@ const ARTWORKS = [
     art: "radial-gradient(circle at 50% 45%, #ffffff 0 8%, #bfc3cb 20%, #5b5f68 42%, #0c0c12 70%)",
     variants: [
       { label: "Argent", stock: 3 },
-      { label: "Rose chromé", stock: 0 },
+      { label: "Bordeaux chromé", stock: 0 },
     ],
   },
   {
-    id: "a6", title: "Fréquence", artist: "zia", type: "Textile", color: "bleu", size: "L", price: 920,
+    id: "a6", title: "Fréquence", artist: "zia", type: "Textile", color: "ardoise", size: "L", price: 920,
     technique: "Tissage, fibre optique", dims: "100 × 150 cm",
-    art: "repeating-radial-gradient(circle at 50% 120%, #2b6bff 0 6px, #0a0a14 6px 18px)",
+    art: "repeating-radial-gradient(circle at 50% 120%, #3a3f4a 0 6px, #151213 6px 18px)",
     variants: [{ label: "Original", stock: 1 }],
   },
   {
-    id: "a7", title: "Bubblegum Void", artist: "nova", type: "Peinture", color: "rose", size: "L", price: 1250,
-    technique: "Aérosol et vernis holographique", dims: "100 × 120 cm",
-    art: "radial-gradient(ellipse at 20% 80%, #ff7ac0, transparent 50%), radial-gradient(ellipse at 80% 20%, #ff2bd6, transparent 45%), linear-gradient(135deg, #0c0010, #2a0030)",
+    id: "a7", title: "Velours Noir", artist: "nova", type: "Peinture", color: "bordeaux", size: "L", price: 1250,
+    technique: "Aérosol et vernis satiné", dims: "100 × 120 cm",
+    art: "radial-gradient(ellipse at 20% 80%, #c48a86, transparent 50%), radial-gradient(ellipse at 80% 20%, #9b3446, transparent 45%), linear-gradient(135deg, #160a0c, #33101a)",
     variants: [{ label: "Original", stock: 1 }],
   },
   {
@@ -95,24 +95,24 @@ const ARTWORKS = [
     ],
   },
   {
-    id: "a9", title: "Cellule Verte", artist: "milo", type: "Peinture", color: "vert", size: "S", price: 260,
+    id: "a9", title: "Cellule Beige", artist: "milo", type: "Peinture", color: "beige", size: "S", price: 260,
     technique: "Gouache sur papier", dims: "30 × 30 cm",
-    art: "radial-gradient(circle at 50% 50%, #19f57a 0 18%, #07af4f 19% 34%, #0b0b12 35% 52%, #19f57a 53% 56%, #0b0b12 57%)",
+    art: "radial-gradient(circle at 50% 50%, #d9c9b0 0 18%, #6d1a2a 19% 34%, #141111 35% 52%, #d9c9b0 53% 56%, #141111 57%)",
     variants: [{ label: "Original", stock: 0 }],
   },
   {
-    id: "a10", title: "Résine Aurore", artist: "zia", type: "Sculpture", color: "rose", size: "M", price: 780,
+    id: "a10", title: "Résine Aurore", artist: "zia", type: "Sculpture", color: "bordeaux", size: "M", price: 780,
     technique: "Résine teintée, LED", dims: "35 × 35 × 50 cm",
-    art: "linear-gradient(200deg, #ff1f8f 0%, #ffb3d9 30%, #e6e8ec 55%, #7a7f89 80%, #0b0b12 100%)",
+    art: "linear-gradient(200deg, #6d1a2a 0%, #e6d2c3 30%, #e6e8ec 55%, #7a7f89 80%, #141111 100%)",
     variants: [
-      { label: "Rose", stock: 2 },
+      { label: "Bordeaux", stock: 2 },
       { label: "Argent", stock: 1 },
     ],
   },
   {
-    id: "a11", title: "Interférence", artist: "milo", type: "Peinture", color: "bleu", size: "L", price: 1420,
+    id: "a11", title: "Interférence", artist: "milo", type: "Peinture", color: "ardoise", size: "L", price: 1420,
     technique: "Acrylique sur aluminium", dims: "90 × 120 cm",
-    art: "repeating-conic-gradient(from 0deg at 50% 50%, #2b6bff 0 10deg, #0a0a14 10deg 20deg, #ff1f8f 20deg 30deg, #0a0a14 30deg 40deg)",
+    art: "repeating-conic-gradient(from 0deg at 50% 50%, #3a3f4a 0 10deg, #151213 10deg 20deg, #6d1a2a 20deg 30deg, #151213 30deg 40deg)",
     variants: [{ label: "Original", stock: 1 }],
   },
   {
@@ -124,11 +124,11 @@ const ARTWORKS = [
 ];
 
 const COLORS = {
-  rose: "#ff1f8f",
+  bordeaux: "#6d1a2a",
+  beige: "#d9c9b0",
   argent: "linear-gradient(135deg,#fff,#8c9099)",
-  vert: "#07af4f",
-  bleu: "#2b6bff",
-  noir: "#111",
+  ardoise: "#3a3f4a",
+  noir: "#141111",
 };
 
 /* Données de démo pour l'espace administrateur. */

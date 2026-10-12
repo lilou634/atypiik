@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>ATYPIIK</title>
     <meta name="description" content="ATYPIIK, la marketplace des artistes indépendants : œuvres uniques et déclinées." />
-    <meta name="theme-color" content="#ffffff" />
+    <meta name="theme-color" content="#efe8dc" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800&family=Modak&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800&family=Unbounded:wght@700;800&display=swap"
       rel="stylesheet"
     />
     <style>
 /* =========================================================
-   ATYPIIK — Thème « Affiche »
-   Base noir & blanc façon affiche de rue, avec de petites
-   touches de rose flash, de vert et de chrome argenté.
+   ATYPIIK — Thème « Bordeaux »
+   Beige, blanc et noir, un bordeaux profond comme seule
+   couleur d'accent, et quelques touches de chrome argenté.
    Ce fichier ne contient que les variables : copiez-le tel quel
    dans un autre projet pour en récupérer la palette.
    ========================================================= */
@@ -26,26 +26,28 @@
   color-scheme: light;
 
   /* --- Base --- */
-  --paper: #ffffff;
-  --paper-2: #f3f3f1;
-  --ink: #111111;
-  --ink-2: #4a4a4a;
-  --ink-3: #8a8a8a;
-  --rule: #111111;
-  --rule-soft: #dcdcda;
+  --paper: #efe8dc; /* beige : fond de page */
+  --paper-2: #e4dacb; /* beige plus soutenu : fonds d'œuvres, encarts */
+  --white: #ffffff; /* cartes, panneaux, champs */
+  --ink: #141111; /* noir chaud : texte, filets, boutons */
+  --ink-2: #4d4440;
+  --ink-3: #8c827a;
+  --rule: #141111;
+  --rule-soft: #d3c7b6;
 
-  /* --- Touches de couleur (à doser) --- */
-  --pink: #ff1f8f;
-  --pink-soft: #ffe3f1;
-  --green: #07af4f;
-  --green-soft: #ddf6e7;
+  /* --- Accent unique : bordeaux --- */
+  --accent: #6d1a2a;
+  --accent-deep: #4a0f1b;
+  --accent-soft: #ead6d4;
 
   /* --- Chrome argenté --- */
+  --silver: #c9ccd3;
   --chrome: linear-gradient(135deg, #fbfbfc 0%, #b9bdc6 22%, #ffffff 40%, #7d828c 58%, #e9ebef 76%, #a3a8b1 100%);
+  --chrome-text: linear-gradient(180deg, #ffffff 0%, #e3e5ea 40%, #8a8f99 52%, #f2f3f6 64%, #b4b8c1 100%);
   --chrome-edge: inset 0 1px 0 #fff, inset 0 -1px 2px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.25);
 
   /* --- Typo --- */
-  --font-logo: "Modak", "Arial Black", sans-serif;
+  --font-logo: "Unbounded", "Arial Black", sans-serif;
   --font-display: "Anton", "Impact", "Arial Narrow", sans-serif;
   --font-body: "Archivo", "Helvetica Neue", Arial, sans-serif;
 
@@ -89,7 +91,7 @@ img {
   display: block;
 }
 :focus-visible {
-  outline: 2px solid var(--pink);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 h1,
@@ -115,7 +117,7 @@ h4 {
   color: var(--ink-3);
 }
 .star {
-  color: var(--pink);
+  color: var(--accent);
 }
 .chrome-chip {
   display: inline-block;
@@ -148,8 +150,8 @@ h4 {
   transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s;
 }
 .btn:hover {
-  background: var(--pink);
-  border-color: var(--pink);
+  background: var(--accent);
+  border-color: var(--accent);
   color: #fff;
 }
 .btn-outline {
@@ -173,10 +175,6 @@ h4 {
   background-position: 100% 100%;
   transform: translateY(-1px);
 }
-.btn-green {
-  background: var(--green);
-  border-color: var(--green);
-}
 .btn-small {
   padding: 0.6em 1em;
   font-size: 0.66rem;
@@ -197,7 +195,7 @@ h4 {
   text-underline-offset: 3px;
 }
 .link-btn:hover {
-  color: var(--pink);
+  color: var(--accent);
 }
 
 /* ---------- Bandeau d'annonce ---------- */
@@ -212,7 +210,7 @@ h4 {
   padding: 9px 16px;
 }
 .announce b {
-  color: var(--pink);
+  color: var(--silver);
 }
 
 /* ---------- Header ---------- */
@@ -220,7 +218,7 @@ h4 {
   position: sticky;
   top: env(safe-area-inset-top, 0px);
   z-index: 50;
-  background: var(--paper);
+  background: var(--white);
   border-bottom: 2px solid var(--rule);
 }
 .header-inner {
@@ -249,7 +247,7 @@ h4 {
   right: 100%;
   bottom: 0;
   height: 2px;
-  background: var(--pink);
+  background: var(--accent);
   transition: right 0.25s var(--ease);
 }
 .nav a:hover::after,
@@ -261,7 +259,9 @@ h4 {
   align-items: center;
   gap: 8px;
   font-family: var(--font-logo);
-  font-size: 2.2rem;
+  font-weight: 800;
+  font-size: 1.55rem;
+  letter-spacing: 0.06em;
   line-height: 1;
   justify-self: center;
 }
@@ -299,7 +299,7 @@ h4 {
 }
 .icon-link:hover,
 .icon-link.active {
-  color: var(--pink);
+  color: var(--accent);
 }
 .count {
   position: absolute;
@@ -309,7 +309,7 @@ h4 {
   height: 17px;
   padding: 0 4px;
   border-radius: 999px;
-  background: var(--pink);
+  background: var(--accent);
   color: #fff;
   font-size: 0.6rem;
   font-weight: 800;
@@ -357,7 +357,7 @@ h4 {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--green);
+  background: var(--ink);
 }
 
 /* Menu mobile */
@@ -384,7 +384,7 @@ h4 {
   border-bottom: 1px solid var(--rule-soft);
 }
 .drawer a:hover {
-  color: var(--pink);
+  color: var(--accent);
 }
 .drawer .close {
   position: absolute;
@@ -453,8 +453,8 @@ main {
   white-space: nowrap;
 }
 .section-head a:hover {
-  color: var(--pink);
-  border-color: var(--pink);
+  color: var(--accent);
+  border-color: var(--accent);
 }
 
 /* ---------- Hero affiche ---------- */
@@ -466,7 +466,7 @@ main {
 .hero-text {
   position: relative;
   padding: clamp(24px, 4vw, 56px);
-  background: var(--ink);
+  background: var(--accent);
   color: var(--paper);
   overflow: hidden;
 }
@@ -493,11 +493,14 @@ main {
   margin: 18px 0 22px;
 }
 .hero h1 .pink {
-  color: var(--pink);
+  background: var(--chrome-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 .hero p {
   max-width: 460px;
-  color: #cfcfcf;
+  color: #e8d6d3;
 }
 .hero-cta {
   display: flex;
@@ -511,9 +514,9 @@ main {
   border-color: var(--paper);
 }
 .hero .btn:hover {
-  background: var(--pink);
-  border-color: var(--pink);
-  color: #fff;
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
 }
 .hero .btn-chrome,
 .hero .btn-chrome:hover {
@@ -606,12 +609,13 @@ main {
   text-transform: uppercase;
 }
 .cat:hover span {
-  background: var(--pink);
+  background: var(--accent);
   color: #fff;
 }
 
 /* Bloc valeurs */
 .values {
+  background: var(--white);
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   border: 2px solid var(--rule);
@@ -659,7 +663,7 @@ main {
   display: block;
   aspect-ratio: 4 / 5;
   overflow: hidden;
-  background: var(--paper-2);
+  background: var(--white);
 }
 .card-media .art {
   position: absolute;
@@ -680,7 +684,7 @@ main {
   text-transform: uppercase;
 }
 .card-title a:hover {
-  color: var(--pink);
+  color: var(--accent);
 }
 .card-artist {
   font-size: 0.82rem;
@@ -714,7 +718,7 @@ main {
 .reason {
   margin-top: 4px;
   font-size: 0.74rem;
-  color: var(--pink);
+  color: var(--accent);
   font-weight: 700;
 }
 .card-actions {
@@ -746,10 +750,10 @@ main {
   transform: scale(1.1);
 }
 .fav-btn.on {
-  color: var(--pink);
+  color: var(--accent);
 }
 .fav-btn.on svg {
-  fill: var(--pink);
+  fill: var(--accent);
 }
 
 /* Badges de stock */
@@ -774,14 +778,14 @@ main {
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  background: var(--paper);
+  background: var(--white);
   color: var(--ink);
 }
 .badge-stock {
-  color: var(--green);
+  color: var(--ink);
 }
 .badge-out {
-  background: var(--pink);
+  background: var(--accent);
   color: #fff;
 }
 .badge-sold {
@@ -793,7 +797,7 @@ main {
   box-shadow: var(--chrome-edge);
 }
 .badge-new {
-  background: var(--green);
+  background: var(--accent);
   color: #fff;
 }
 .art {
@@ -851,8 +855,8 @@ main {
   letter-spacing: 0.06em;
 }
 .chip:hover {
-  border-color: var(--pink);
-  color: var(--pink);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 .chip.on {
   background: var(--ink);
@@ -882,7 +886,7 @@ main {
 }
 .range {
   width: 100%;
-  accent-color: var(--pink);
+  accent-color: var(--accent);
 }
 .range-labels {
   display: flex;
@@ -898,7 +902,7 @@ main {
   padding: 0.8em 0.9em;
   border: 1px solid var(--ink);
   border-radius: var(--radius);
-  background: var(--paper);
+  background: var(--white);
   color: var(--ink);
   font: inherit;
   font-size: 0.9rem;
@@ -908,8 +912,8 @@ main {
 .field textarea:focus,
 .select:focus {
   outline: none;
-  box-shadow: 0 0 0 3px var(--pink-soft);
-  border-color: var(--pink);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  border-color: var(--accent);
 }
 .toolbar {
   display: flex;
@@ -948,7 +952,7 @@ main {
   text-transform: uppercase;
 }
 .back-link:hover {
-  color: var(--pink);
+  color: var(--accent);
 }
 .product {
   display: grid;
@@ -959,7 +963,7 @@ main {
   position: relative;
   aspect-ratio: 4 / 5;
   overflow: hidden;
-  background: var(--paper-2);
+  background: var(--white);
   cursor: zoom-in;
 }
 .zoom .art {
@@ -1004,7 +1008,7 @@ main {
   text-underline-offset: 3px;
 }
 .by a:hover {
-  color: var(--pink);
+  color: var(--accent);
 }
 .product-price {
   margin: 18px 0 0;
@@ -1047,11 +1051,11 @@ main {
   height: 6px;
   margin-left: 6px;
   border-radius: 50%;
-  background: var(--green);
+  background: var(--ink);
   vertical-align: middle;
 }
 .chip.na .dot {
-  background: var(--pink);
+  background: var(--accent);
 }
 .availability {
   margin-top: 12px;
@@ -1059,10 +1063,10 @@ main {
   font-weight: 700;
 }
 .ok {
-  color: var(--green);
+  color: var(--ink);
 }
 .ko {
-  color: var(--pink);
+  color: var(--accent);
 }
 .actions {
   display: flex;
@@ -1087,10 +1091,10 @@ main {
 .actions .fav-inline.on {
   background: var(--paper);
   border-color: var(--ink);
-  color: var(--pink);
+  color: var(--accent);
 }
 .fav-inline.on svg {
-  fill: var(--pink);
+  fill: var(--accent);
 }
 
 /* ---------- Artiste ---------- */
@@ -1144,6 +1148,7 @@ main {
   font-variant-numeric: tabular-nums;
 }
 .artist-mini {
+  background: var(--white);
   display: flex;
   align-items: center;
   gap: 14px;
@@ -1151,7 +1156,7 @@ main {
   padding: 14px;
   border: 1px solid var(--ink);
 }
-.artist-mini > div {
+.artist-mini > div:not(.avatar) {
   flex: 1;
   min-width: 0;
 }
@@ -1231,7 +1236,7 @@ main {
   right: 0;
   bottom: -2px;
   height: 4px;
-  background: var(--pink);
+  background: var(--accent);
 }
 .tabs .count {
   position: static;
@@ -1280,15 +1285,16 @@ td .btn + .btn {
   white-space: nowrap;
 }
 .tag.green {
-  color: var(--green);
+  color: var(--ink);
 }
 .tag.pink {
-  color: var(--pink);
+  color: var(--accent);
 }
 .tag.grey {
   color: var(--ink-3);
 }
 .kpis {
+  background: var(--white);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   border: 2px solid var(--rule);
@@ -1315,14 +1321,15 @@ td .btn + .btn {
   color: var(--ink-2);
 }
 .kpis .pink {
-  color: var(--pink);
+  color: var(--accent);
 }
 .kpis .green {
-  color: var(--green);
+  color: var(--ink);
 }
 
 /* Suivi de commande */
 .order {
+  background: var(--white);
   border: 1px solid var(--ink);
   padding: 18px;
   margin-bottom: 16px;
@@ -1349,11 +1356,11 @@ td .btn + .btn {
   color: var(--ink-3);
 }
 .steps div.done {
-  border-color: var(--green);
+  border-color: var(--ink);
   color: var(--ink);
 }
 .steps div.current {
-  border-color: var(--pink);
+  border-color: var(--accent);
   color: var(--ink);
 }
 .order-lines {
@@ -1384,6 +1391,7 @@ td .btn + .btn {
 }
 .panel {
   padding: 26px;
+  background: var(--white);
   border: 2px solid var(--ink);
   min-width: 0;
 }
@@ -1420,7 +1428,7 @@ td .btn + .btn {
   font-size: 0.88rem;
 }
 .check input {
-  accent-color: var(--pink);
+  accent-color: var(--accent);
   width: 16px;
   height: 16px;
 }
@@ -1514,6 +1522,7 @@ td .btn + .btn {
   font-variant-numeric: tabular-nums;
 }
 .summary {
+  background: var(--white);
   position: sticky;
   top: calc(90px + env(safe-area-inset-top, 0px));
   padding: 22px;
@@ -1549,7 +1558,7 @@ td .btn + .btn {
   margin-top: 4px;
   font-size: 0.78rem;
   font-weight: 700;
-  color: var(--pink);
+  color: var(--accent);
 }
 .secure {
   margin: 12px 0 0;
@@ -1570,14 +1579,15 @@ td .btn + .btn {
 }
 .checkout-steps .on {
   color: var(--ink);
-  border-bottom: 3px solid var(--pink);
+  border-bottom: 3px solid var(--accent);
 }
 .checkout-steps .done {
-  color: var(--green);
+  color: var(--ink);
 }
 
 /* ---------- Messagerie ---------- */
 .inbox {
+  background: var(--white);
   display: grid;
   grid-template-columns: 280px minmax(0, 1fr);
   border: 2px solid var(--ink);
@@ -1603,7 +1613,7 @@ td .btn + .btn {
 }
 .thread.on {
   background: var(--paper-2);
-  box-shadow: inset 4px 0 0 var(--pink);
+  box-shadow: inset 4px 0 0 var(--accent);
 }
 .thread small {
   display: block;
@@ -1677,7 +1687,7 @@ td .btn + .btn {
   background: var(--rule-soft);
 }
 .notif.unread .n-dot {
-  background: var(--pink);
+  background: var(--accent);
 }
 .notif.unread strong {
   font-weight: 800;
@@ -1732,7 +1742,7 @@ td .btn + .btn {
   color: var(--paper);
   font-size: 0.84rem;
   font-weight: 700;
-  border-left: 4px solid var(--pink);
+  border-left: 4px solid var(--accent);
   transform: translate(-50%, 20px);
   opacity: 0;
   transition: all 0.3s var(--ease);
@@ -1756,7 +1766,7 @@ td .btn + .btn {
 }
 .footer .logo {
   justify-self: start;
-  font-size: 2.6rem;
+  font-size: 1.9rem;
 }
 .footer p {
   color: #bdbdbd;
@@ -1775,7 +1785,7 @@ td .btn + .btn {
   font-size: 0.88rem;
 }
 .footer a:hover {
-  color: var(--pink);
+  color: var(--accent);
 }
 .newsletter {
   display: flex;
@@ -1794,7 +1804,7 @@ td .btn + .btn {
 .newsletter button {
   padding: 0 1em;
   border: 0;
-  background: var(--green);
+  background: var(--accent);
   color: #fff;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -1900,7 +1910,7 @@ td .btn + .btn {
     display: none;
   }
   .logo {
-    font-size: 1.8rem;
+    font-size: 1.25rem;
   }
   .logo-star {
     display: none;
@@ -1956,7 +1966,7 @@ td .btn + .btn {
     height: 21px;
   }
   .bottom-bar a.active {
-    color: var(--pink);
+    color: var(--accent);
   }
   .bottom-bar .count {
     top: 0;
@@ -2122,8 +2132,8 @@ td .btn + .btn {
 const ARTISTS = [
   {
     id: "nova", name: "Nova Lune", city: "Marseille", followers: 1840,
-    bio: "Peintre de l'aube numérique, entre néons et matières brutes.",
-    videos: ["Atelier : préparation des pigments fluo", "Making-of de Rose Protocol"],
+    bio: "Peintre de l'aube numérique, entre lumières urbaines et matières brutes.",
+    videos: ["Atelier : préparation des pigments", "Making-of de Bordeaux Protocol"],
     press: ["Dossier de presse 2026.pdf", "Article — Beaux Arts Magazine.pdf"],
   },
   {
@@ -2155,9 +2165,9 @@ const ARTISTS = [
 /* Chaque œuvre est « peinte » en CSS pour ne dépendre d'aucune image externe. */
 const ARTWORKS = [
   {
-    id: "a1", title: "Rose Protocol", artist: "nova", type: "Peinture", color: "rose", size: "M", price: 480,
-    technique: "Acrylique et pigments fluo sur toile", dims: "60 × 80 cm",
-    art: "radial-gradient(circle at 30% 30%, #ff2bd6, transparent 45%), radial-gradient(circle at 70% 70%, #ff1f8f, transparent 50%), linear-gradient(160deg, #1a0010, #3d0026)",
+    id: "a1", title: "Bordeaux Protocol", artist: "nova", type: "Peinture", color: "bordeaux", size: "M", price: 480,
+    technique: "Acrylique et pigments sur toile", dims: "60 × 80 cm",
+    art: "radial-gradient(circle at 30% 30%, #9b3446, transparent 45%), radial-gradient(circle at 70% 70%, #6d1a2a, transparent 50%), linear-gradient(160deg, #1d0a0e, #3a0f19)",
     variants: [{ label: "Original", stock: 1 }],
   },
   {
@@ -2168,9 +2178,9 @@ const ARTWORKS = [
     sold: true,
   },
   {
-    id: "a3", title: "Néon 3h du matin", artist: "ines", type: "Photographie", color: "rose", size: "S", price: 120,
+    id: "a3", title: "Néon 3 h du matin", artist: "ines", type: "Photographie", color: "bordeaux", size: "S", price: 120,
     technique: "Tirage fine art, papier baryté", dims: "30 × 40 cm",
-    art: "linear-gradient(180deg, #05050a 0%, #160822 45%, #ff1f8f 46%, #2a0b2e 48%, #05050a 100%)",
+    art: "linear-gradient(180deg, #05050a 0%, #1a0c10 45%, #6d1a2a 46%, #2b0d14 48%, #05050a 100%)",
     variants: [
       { label: "30 × 40 cm", stock: 4 },
       { label: "50 × 70 cm", stock: 2 },
@@ -2178,9 +2188,9 @@ const ARTWORKS = [
     ],
   },
   {
-    id: "a4", title: "Grille Infinie", artist: "milo", type: "Peinture", color: "vert", size: "M", price: 690,
+    id: "a4", title: "Grille Infinie", artist: "milo", type: "Peinture", color: "beige", size: "M", price: 690,
     technique: "Huile et feuille d'argent", dims: "70 × 70 cm",
-    art: "repeating-linear-gradient(45deg, #07af4f 0 14px, #0b0b12 14px 28px), linear-gradient(#07af4f, #0b0b12)",
+    art: "repeating-linear-gradient(45deg, #6d1a2a 0 14px, #141111 14px 28px), linear-gradient(#6d1a2a, #141111)",
     variants: [{ label: "Original", stock: 1 }],
   },
   {
@@ -2189,19 +2199,19 @@ const ARTWORKS = [
     art: "radial-gradient(circle at 50% 45%, #ffffff 0 8%, #bfc3cb 20%, #5b5f68 42%, #0c0c12 70%)",
     variants: [
       { label: "Argent", stock: 3 },
-      { label: "Rose chromé", stock: 0 },
+      { label: "Bordeaux chromé", stock: 0 },
     ],
   },
   {
-    id: "a6", title: "Fréquence", artist: "zia", type: "Textile", color: "bleu", size: "L", price: 920,
+    id: "a6", title: "Fréquence", artist: "zia", type: "Textile", color: "ardoise", size: "L", price: 920,
     technique: "Tissage, fibre optique", dims: "100 × 150 cm",
-    art: "repeating-radial-gradient(circle at 50% 120%, #2b6bff 0 6px, #0a0a14 6px 18px)",
+    art: "repeating-radial-gradient(circle at 50% 120%, #3a3f4a 0 6px, #151213 6px 18px)",
     variants: [{ label: "Original", stock: 1 }],
   },
   {
-    id: "a7", title: "Bubblegum Void", artist: "nova", type: "Peinture", color: "rose", size: "L", price: 1250,
-    technique: "Aérosol et vernis holographique", dims: "100 × 120 cm",
-    art: "radial-gradient(ellipse at 20% 80%, #ff7ac0, transparent 50%), radial-gradient(ellipse at 80% 20%, #ff2bd6, transparent 45%), linear-gradient(135deg, #0c0010, #2a0030)",
+    id: "a7", title: "Velours Noir", artist: "nova", type: "Peinture", color: "bordeaux", size: "L", price: 1250,
+    technique: "Aérosol et vernis satiné", dims: "100 × 120 cm",
+    art: "radial-gradient(ellipse at 20% 80%, #c48a86, transparent 50%), radial-gradient(ellipse at 80% 20%, #9b3446, transparent 45%), linear-gradient(135deg, #160a0c, #33101a)",
     variants: [{ label: "Original", stock: 1 }],
   },
   {
@@ -2214,24 +2224,24 @@ const ARTWORKS = [
     ],
   },
   {
-    id: "a9", title: "Cellule Verte", artist: "milo", type: "Peinture", color: "vert", size: "S", price: 260,
+    id: "a9", title: "Cellule Beige", artist: "milo", type: "Peinture", color: "beige", size: "S", price: 260,
     technique: "Gouache sur papier", dims: "30 × 30 cm",
-    art: "radial-gradient(circle at 50% 50%, #19f57a 0 18%, #07af4f 19% 34%, #0b0b12 35% 52%, #19f57a 53% 56%, #0b0b12 57%)",
+    art: "radial-gradient(circle at 50% 50%, #d9c9b0 0 18%, #6d1a2a 19% 34%, #141111 35% 52%, #d9c9b0 53% 56%, #141111 57%)",
     variants: [{ label: "Original", stock: 0 }],
   },
   {
-    id: "a10", title: "Résine Aurore", artist: "zia", type: "Sculpture", color: "rose", size: "M", price: 780,
+    id: "a10", title: "Résine Aurore", artist: "zia", type: "Sculpture", color: "bordeaux", size: "M", price: 780,
     technique: "Résine teintée, LED", dims: "35 × 35 × 50 cm",
-    art: "linear-gradient(200deg, #ff1f8f 0%, #ffb3d9 30%, #e6e8ec 55%, #7a7f89 80%, #0b0b12 100%)",
+    art: "linear-gradient(200deg, #6d1a2a 0%, #e6d2c3 30%, #e6e8ec 55%, #7a7f89 80%, #141111 100%)",
     variants: [
-      { label: "Rose", stock: 2 },
+      { label: "Bordeaux", stock: 2 },
       { label: "Argent", stock: 1 },
     ],
   },
   {
-    id: "a11", title: "Interférence", artist: "milo", type: "Peinture", color: "bleu", size: "L", price: 1420,
+    id: "a11", title: "Interférence", artist: "milo", type: "Peinture", color: "ardoise", size: "L", price: 1420,
     technique: "Acrylique sur aluminium", dims: "90 × 120 cm",
-    art: "repeating-conic-gradient(from 0deg at 50% 50%, #2b6bff 0 10deg, #0a0a14 10deg 20deg, #ff1f8f 20deg 30deg, #0a0a14 30deg 40deg)",
+    art: "repeating-conic-gradient(from 0deg at 50% 50%, #3a3f4a 0 10deg, #151213 10deg 20deg, #6d1a2a 20deg 30deg, #151213 30deg 40deg)",
     variants: [{ label: "Original", stock: 1 }],
   },
   {
@@ -2243,11 +2253,11 @@ const ARTWORKS = [
 ];
 
 const COLORS = {
-  rose: "#ff1f8f",
+  bordeaux: "#6d1a2a",
+  beige: "#d9c9b0",
   argent: "linear-gradient(135deg,#fff,#8c9099)",
-  vert: "#07af4f",
-  bleu: "#2b6bff",
-  noir: "#111",
+  ardoise: "#3a3f4a",
+  noir: "#141111",
 };
 
 /* Données de démo pour l'espace administrateur. */
@@ -2330,7 +2340,7 @@ const state = {
   ]),
   threads: store.get("threads", {
     nova: [
-      { from: "artist", text: "Bonjour ! Merci pour votre intérêt pour « Rose Protocol ». Une question sur l'œuvre ?" },
+      { from: "artist", text: "Bonjour ! Merci pour votre intérêt pour « Bordeaux Protocol ». Une question sur l'œuvre ?" },
     ],
     support: [{ from: "artist", text: "Bonjour, l'équipe ATYPIIK vous répond ici du lundi au vendredi, de 9 h à 18 h." }],
   }),
@@ -2392,7 +2402,7 @@ function updateChrome() {
   });
   const roles = { acheteur: "Acheteur", vendeur: "Artiste", admin: "Admin", attente: "En validation" };
   $("#user-pill").innerHTML = state.user
-    ? `<a href="#/profil" class="user-pill"><span class="role-dot" style="${state.user.role === "admin" ? "background:var(--pink)" : ""}"></span><span class="name">${esc(roles[state.user.role])}</span></a>`
+    ? `<a href="#/profil" class="user-pill"><span class="role-dot" style="${state.user.role === "admin" ? "background:var(--accent)" : ""}"></span><span class="name">${esc(roles[state.user.role])}</span></a>`
     : "";
   $("#cookie").hidden = state.cookies !== null;
 }
@@ -2664,7 +2674,7 @@ function refreshAvailability(w) {
   $("#availability").innerHTML = w.sold
     ? '<span class="ko">Cette œuvre a été vendue.</span>'
     : ok
-      ? `<span class="ok">● Disponible</span> — ${v.stock} exemplaire${v.stock > 1 ? "s" : ""} en « ${esc(v.label)} »`
+      ? `<span class="ok">✓ Disponible</span> — ${v.stock} exemplaire${v.stock > 1 ? "s" : ""} en « ${esc(v.label)} »`
       : `<span class="ko">● Rupture de stock pour « ${esc(v.label)} »</span>`;
   $("#add-cart").disabled = !ok;
   $("#buy-now").disabled = !ok;
@@ -2840,7 +2850,7 @@ function viewCheckout() {
             <div class="field"><label for="cc-cvc">CVC</label><input id="cc-cvc" required inputmode="numeric" placeholder="123" autocomplete="cc-csc" /></div>
           </div>
           <p class="hint">Démo : aucun paiement réel n'est effectué. En production, la saisie est gérée par Stripe et le montant est réparti automatiquement : 90 % à l'artiste, 10 % à ATYPIIK.</p>
-          <button class="btn btn-block btn-green">Payer ${euro(total + (total >= 150 ? 0 : 12))}</button>
+          <button class="btn btn-block">Payer ${euro(total + (total >= 150 ? 0 : 12))}</button>
         </form>`;
   return `
     <div class="page-head"><h1>Commande</h1></div>
@@ -3338,7 +3348,7 @@ function bindSeller() {
           return { label: l.value.trim() || "Original", stock: Math.max(0, +s.value || 0) };
         })
         .filter(Boolean);
-      const palette = ["#ff1f8f", "#07af4f", "#111111", "#c9ccd3", "#2b6bff", "#ffffff"];
+      const palette = ["#6d1a2a", "#d9c9b0", "#141111", "#c9ccd3", "#efe8dc", "#ffffff"];
       const pick = () => palette[Math.floor(Math.random() * palette.length)];
       const w = {
         id: "u" + Date.now(), title: $("#wk-title").value.trim(), artist: state.user.artistId, type: $("#wk-type").value,
@@ -3385,7 +3395,7 @@ function adminSpace() {
           .map(
             (p) => `<tr><td><strong>${esc(p.name)}</strong></td><td>${esc(p.email)}</td><td>${esc(p.city)}</td><td>${esc(p.discipline)}</td>
             <td><span class="tag ${p.status === "validé" ? "green" : p.status === "refusé" ? "grey" : "pink"}">${p.status}</span></td>
-            <td class="num">${p.status === "en attente" ? `<button class="btn btn-small btn-green" data-act="seller-ok" data-id="${p.id}">Valider</button><button class="btn btn-small btn-outline" data-act="seller-ko" data-id="${p.id}">Refuser</button>` : ""}</td></tr>`,
+            <td class="num">${p.status === "en attente" ? `<button class="btn btn-small" data-act="seller-ok" data-id="${p.id}">Valider</button><button class="btn btn-small btn-outline" data-act="seller-ko" data-id="${p.id}">Refuser</button>` : ""}</td></tr>`,
           )
           .join("")}</tbody></table></div>`
       : emptyBox("Aucune demande", "Les nouvelles candidatures d'artistes apparaîtront ici.");

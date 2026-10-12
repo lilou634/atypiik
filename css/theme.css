@@ -1,7 +1,7 @@
 /* =========================================================
-   ATYPIIK — Thème « Affiche »
-   Base noir & blanc façon affiche de rue, avec de petites
-   touches de rose flash, de vert et de chrome argenté.
+   ATYPIIK — Thème « Bordeaux »
+   Beige, blanc et noir, un bordeaux profond comme seule
+   couleur d'accent, et quelques touches de chrome argenté.
    Ce fichier ne contient que les variables : copiez-le tel quel
    dans un autre projet pour en récupérer la palette.
    ========================================================= */
@@ -11,26 +11,28 @@
   color-scheme: light;
 
   /* --- Base --- */
-  --paper: #ffffff;
-  --paper-2: #f3f3f1;
-  --ink: #111111;
-  --ink-2: #4a4a4a;
-  --ink-3: #8a8a8a;
-  --rule: #111111;
-  --rule-soft: #dcdcda;
+  --paper: #efe8dc; /* beige : fond de page */
+  --paper-2: #e4dacb; /* beige plus soutenu : fonds d'œuvres, encarts */
+  --white: #ffffff; /* cartes, panneaux, champs */
+  --ink: #141111; /* noir chaud : texte, filets, boutons */
+  --ink-2: #4d4440;
+  --ink-3: #8c827a;
+  --rule: #141111;
+  --rule-soft: #d3c7b6;
 
-  /* --- Touches de couleur (à doser) --- */
-  --pink: #ff1f8f;
-  --pink-soft: #ffe3f1;
-  --green: #07af4f;
-  --green-soft: #ddf6e7;
+  /* --- Accent unique : bordeaux --- */
+  --accent: #6d1a2a;
+  --accent-deep: #4a0f1b;
+  --accent-soft: #ead6d4;
 
   /* --- Chrome argenté --- */
+  --silver: #c9ccd3;
   --chrome: linear-gradient(135deg, #fbfbfc 0%, #b9bdc6 22%, #ffffff 40%, #7d828c 58%, #e9ebef 76%, #a3a8b1 100%);
+  --chrome-text: linear-gradient(180deg, #ffffff 0%, #e3e5ea 40%, #8a8f99 52%, #f2f3f6 64%, #b4b8c1 100%);
   --chrome-edge: inset 0 1px 0 #fff, inset 0 -1px 2px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.25);
 
   /* --- Typo --- */
-  --font-logo: "Modak", "Arial Black", sans-serif;
+  --font-logo: "Unbounded", "Arial Black", sans-serif;
   --font-display: "Anton", "Impact", "Arial Narrow", sans-serif;
   --font-body: "Archivo", "Helvetica Neue", Arial, sans-serif;
 

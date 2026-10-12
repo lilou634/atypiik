@@ -1,7 +1,7 @@
 # ATYPIIK — Marketplace d'art
 
-Front-end ATYPIIK, thème **« Affiche »** : base noir et blanc inspirée de l'affiche de rue,
-avec de petites touches de rose flash, de vert et de chrome argenté.
+Front-end ATYPIIK, thème **« Bordeaux »** : beige, blanc et noir, un bordeaux profond comme
+seule couleur d'accent et quelques touches de chrome argenté.
 
 **Le plus simple :** ouvrez `dist/ATYPIIK.html` d'un double-clic (tout le site en un seul fichier).
 Après une modification des sources, régénérez-le avec `python3 tools/build.py`.
@@ -22,14 +22,15 @@ Puis ouvrir http://localhost:8000
 
 | Rôle | Couleur | Usage |
 | --- | --- | --- |
-| Base | `#ffffff` / `#111111` | fond, texte, filets, boutons |
-| Rose flash | `#ff1f8f` | prix barrés, survols, alertes, compteurs |
-| Vert | `#07af4f` | « En stock », validation, succès |
-| Chrome | dégradé `--chrome` | logo, avatars, bouton secondaire, badges « Plusieurs versions » |
+| Fond | `#efe8dc` beige | fond de page |
+| Surfaces | `#ffffff` blanc | cartes, panneaux, champs, header |
+| Encre | `#141111` noir | texte, filets, boutons, footer |
+| Accent | `#6d1a2a` bordeaux | bloc d'accueil, survols, alertes, compteurs, onglet actif |
+| Chrome | dégradé `--chrome` | logo, avatars, bouton secondaire, badge « Plusieurs versions » |
 
 Toutes les couleurs sont des variables CSS dans `css/theme.css`.
 
-Polices : **Modak** (logo), **Anton** (titres en capitales), **Archivo** (texte).
+Polices : **Unbounded** (logo), **Anton** (titres en capitales), **Archivo** (texte).
 
 ## Mode démo
 
