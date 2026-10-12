@@ -1,0 +1,75 @@
+/* =========================================================
+   ATYPIIK — Thème « Chrome Flash »
+   Rose flash + chrome argenté, ambiance futuriste.
+   Ce fichier ne contient que les variables : copiez-le tel quel
+   dans un autre projet pour en récupérer la palette.
+   ========================================================= */
+
+:root {
+  /* --- Rose flash (remplace l'ancien rose pâle #f4c2c2) --- */
+  --pink: #ff1f8f;
+  --pink-hot: #ff2bd6;
+  --pink-soft: #ff7ac0;
+  --pink-glow: rgba(255, 31, 143, 0.55);
+  --pink-glow-soft: rgba(255, 31, 143, 0.18);
+
+  /* --- Vert (accent secondaire du cahier des charges) --- */
+  --green: #07af4f;
+  --green-neon: #19f57a;
+
+  /* --- Chrome argenté --- */
+  --chrome-1: #fdfdfd;
+  --chrome-2: #c9ccd3;
+  --chrome-3: #8c9099;
+  --chrome-4: #e6e8ec;
+  --chrome-5: #5b5f68;
+  --chrome: linear-gradient(
+    135deg,
+    #f8f9fb 0%,
+    #b9bdc6 18%,
+    #ffffff 32%,
+    #7d828c 50%,
+    #e9ebef 66%,
+    #9ea3ad 82%,
+    #ffffff 100%
+  );
+  --chrome-text: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #e3e5ea 38%,
+    #8a8f99 50%,
+    #f2f3f6 62%,
+    #b4b8c1 100%
+  );
+  --chrome-border: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(140, 144, 153, 0.35) 40%,
+    rgba(255, 255, 255, 0.75) 60%,
+    rgba(255, 31, 143, 0.6)
+  );
+
+  /* --- Neutres (fond sombre futuriste) --- */
+  --bg: #07070b;
+  --bg-2: #0e0e15;
+  --surface: rgba(255, 255, 255, 0.04);
+  --surface-2: rgba(255, 255, 255, 0.08);
+  --line: rgba(220, 224, 232, 0.14);
+  --text: #f1f2f5;
+  --text-dim: #a3a7b1;
+  --white: #ffffff;
+  --grey: #d9d9d9;
+  --dark: #181a1b;
+
+  /* --- Typo --- */
+  --font-display: "Modak", system-ui, sans-serif;
+  --font-tech: "Orbitron", "Space Grotesk", system-ui, sans-serif;
+  --font-body: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* --- Formes & effets --- */
+  --radius: 18px;
+  --radius-sm: 10px;
+  --blur: blur(18px) saturate(140%);
+  --shadow-pink: 0 0 0 1px rgba(255, 31, 143, 0.4), 0 0 28px var(--pink-glow);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
