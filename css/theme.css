@@ -1,75 +1,40 @@
 /* =========================================================
-   ATYPIIK — Thème « Chrome Flash »
-   Rose flash + chrome argenté, ambiance futuriste.
+   ATYPIIK — Thème « Affiche »
+   Base noir & blanc façon affiche de rue, avec de petites
+   touches de rose flash, de vert et de chrome argenté.
    Ce fichier ne contient que les variables : copiez-le tel quel
    dans un autre projet pour en récupérer la palette.
    ========================================================= */
 
+/* Mise en page : grille éditoriale à filets noirs, titres massifs en capitales. */
 :root {
-  /* --- Rose flash (remplace l'ancien rose pâle #f4c2c2) --- */
-  --pink: #ff1f8f;
-  --pink-hot: #ff2bd6;
-  --pink-soft: #ff7ac0;
-  --pink-glow: rgba(255, 31, 143, 0.55);
-  --pink-glow-soft: rgba(255, 31, 143, 0.18);
+  color-scheme: light;
 
-  /* --- Vert (accent secondaire du cahier des charges) --- */
+  /* --- Base --- */
+  --paper: #ffffff;
+  --paper-2: #f3f3f1;
+  --ink: #111111;
+  --ink-2: #4a4a4a;
+  --ink-3: #8a8a8a;
+  --rule: #111111;
+  --rule-soft: #dcdcda;
+
+  /* --- Touches de couleur (à doser) --- */
+  --pink: #ff1f8f;
+  --pink-soft: #ffe3f1;
   --green: #07af4f;
-  --green-neon: #19f57a;
+  --green-soft: #ddf6e7;
 
   /* --- Chrome argenté --- */
-  --chrome-1: #fdfdfd;
-  --chrome-2: #c9ccd3;
-  --chrome-3: #8c9099;
-  --chrome-4: #e6e8ec;
-  --chrome-5: #5b5f68;
-  --chrome: linear-gradient(
-    135deg,
-    #f8f9fb 0%,
-    #b9bdc6 18%,
-    #ffffff 32%,
-    #7d828c 50%,
-    #e9ebef 66%,
-    #9ea3ad 82%,
-    #ffffff 100%
-  );
-  --chrome-text: linear-gradient(
-    180deg,
-    #ffffff 0%,
-    #e3e5ea 38%,
-    #8a8f99 50%,
-    #f2f3f6 62%,
-    #b4b8c1 100%
-  );
-  --chrome-border: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.9),
-    rgba(140, 144, 153, 0.35) 40%,
-    rgba(255, 255, 255, 0.75) 60%,
-    rgba(255, 31, 143, 0.6)
-  );
-
-  /* --- Neutres (fond sombre futuriste) --- */
-  --bg: #07070b;
-  --bg-2: #0e0e15;
-  --surface: rgba(255, 255, 255, 0.04);
-  --surface-2: rgba(255, 255, 255, 0.08);
-  --line: rgba(220, 224, 232, 0.14);
-  --text: #f1f2f5;
-  --text-dim: #a3a7b1;
-  --white: #ffffff;
-  --grey: #d9d9d9;
-  --dark: #181a1b;
+  --chrome: linear-gradient(135deg, #fbfbfc 0%, #b9bdc6 22%, #ffffff 40%, #7d828c 58%, #e9ebef 76%, #a3a8b1 100%);
+  --chrome-edge: inset 0 1px 0 #fff, inset 0 -1px 2px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.25);
 
   /* --- Typo --- */
-  --font-display: "Modak", system-ui, sans-serif;
-  --font-tech: "Orbitron", "Space Grotesk", system-ui, sans-serif;
-  --font-body: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-logo: "Modak", "Arial Black", sans-serif;
+  --font-display: "Anton", "Impact", "Arial Narrow", sans-serif;
+  --font-body: "Archivo", "Helvetica Neue", Arial, sans-serif;
 
-  /* --- Formes & effets --- */
-  --radius: 18px;
-  --radius-sm: 10px;
-  --blur: blur(18px) saturate(140%);
-  --shadow-pink: 0 0 0 1px rgba(255, 31, 143, 0.4), 0 0 28px var(--pink-glow);
+  /* --- Formes --- */
+  --radius: 2px;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }

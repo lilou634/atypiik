@@ -1,6 +1,10 @@
 # ATYPIIK — Marketplace d'art
 
-Front-end ATYPIIK, thème **« Chrome Flash »** : rose flash, chrome argenté, ambiance futuriste.
+Front-end ATYPIIK, thème **« Affiche »** : base noir et blanc inspirée de l'affiche de rue,
+avec de petites touches de rose flash, de vert et de chrome argenté.
+
+**Le plus simple :** ouvrez `dist/ATYPIIK.html` d'un double-clic (tout le site en un seul fichier).
+Après une modification des sources, régénérez-le avec `python3 tools/build.py`.
 
 ## Lancer en local
 
@@ -16,38 +20,47 @@ Puis ouvrir http://localhost:8000
 
 ## Palette
 
-| Rôle | Ancien | Nouveau |
+| Rôle | Couleur | Usage |
 | --- | --- | --- |
-| Primaire | `#f4c2c2` rose pâle | `#ff1f8f` rose flash (+ `#ff2bd6` néon) |
-| Métal | — | dégradé chrome argenté (`--chrome`, `--chrome-text`) |
-| Secondaire | `#07af4f` vert | `#07af4f` vert (+ `#19f57a` néon pour les badges) |
-| Fond | `#181a1b` | `#07070b` noir profond |
+| Base | `#ffffff` / `#111111` | fond, texte, filets, boutons |
+| Rose flash | `#ff1f8f` | prix barrés, survols, alertes, compteurs |
+| Vert | `#07af4f` | « En stock », validation, succès |
+| Chrome | dégradé `--chrome` | logo, avatars, bouton secondaire, badges « Plusieurs versions » |
 
-Toutes les couleurs sont des variables CSS dans `css/theme.css`. Pour appliquer le thème à un
-autre projet, il suffit de copier ce fichier et de remplacer l'ancien rose (`#f4c2c2`)
-par `var(--pink)`.
+Toutes les couleurs sont des variables CSS dans `css/theme.css`.
 
-Polices : **Modak** (titres, comme dans le cahier des charges), **Orbitron** (boutons, prix),
-**Space Grotesk** (texte).
+Polices : **Modak** (logo), **Anton** (titres en capitales), **Archivo** (texte).
+
+## Mode démo
+
+Sur la page Profil, trois boutons permettent d'entrer directement dans chaque espace :
+**Acheteur**, **Artiste** (Nova Lune) ou **Administrateur**. Les données sont simulées
+et enregistrées dans le navigateur (localStorage).
+
+## Fonctionnalités (cahier des charges)
+
+- **Visiteur** : navigation, recherche, galerie filtrable (type, couleur, taille, prix, artiste),
+  grille / liste, badges de stock, conservation du défilement, pages artistes.
+  L'ajout au panier demande une connexion.
+- **Acheteur** : favoris, abonnements aux artistes, messagerie, panier persistant,
+  tunnel de paiement (adresse → paiement → confirmation), suivi de commande en 4 étapes,
+  retours et signalement de problème, préférences de notifications, export / suppression des données.
+- **Artiste** : tableau de bord, publication d'œuvres avec déclinaisons et stock, modification
+  prix / stock, ventes avec part nette (90 %) et expédition, profil public, dossier de presse
+  et vidéos coulisses, messages des acheteurs.
+- **Administrateur** : validation des comptes vendeurs, modération des œuvres,
+  commissions (10 %) et flux financiers, gestion des litiges.
+- **Notifications** : commande, expédition, livraison, baisse de prix, retour en stock,
+  nouvelle œuvre d'un artiste suivi, offres.
+- **RGPD** : bandeau cookies, formulaire d'exercice des droits, pages légales.
 
 ## Structure
 
 ```
-index.html      squelette : header, menu mobile, barre basse, footer
-css/theme.css   variables de couleurs / typo / effets
-css/style.css   composants
-js/data.js      œuvres et artistes de démo (à remplacer par l'API)
-js/app.js       routage, galerie filtrable, fiche produit, panier, favoris, messagerie
+index.html       squelette : header, menu mobile, barre basse, footer, bandeau cookies
+css/theme.css    variables de couleurs / typo
+css/style.css    composants
+js/data.js       œuvres, artistes et données de démo (à remplacer par l'API)
+js/app.js        routage, vues, espaces acheteur / artiste / admin
+tools/build.py   génère dist/ATYPIIK.html (version en un seul fichier)
 ```
-
-## Pages couvertes (cahier des charges)
-
-- Accueil : hero, section « Art », points clés
-- Galerie : filtres dynamiques (type, couleur, taille, prix, artiste), grille / liste,
-  badges de stock (En stock, Rupture, Vendu, Plusieurs versions), **conservation du scroll**
-  au retour d'une fiche
-- Fiche œuvre : zoom au survol, déclinaisons avec dispo en temps réel, Ajouter au panier /
-  Acheter maintenant
-- Notre sélection : recommandations basées sur les vues, favoris et abonnements
-- Favoris, Panier (persisté en localStorage, répartition 90 % artiste / 10 % commission)
-- Profil (connexion / création de compte), Contact (messagerie), pages légales

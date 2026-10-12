@@ -2,82 +2,124 @@
 <html lang="fr">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>ATYPIIK — Marketplace d'art</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>ATYPIIK</title>
     <meta name="description" content="ATYPIIK, la marketplace des artistes indépendants : œuvres uniques et déclinées." />
-    <meta name="theme-color" content="#07070b" />
+    <meta name="theme-color" content="#ffffff" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Modak&family=Orbitron:wght@500;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800&family=Modak&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="css/theme.css" />
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
-    <div class="backdrop" aria-hidden="true"><div class="grid-floor"></div></div>
+    <div class="announce">Livraison suivie offerte dès 150 € <b>✦</b> 90 % reversés directement aux artistes</div>
 
     <header class="header">
       <div class="container header-inner">
-        <a href="#/" class="logo chrome-text" aria-label="ATYPIIK, accueil">ATYPIIK</a>
-
-        <label class="search">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
-          <input id="search" type="search" placeholder="Rechercher une œuvre, un artiste…" autocomplete="off" />
-        </label>
-
         <nav class="nav" aria-label="Navigation principale">
-          <a href="#/" data-route="">Accueil</a>
           <a href="#/galerie" data-route="galerie">Galerie</a>
+          <a href="#/artistes" data-route="artistes">Artistes</a>
           <a href="#/selection" data-route="selection">Notre sélection</a>
-          <a href="#/contact" data-route="contact">Contact</a>
+          <a href="#/messages" data-route="messages">Contact</a>
         </nav>
+        <button class="icon-link burger" id="burger" aria-label="Ouvrir le menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h18M3 12h18M3 17h18" /></svg>
+        </button>
 
-        <div class="header-actions">
-          <a href="#/favoris" class="icon-link" data-route="favoris" aria-label="Favoris">
+        <a href="#/" class="logo" aria-label="ATYPIIK, accueil">ATYPIIK<span class="logo-star" aria-hidden="true">✦</span></a>
+
+        <div class="header-tools">
+          <span id="user-pill"></span>
+          <button class="icon-link" id="search-toggle" aria-label="Rechercher">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+          </button>
+          <a href="#/notifications" class="icon-link hide-sm" data-route="notifications" aria-label="Notifications">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 16V11a6 6 0 1 1 12 0v5l2 2H4l2-2Z" /><path d="M10 20a2 2 0 0 0 4 0" /></svg>
+            <span class="count" data-count="notif"></span>
+          </a>
+          <a href="#/favoris" class="icon-link hide-sm" data-route="favoris" aria-label="Favoris">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7.5-4.6-9.5-9.3C1.2 8.4 3.3 5 6.8 5c2 0 3.4 1.1 4.2 2.4h2C13.8 6.1 15.2 5 17.2 5c3.5 0 5.6 3.4 4.3 6.7C19.5 16.4 12 21 12 21Z" /></svg>
             <span class="count" data-count="fav"></span>
+          </a>
+          <a href="#/profil" class="icon-link hide-sm" data-route="profil" aria-label="Profil">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4" /><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" /></svg>
           </a>
           <a href="#/panier" class="icon-link" data-route="panier" aria-label="Panier">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 7h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 7Z" /><path d="M9 7a3 3 0 0 1 6 0" /></svg>
             <span class="count" data-count="cart"></span>
           </a>
-          <a href="#/profil" class="icon-link" data-route="profil" aria-label="Profil">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4" /><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" /></svg>
-          </a>
-          <button class="icon-link burger" id="burger" aria-label="Ouvrir le menu">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h10" /></svg>
-          </button>
+        </div>
+      </div>
+      <div class="search-bar" id="search-bar">
+        <div class="container">
+          <input id="search" type="search" placeholder="Rechercher une œuvre, un artiste…" autocomplete="off" aria-label="Rechercher" />
         </div>
       </div>
     </header>
 
-    <div class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawer" id="drawer">
       <button class="icon-link close" id="drawer-close" aria-label="Fermer le menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18" /></svg>
       </button>
       <a href="#/">Accueil</a>
       <a href="#/galerie">Galerie</a>
+      <a href="#/artistes">Artistes</a>
       <a href="#/selection">Notre sélection</a>
       <a href="#/favoris">Favoris</a>
       <a href="#/panier">Panier</a>
+      <a href="#/notifications">Notifications</a>
       <a href="#/profil">Profil</a>
-      <a href="#/contact">Contact</a>
+      <a href="#/messages">Contact / Messagerie</a>
     </div>
 
     <main id="app" class="container" tabindex="-1"></main>
 
     <footer class="footer">
-      <div class="container footer-inner">
-        <a href="#/" class="logo chrome-text">ATYPIIK</a>
-        <nav aria-label="Liens légaux">
-          <a href="#/legal/mentions">Mentions légales</a>
-          <a href="#/legal/rgpd">Confidentialité (RGPD)</a>
-          <a href="#/legal/cgu">CGU / CGV</a>
-          <a href="#/contact">Contact</a>
-        </nav>
-        <small>© <span id="year"></span> ATYPIIK — L'art dans sa globalité.</small>
+      <div class="container">
+        <div class="footer-grid">
+          <div>
+            <a href="#/" class="logo">ATYPIIK</a>
+            <p>La marketplace de l'art dans sa globalité. Des pièces uniques ou déclinées, en direct des artistes indépendants.</p>
+            <form class="newsletter" id="newsletter">
+              <input type="email" required placeholder="Votre e-mail" aria-label="Votre e-mail" id="newsletter-email" />
+              <button>S'inscrire</button>
+            </form>
+          </div>
+          <div>
+            <h4>Explorer</h4>
+            <nav>
+              <a href="#/galerie">Galerie</a>
+              <a href="#/artistes">Artistes</a>
+              <a href="#/selection">Notre sélection</a>
+            </nav>
+          </div>
+          <div>
+            <h4>Mon compte</h4>
+            <nav>
+              <a href="#/profil">Profil</a>
+              <a href="#/favoris">Favoris</a>
+              <a href="#/messages">Messagerie</a>
+              <a href="#/profil">Vendre sur ATYPIIK</a>
+            </nav>
+          </div>
+          <div>
+            <h4>Légal</h4>
+            <nav>
+              <a href="#/legal/mentions">Mentions légales</a>
+              <a href="#/legal/rgpd">Confidentialité (RGPD)</a>
+              <a href="#/legal/cgu">CGU / CGV</a>
+              <a href="#/messages">Contact</a>
+            </nav>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <span>© <span id="year"></span> ATYPIIK</span>
+          <span>Paiement sécurisé · Stripe Connect · HTTPS</span>
+        </div>
       </div>
     </footer>
 
@@ -86,20 +128,29 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 11 9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9Z" /></svg>Accueil
       </a>
       <a href="#/galerie" data-route="galerie">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" /></svg>Galerie
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /></svg>Galerie
       </a>
       <a href="#/favoris" data-route="favoris">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7.5-4.6-9.5-9.3C1.2 8.4 3.3 5 6.8 5c2 0 3.4 1.1 4.2 2.4h2C13.8 6.1 15.2 5 17.2 5c3.5 0 5.6 3.4 4.3 6.7C19.5 16.4 12 21 12 21Z" /></svg>Favoris
         <span class="count" data-count="fav"></span>
       </a>
-      <a href="#/panier" data-route="panier">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 7h14l-1.2 11.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 7Z" /><path d="M9 7a3 3 0 0 1 6 0" /></svg>Panier
-        <span class="count" data-count="cart"></span>
+      <a href="#/notifications" data-route="notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 16V11a6 6 0 1 1 12 0v5l2 2H4l2-2Z" /><path d="M10 20a2 2 0 0 0 4 0" /></svg>Alertes
+        <span class="count" data-count="notif"></span>
       </a>
       <a href="#/profil" data-route="profil">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4" /><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" /></svg>Profil
       </a>
     </nav>
+
+    <div class="cookie" id="cookie" hidden>
+      <p><strong>Cookies.</strong> Nous utilisons des cookies nécessaires au panier et à la connexion, et, avec votre accord, des cookies de mesure d'audience.</p>
+      <div class="btns">
+        <button class="btn btn-small btn-outline" data-cookie="refuse">Refuser</button>
+        <a class="btn btn-small btn-outline" href="#/legal/rgpd">Personnaliser</a>
+        <button class="btn btn-small" data-cookie="accept">Accepter</button>
+      </div>
+    </div>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 

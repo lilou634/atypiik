@@ -1,11 +1,36 @@
 /* Données de démonstration — à remplacer par l'API (PostgreSQL) plus tard. */
 
 const ARTISTS = [
-  { id: "nova", name: "Nova Lune", city: "Marseille", bio: "Peintre de l'aube numérique, entre néons et matières brutes." },
-  { id: "kairo", name: "Kairo Sato", city: "Lyon", bio: "Sculpteur métal, obsédé par les surfaces miroir." },
-  { id: "ines", name: "Inès Vale", city: "Paris", bio: "Photographe argentique des villes la nuit." },
-  { id: "milo", name: "Milo Arden", city: "Bordeaux", bio: "Abstraction géométrique et couleurs saturées." },
-  { id: "zia", name: "Zia Okafor", city: "Lille", bio: "Textile, résine et installations lumineuses." },
+  {
+    id: "nova", name: "Nova Lune", city: "Marseille", followers: 1840,
+    bio: "Peintre de l'aube numérique, entre néons et matières brutes.",
+    videos: ["Atelier : préparation des pigments fluo", "Making-of de Rose Protocol"],
+    press: ["Dossier de presse 2026.pdf", "Article — Beaux Arts Magazine.pdf"],
+  },
+  {
+    id: "kairo", name: "Kairo Sato", city: "Lyon", followers: 960,
+    bio: "Sculpteur métal, obsédé par les surfaces miroir.",
+    videos: ["Polissage miroir en 4 minutes"],
+    press: ["Portfolio Kairo Sato.pdf"],
+  },
+  {
+    id: "ines", name: "Inès Vale", city: "Paris", followers: 2310,
+    bio: "Photographe argentique des villes la nuit.",
+    videos: ["Une nuit de prise de vue à Pigalle", "Tirage en chambre noire"],
+    press: ["Dossier de presse Inès Vale.pdf"],
+  },
+  {
+    id: "milo", name: "Milo Arden", city: "Bordeaux", followers: 640,
+    bio: "Abstraction géométrique et couleurs saturées.",
+    videos: [],
+    press: ["CV artistique.pdf"],
+  },
+  {
+    id: "zia", name: "Zia Okafor", city: "Lille", followers: 1205,
+    bio: "Textile, résine et installations lumineuses.",
+    videos: ["Coulisses de l'expo Fréquence"],
+    press: [],
+  },
 ];
 
 /* Chaque œuvre est « peinte » en CSS pour ne dépendre d'aucune image externe. */
@@ -105,3 +130,22 @@ const COLORS = {
   bleu: "#2b6bff",
   noir: "#111",
 };
+
+/* Données de démo pour l'espace administrateur. */
+const SEED_PENDING_SELLERS = [
+  { id: "p1", name: "Léa Moreau", email: "lea.moreau@exemple.fr", city: "Nantes", discipline: "Céramique", status: "en attente" },
+  { id: "p2", name: "Studio Ghost", email: "hello@studioghost.fr", city: "Toulouse", discipline: "Sérigraphie", status: "en attente" },
+];
+
+const SEED_DISPUTES = [
+  { id: "L-1042", order: "CMD-2025-0871", buyer: "Camille R.", reason: "Colis abîmé à la livraison", amount: 210, status: "ouvert" },
+];
+
+/* Ventes passées (démo) pour l'espace artiste et les commissions. */
+const SEED_SALES = [
+  { order: "CMD-2026-0912", date: "2026-09-28", buyer: "Hugo L.", work: "a7", qty: 1, price: 1250, status: 3 },
+  { order: "CMD-2026-0944", date: "2026-10-03", buyer: "Sarah B.", work: "a1", qty: 1, price: 480, status: 2 },
+  { order: "CMD-2026-0961", date: "2026-10-06", buyer: "Marc D.", work: "a3", qty: 2, price: 120, status: 1 },
+  { order: "CMD-2026-0975", date: "2026-10-09", buyer: "Jade P.", work: "a8", qty: 1, price: 210, status: 1 },
+  { order: "CMD-2026-0980", date: "2026-10-10", buyer: "Yanis K.", work: "a2", qty: 1, price: 1650, status: 3 },
+];
