@@ -1,42 +1,41 @@
 /* =========================================================
-   ATYPIIK — Thème « Bordeaux »
-   Beige, blanc et noir, un bordeaux profond comme seule
-   couleur d'accent, et quelques touches de chrome argenté.
+   ATYPIIK — Thème « Atelier »
+   Épuré et lumineux : blanc cassé, beige et noir, un bordeaux
+   en touches discrètes et un soupçon de chrome argenté.
    Ce fichier ne contient que les variables : copiez-le tel quel
    dans un autre projet pour en récupérer la palette.
    ========================================================= */
 
-/* Mise en page : grille éditoriale à filets noirs, titres massifs en capitales. */
+/* Mise en page : grands visuels, beaucoup d'air, filets fins, titres en serif. */
 :root {
   color-scheme: light;
 
   /* --- Base --- */
-  --paper: #efe8dc; /* beige : fond de page */
-  --paper-2: #e4dacb; /* beige plus soutenu : fonds d'œuvres, encarts */
-  --white: #ffffff; /* cartes, panneaux, champs */
-  --ink: #141111; /* noir chaud : texte, filets, boutons */
-  --ink-2: #4d4440;
-  --ink-3: #8c827a;
-  --rule: #141111;
-  --rule-soft: #d3c7b6;
+  --paper: #faf8f4; /* blanc cassé : fond de page */
+  --paper-2: #efe8dc; /* beige : fonds d'œuvres, encarts, footer */
+  --white: #ffffff;
+  --ink: #1a1717; /* noir doux : texte, boutons */
+  --ink-2: #5a524d;
+  --ink-3: #9a918a;
+  --rule: #1a1717;
+  --rule-soft: #e2dbd0;
 
-  /* --- Accent unique : bordeaux --- */
+  /* --- Accent discret : bordeaux --- */
   --accent: #6d1a2a;
   --accent-deep: #4a0f1b;
-  --accent-soft: #ead6d4;
+  --accent-soft: #f1e4e2;
 
-  /* --- Chrome argenté --- */
+  /* --- Chrome argenté (avatars, badge « plusieurs versions ») --- */
   --silver: #c9ccd3;
-  --chrome: linear-gradient(135deg, #fbfbfc 0%, #b9bdc6 22%, #ffffff 40%, #7d828c 58%, #e9ebef 76%, #a3a8b1 100%);
-  --chrome-text: linear-gradient(180deg, #ffffff 0%, #e3e5ea 40%, #8a8f99 52%, #f2f3f6 64%, #b4b8c1 100%);
-  --chrome-edge: inset 0 1px 0 #fff, inset 0 -1px 2px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.25);
+  --chrome: linear-gradient(135deg, #fbfbfc 0%, #c4c8cf 25%, #ffffff 45%, #9097a1 62%, #eceef1 80%, #b3b8c0 100%);
+  --chrome-edge: inset 0 1px 0 #fff, 0 1px 2px rgba(0, 0, 0, 0.12);
 
   /* --- Typo --- */
-  --font-logo: "Unbounded", "Arial Black", sans-serif;
-  --font-display: "Anton", "Impact", "Arial Narrow", sans-serif;
-  --font-body: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-logo: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Instrument Serif", "Times New Roman", Georgia, serif;
+  --font-body: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
 
   /* --- Formes --- */
-  --radius: 2px;
+  --radius: 0;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }

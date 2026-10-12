@@ -121,6 +121,44 @@ const ARTWORKS = [
     art: "linear-gradient(135deg, #000 0%, #2b2e35 40%, #e9ebef 50%, #2b2e35 60%, #000 100%)",
     variants: [{ label: "Original", stock: 1 }],
   },
+  {
+    id: "a13", title: "Veste Atelier", artist: "zia", type: "Mode", color: "noir", size: "M", price: 540,
+    technique: "Toile de coton peinte à la main, pièce unique", dims: "Taille M",
+    art: "linear-gradient(160deg, #1a1717 0%, #3a2a28 55%, #6d1a2a 100%)",
+    variants: [
+      { label: "S", stock: 0 },
+      { label: "M", stock: 1 },
+      { label: "L", stock: 1 },
+    ],
+  },
+  {
+    id: "a14", title: "Robe Dune", artist: "zia", type: "Mode", color: "beige", size: "M", price: 690,
+    technique: "Lin teint à la main", dims: "Taille unique",
+    art: "linear-gradient(180deg, #efe8dc 0%, #d9c9b0 60%, #b9a587 100%)",
+    variants: [{ label: "Taille unique", stock: 2 }],
+  },
+  {
+    id: "a15", title: "Bague Mercure", artist: "kairo", type: "Bijoux", color: "argent", size: "S", price: 180,
+    technique: "Argent 925 poli miroir", dims: "Tailles 50 à 58",
+    art: "radial-gradient(circle at 50% 50%, #ffffff 0 10%, #c4c8cf 22%, #7d828c 34%, #efe8dc 35%)",
+    variants: [
+      { label: "52", stock: 2 },
+      { label: "54", stock: 3 },
+      { label: "56", stock: 0 },
+    ],
+  },
+  {
+    id: "a16", title: "Créoles Bordeaux", artist: "nova", type: "Bijoux", color: "bordeaux", size: "S", price: 145,
+    technique: "Laiton doré et émail bordeaux", dims: "Ø 3,5 cm",
+    art: "radial-gradient(circle at 50% 50%, #efe8dc 0 26%, #6d1a2a 27% 36%, #efe8dc 37%)",
+    variants: [{ label: "Paire", stock: 4 }],
+  },
+  {
+    id: "a17", title: "Vase Sillon", artist: "milo", type: "Céramique", color: "beige", size: "M", price: 230,
+    technique: "Grès émaillé, tourné à la main", dims: "18 × 32 cm",
+    art: "linear-gradient(180deg, #faf8f4 0%, #e4dacb 50%, #c9b79c 100%)",
+    variants: [{ label: "Original", stock: 1 }],
+  },
 ];
 
 const COLORS = {

@@ -16,7 +16,7 @@ const clone = (o) => JSON.parse(JSON.stringify(o));
 const initials = (name) => name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
 
 /* ---------- Persistance ---------- */
-const DATA_VERSION = 2;
+const DATA_VERSION = 3;
 const store = {
   get(key, fallback) {
     try {
@@ -128,6 +128,14 @@ function updateChrome() {
 }
 
 /* ---------- Composants ---------- */
+/* Visuel d'une œuvre : la photo si elle existe (js/photos.js), sinon un aplat généré. */
+function visual(w, style = "") {
+  if (!w) return `<div class="art" style="background:var(--chrome);${style}"></div>`;
+  const src = (typeof PHOTOS !== "undefined" && PHOTOS[w.id]) || w.img;
+  return src
+    ? `<img class="art" src="${src}" alt="${esc(w.title)}" loading="lazy" style="${style}" />`
+    : `<div class="art" style="background:${w.art};${style}"></div>`;
+}
 const heart =
   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7.5-4.6-9.5-9.3C1.2 8.4 3.3 5 6.8 5c2 0 3.4 1.1 4.2 2.4h2C13.8 6.1 15.2 5 17.2 5c3.5 0 5.6 3.4 4.3 6.7C19.5 16.4 12 21 12 21Z"/></svg>';
 
@@ -146,7 +154,7 @@ function card(w, extra = "") {
   const fav = state.favs.includes(w.id);
   return `
     <article class="card ${w.sold ? "sold" : ""}">
-      <a class="card-media" href="#/oeuvre/${w.id}" aria-label="${esc(w.title)}"><div class="art" style="background:${w.art}"></div></a>
+      <a class="card-media" href="#/oeuvre/${w.id}" aria-label="${esc(w.title)}">${visual(w)}</a>
       <div class="badges">${badgesFor(w)}</div>
       <button class="fav-btn ${fav ? "on" : ""}" data-act="fav" data-id="${w.id}" aria-pressed="${fav}" aria-label="Favori">${heart}</button>
       <div class="card-body">
@@ -179,46 +187,41 @@ function emptyBox(title, text, cta = "") {
 
 function viewHome() {
   const works = visibleWorks();
-  const hero = byId("a7");
-  const words = ["Peinture", "Sculpture", "Photographie", "Textile", "Pièces uniques", "Artistes indépendants", "Éditions limitées"];
-  const marquee = [...words, ...words].map((w) => `<span>${w}</span><span class="star">✦</span>`).join("");
+  const left = byId("a7");
+  const right = byId("a2");
   const cats = [
     ["Peinture", "a1"],
-    ["Sculpture", "a5"],
+    ["Mode", "a13"],
+    ["Bijoux", "a15"],
     ["Photographie", "a8"],
-    ["Textile", "a6"],
   ];
   return `
     <section class="hero">
+      <a class="hero-panel" href="#/oeuvre/${left.id}" aria-label="${esc(left.title)}">${visual(left)}</a>
+      <a class="hero-panel" href="#/oeuvre/${right.id}" aria-label="${esc(right.title)}">${visual(right)}</a>
       <div class="hero-text">
-        <span class="chrome-chip">Marketplace d'art</span>
-        <h1>L'art<br />ne se tient<br />pas <span class="pink">sage.</span></h1>
-        <p>ATYPIIK met en relation les collectionneurs en quête de pièces uniques ou déclinées et les artistes indépendants. Achetez en direct, l'artiste touche 90 %.</p>
+        <span class="label">Marketplace d'art</span>
+        <h1>L'art, <em>autrement.</em></h1>
         <div class="hero-cta">
-          <a href="#/galerie" class="btn">Explorer la galerie</a>
-          <a href="#/profil" class="btn btn-chrome">Vendre mes œuvres</a>
+          <a href="#/galerie" class="text-link">Découvrir la galerie</a>
+          <a href="#/profil" class="text-link">Vendre mes œuvres</a>
         </div>
       </div>
-      <a class="hero-art" href="#/oeuvre/${hero.id}">
-        <div class="art" style="background:${hero.art}"></div>
-        <div class="hero-caption">
-          <div><span class="label muted">À l'affiche</span><b>${esc(hero.title)}</b>${esc(artistOf(hero).name)}</div>
-          <span class="price">${euro(hero.price)}</span>
-        </div>
-      </a>
     </section>
 
-    <div class="marquee" aria-hidden="true"><div class="marquee-track">${marquee}</div></div>
+    <section class="intro">
+      <p>ATYPIIK met en relation les collectionneurs en quête de pièces uniques ou déclinées et les artistes indépendants. Chaque achat se fait en direct&nbsp;: l'artiste reçoit 90&nbsp;% du prix.</p>
+    </section>
 
     <section class="section">
-      <div class="section-head"><h2>Art <span class="star">✦</span> tout le catalogue</h2><a href="#/galerie">Tout voir</a></div>
+      <div class="section-head"><h2>Art</h2><a href="#/galerie">Tout voir</a></div>
       <div class="grid">${works.slice(0, 8).map((w) => card(w)).join("")}</div>
     </section>
 
     <section class="section">
       <div class="section-head"><h2>Par discipline</h2></div>
       <div class="cats">${cats
-        .map(([t, id]) => `<a class="cat" href="#/galerie" data-act="cat" data-type="${t}"><div class="art" style="background:${byId(id).art}"></div><span>${t}</span></a>`)
+        .map(([t, id]) => `<a class="cat" href="#/galerie" data-act="cat" data-type="${t}">${visual(byId(id))}<span>${t}</span></a>`)
         .join("")}</div>
     </section>
 
@@ -341,9 +344,9 @@ function viewProduct(id) {
     <a class="back-link" href="#/galerie">← Retour à la galerie</a>
     <div class="product">
       <div>
-        <div class="zoom" id="zoom"><div class="art" style="background:${w.art}"></div></div>
+        <div class="zoom" id="zoom">${visual(w)}</div>
         <div class="thumbs">${[0, 1, 2]
-          .map((i) => `<button class="${i ? "" : "on"}" data-act="thumb" data-i="${i}" aria-label="Vue ${i + 1}"><div class="art" style="background:${w.art};filter:hue-rotate(${i * 25}deg) brightness(${1 - i * 0.08})"></div></button>`)
+          .map((i) => `<button class="${i ? "" : "on"}" data-act="thumb" data-i="${i}" aria-label="Vue ${i + 1}">${visual(w, `filter:brightness(${1 - i * 0.07}) saturate(${1 - i * 0.15})`)}</button>`)
           .join("")}</div>
       </div>
       <div class="product-info">
@@ -420,7 +423,7 @@ function viewArtist(id) {
   if (tab === "coulisses")
     body = videos.length
       ? `<div class="grid cols-3">${videos
-          .map((v, i) => `<button class="video-tile" style="border:0;padding:0" data-act="play" aria-label="Lire ${esc(v)}"><div class="art" style="background:${works[i % Math.max(works.length, 1)]?.art || "var(--chrome)"}"></div><div class="play"></div><span>${esc(v)}</span></button>`)
+          .map((v, i) => `<button class="video-tile" style="border:0;padding:0" data-act="play" aria-label="Lire ${esc(v)}">${visual(works[i % Math.max(works.length, 1)])}<div class="play"></div><span>${esc(v)}</span></button>`)
           .join("")}</div>`
       : emptyBox("Pas encore de vidéo", "Les vidéos coulisses de l'artiste apparaîtront ici.");
   if (tab === "presse")
@@ -467,7 +470,7 @@ function viewSelection() {
       .map(({ w, reason }) =>
         card(
           w,
-          `<div class="reason">✦ ${esc(reason)}</div>
+          `<div class="reason">${esc(reason)}</div>
            <div class="card-actions"><a class="btn btn-small" href="#/oeuvre/${w.id}">Voir l'œuvre</a><a class="btn btn-small btn-outline" href="#/artiste/${w.artist}">Profil de l'artiste</a></div>`,
         ),
       )
@@ -501,7 +504,7 @@ function viewCart() {
           const ko = l.w.sold || v.stock === 0;
           return `
           <div class="cart-line">
-            <a class="thumb" href="#/oeuvre/${l.w.id}"><div class="art" style="background:${l.w.art}"></div></a>
+            <a class="thumb" href="#/oeuvre/${l.w.id}">${visual(l.w)}</a>
             <div>
               <div class="card-title">${esc(l.w.title)}</div>
               <div class="card-artist">${esc(artistOf(l.w).name)} · ${esc(v.label)} · ${euro(l.w.price)}</div>
@@ -631,7 +634,7 @@ function viewOrderDone(id) {
   if (!o) return viewNotFound();
   return `
     <div class="empty" style="border-style:solid;border-color:var(--ink)">
-      <span class="chrome-chip">Merci</span>
+      <span class="label muted">Merci</span>
       <h3 style="font-size:3rem;margin-top:12px">Commande confirmée</h3>
       <p>Commande <strong>${o.id}</strong> · ${euro(o.total)}. Un e-mail de confirmation vient de vous être envoyé.<br />Vous suivrez chaque étape depuis votre profil et vos notifications.</p>
       <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><a class="btn" href="#/profil">Suivre ma commande</a><a class="btn btn-outline" href="#/galerie">Continuer mes découvertes</a></div>
@@ -682,11 +685,11 @@ function viewMessages(param) {
       <div class="threads">${keys
         .map((k) => {
           const last = (state.threads[k] || []).slice(-1)[0];
-          return `<a class="thread ${k === current ? "on" : ""}" href="#/messages/${k}"><div class="avatar sm">${k === "support" ? "✦" : initials(label(k))}</div><div><strong>${esc(label(k))}</strong><small>${esc(last?.text || "Nouvelle conversation")}</small></div></a>`;
+          return `<a class="thread ${k === current ? "on" : ""}" href="#/messages/${k}"><div class="avatar sm">${k === "support" ? "A" : initials(label(k))}</div><div><strong>${esc(label(k))}</strong><small>${esc(last?.text || "Nouvelle conversation")}</small></div></a>`;
         })
         .join("")}</div>
       <div class="conv">
-        <div class="conv-head"><div class="avatar sm">${current === "support" ? "✦" : initials(label(current))}</div><strong>${esc(label(current))}</strong>${current !== "support" && !seller ? `<a class="link-btn" style="margin-left:auto" href="#/artiste/${current}">Voir le profil</a>` : ""}</div>
+        <div class="conv-head"><div class="avatar sm">${current === "support" ? "A" : initials(label(current))}</div><strong>${esc(label(current))}</strong>${current !== "support" && !seller ? `<a class="link-btn" style="margin-left:auto" href="#/artiste/${current}">Voir le profil</a>` : ""}</div>
         <div class="chat" id="chat">${msgs.length ? msgs.map((m) => `<div class="bubble ${m.from === meFrom ? "me" : ""}">${esc(m.text)}</div>`).join("") : '<p class="hint">Posez votre question : dimensions, livraison, commande personnalisée…</p>'}</div>
         <form class="chat-form" id="chat-form" data-key="${current}" data-from="${meFrom}">
           <input id="chat-input" placeholder="Votre message…" aria-label="Votre message" autocomplete="off" />
@@ -834,7 +837,7 @@ function orderCard(o, withActions = true) {
       <div class="order-lines">${o.lines
         .map((l) => {
           const w = byId(l.id);
-          return w ? `<a href="#/oeuvre/${w.id}" title="${esc(w.title)}"><div class="art" style="background:${w.art}"></div></a><span class="hint">${esc(w.title)} × ${l.qty}</span>` : "";
+          return w ? `<a href="#/oeuvre/${w.id}" title="${esc(w.title)}">${visual(w)}</a><span class="hint">${esc(w.title)} × ${l.qty}</span>` : "";
         })
         .join("")}</div>
       ${
@@ -948,7 +951,7 @@ function sellerSpace() {
       </div>
       <div class="two-col">
         <div class="panel"><h3>À faire</h3>
-          ${toShip ? `<p>${toShip} commande${toShip > 1 ? "s" : ""} à préparer ou expédier.</p><button class="btn btn-small" data-act="tab" data-key="seller" data-id="ventes">Voir les ventes</button>` : '<p class="hint">Aucune commande en attente. ✦</p>'}
+          ${toShip ? `<p>${toShip} commande${toShip > 1 ? "s" : ""} à préparer ou expédier.</p><button class="btn btn-small" data-act="tab" data-key="seller" data-id="ventes">Voir les ventes</button>` : '<p class="hint">Aucune commande en attente.</p>'}
         </div>
         <div class="panel"><h3>Votre vitrine</h3><p class="hint">${works.length} œuvre${works.length > 1 ? "s" : ""} en ligne · ${works.filter((w) => totalStock(w) === 0).length} en rupture.</p>
           <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-small btn-chrome" data-act="tab" data-key="seller" data-id="ajouter">Publier une œuvre</button><a class="btn btn-small btn-outline" href="#/artiste/${id}">Voir ma page publique</a></div>
@@ -962,7 +965,7 @@ function sellerSpace() {
           <tbody>${works
             .map(
               (w) => `<tr>
-              <td><a href="#/oeuvre/${w.id}" style="display:flex;gap:10px;align-items:center"><span class="art" style="display:block;width:44px;height:44px;flex:none;background:${w.art}"></span><strong>${esc(w.title)}</strong></a></td>
+              <td><a href="#/oeuvre/${w.id}" style="display:flex;gap:10px;align-items:center">${visual(w, "display:block;width:44px;height:44px;flex:none")}<strong>${esc(w.title)}</strong></a></td>
               <td>${w.variants.map((v, i) => `<label style="display:flex;gap:6px;align-items:center;margin:2px 0"><span style="min-width:90px">${esc(v.label)}</span><input type="number" min="0" value="${v.stock}" style="width:64px;padding:4px;border:1px solid var(--ink)" data-act="edit-stock" data-id="${w.id}" data-i="${i}" aria-label="Stock ${esc(v.label)}" /></label>`).join("")}</td>
               <td class="num"><input type="number" min="1" value="${w.price}" style="width:90px;padding:4px;border:1px solid var(--ink);text-align:right" data-act="edit-price" data-id="${w.id}" aria-label="Prix" /></td>
               <td>${w.hidden ? '<span class="tag pink">Masquée</span>' : w.sold ? '<span class="tag grey">Vendue</span>' : totalStock(w) ? '<span class="tag green">En ligne</span>' : '<span class="tag pink">Rupture</span>'}</td>
@@ -1034,7 +1037,7 @@ function addWorkForm() {
       <div class="field"><label for="wk-title">Titre</label><input id="wk-title" required /></div>
       <div class="field"><label for="wk-desc">Description</label><textarea id="wk-desc" rows="3"></textarea></div>
       <div class="field-row">
-        <div class="field"><label for="wk-type">Type d'art</label><select id="wk-type"><option>Peinture</option><option>Sculpture</option><option>Photographie</option><option>Textile</option><option>Dessin</option></select></div>
+        <div class="field"><label for="wk-type">Type d'art</label><select id="wk-type"><option>Peinture</option><option>Sculpture</option><option>Photographie</option><option>Textile</option><option>Mode</option><option>Bijoux</option><option>Céramique</option><option>Dessin</option></select></div>
         <div class="field"><label for="wk-price">Prix TTC (€)</label><input id="wk-price" type="number" min="1" required /></div>
       </div>
       <div class="field-row">
@@ -1080,7 +1083,7 @@ function bindSeller() {
       state.works.unshift(w);
       if (state.follows.includes(w.artist) && state.prefs.news) notify(`${artistOf(w).name}, que vous suivez, a publié « ${w.title} ».`, "#/oeuvre/" + w.id);
       save();
-      toast("Œuvre publiée ✦");
+      toast("Œuvre publiée");
       state.tab.seller = "oeuvres";
       render();
     });
@@ -1123,7 +1126,7 @@ function adminSpace() {
   if (tab === "moderation") {
     body = `<div class="table-wrap"><table><thead><tr><th>Œuvre</th><th>Artiste</th><th class="num">Prix</th><th>Visibilité</th><th></th></tr></thead><tbody>${state.works
       .map(
-        (w) => `<tr><td><a href="#/oeuvre/${w.id}" style="display:flex;gap:10px;align-items:center"><span class="art" style="display:block;width:40px;height:40px;flex:none;background:${w.art}"></span>${esc(w.title)}</a></td>
+        (w) => `<tr><td><a href="#/oeuvre/${w.id}" style="display:flex;gap:10px;align-items:center">${visual(w, "display:block;width:40px;height:40px;flex:none")}${esc(w.title)}</a></td>
         <td>${esc(artistOf(w).name)}</td><td class="num">${euro(w.price)}</td>
         <td>${w.hidden ? '<span class="tag pink">Masquée</span>' : '<span class="tag green">Publique</span>'}</td>
         <td class="num"><button class="btn btn-small btn-outline" data-act="moderate" data-id="${w.id}">${w.hidden ? "Réafficher" : "Masquer"}</button></td></tr>`,
@@ -1494,7 +1497,7 @@ document.addEventListener("submit", (e) => {
   }
   if (f.id === "newsletter") {
     e.preventDefault();
-    toast("Inscription confirmée ✦");
+    toast("Inscription confirmée");
     f.reset();
   }
 });

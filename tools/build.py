@@ -10,11 +10,11 @@ root = pathlib.Path(__file__).resolve().parent.parent
 html = (root / "index.html").read_text(encoding="utf-8")
 
 css = "".join((root / "css" / f).read_text(encoding="utf-8") for f in ("theme.css", "style.css"))
-js = "".join((root / "js" / f).read_text(encoding="utf-8") for f in ("data.js", "app.js"))
+js = "".join((root / "js" / f).read_text(encoding="utf-8") for f in ("data.js", "photos.js", "app.js"))
 
 html = re.sub(r'\s*<link rel="stylesheet" href="css/theme.css" />\s*<link rel="stylesheet" href="css/style.css" />',
               lambda _: f"\n    <style>\n{css}\n    </style>", html)
-html = re.sub(r'\s*<script src="js/data.js"></script>\s*<script src="js/app.js"></script>',
+html = re.sub(r'\s*<script src="js/data.js"></script>\s*<script src="js/photos.js"></script>\s*<script src="js/app.js"></script>',
               lambda _: f"\n    <script>\n{js}\n    </script>", html)
 
 out = root / "dist" / "ATYPIIK.html"

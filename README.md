@@ -1,7 +1,7 @@
 # ATYPIIK — Marketplace d'art
 
-Front-end ATYPIIK, thème **« Bordeaux »** : beige, blanc et noir, un bordeaux profond comme
-seule couleur d'accent et quelques touches de chrome argenté.
+Front-end ATYPIIK, thème **« Atelier »** : épuré et lumineux, blanc cassé, beige et noir,
+un bordeaux en touches discrètes et un soupçon de chrome argenté.
 
 **Le plus simple :** ouvrez `dist/ATYPIIK.html` d'un double-clic (tout le site en un seul fichier).
 Après une modification des sources, régénérez-le avec `python3 tools/build.py`.
@@ -22,15 +22,21 @@ Puis ouvrir http://localhost:8000
 
 | Rôle | Couleur | Usage |
 | --- | --- | --- |
-| Fond | `#efe8dc` beige | fond de page |
-| Surfaces | `#ffffff` blanc | cartes, panneaux, champs, header |
-| Encre | `#141111` noir | texte, filets, boutons, footer |
-| Accent | `#6d1a2a` bordeaux | bloc d'accueil, survols, alertes, compteurs, onglet actif |
-| Chrome | dégradé `--chrome` | logo, avatars, bouton secondaire, badge « Plusieurs versions » |
+| Fond | `#faf8f4` blanc cassé | fond de page |
+| Beige | `#efe8dc` | fonds d'œuvres, bandeau, footer |
+| Encre | `#1a1717` noir doux | texte, boutons |
+| Accent | `#6d1a2a` bordeaux | bouton panier, survols, compteurs, alertes |
+| Chrome | dégradé `--chrome` | avatars d'artistes, badge « Plusieurs versions » |
 
 Toutes les couleurs sont des variables CSS dans `css/theme.css`.
 
-Polices : **Unbounded** (logo), **Anton** (titres en capitales), **Archivo** (texte).
+Polices : **Instrument Serif** (titres) et **Instrument Sans** (logo, texte, navigation).
+
+## Photos
+
+Chaque œuvre affiche un visuel généré tant qu'elle n'a pas de photo. Pour mettre de vraies
+photos, déposez-les dans `assets/photos/` et déclarez-les dans `js/photos.js`
+(mode d'emploi dans `assets/photos/README.md`).
 
 ## Mode démo
 
@@ -62,6 +68,8 @@ index.html       squelette : header, menu mobile, barre basse, footer, bandeau c
 css/theme.css    variables de couleurs / typo
 css/style.css    composants
 js/data.js       œuvres, artistes et données de démo (à remplacer par l'API)
+js/photos.js     photos associées aux œuvres
+assets/photos/   fichiers photo
 js/app.js        routage, vues, espaces acheteur / artiste / admin
 tools/build.py   génère dist/ATYPIIK.html (version en un seul fichier)
 ```
