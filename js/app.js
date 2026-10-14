@@ -195,54 +195,67 @@ function viewHome() {
     ["Bijoux", "a15"],
     ["Photographie", "a8"],
   ];
+  const words = ["Pièces uniques", "Peinture", "Mode", "Bijoux", "Céramique", "Photographie", "Artistes indépendants"];
+  const ribbon = [...words, ...words].map((w) => `<span>${w}</span><span class="sun-dot">✺</span>`).join("");
   return `
     <section class="hero">
-      <a class="hero-panel" href="#/oeuvre/${left.id}" aria-label="${esc(left.title)}">${visual(left)}</a>
-      <a class="hero-panel" href="#/oeuvre/${right.id}" aria-label="${esc(right.title)}">${visual(right)}</a>
-      <div class="hero-text">
-        <span class="label">Marketplace d'art</span>
-        <h1>L'art, <em>autrement.</em></h1>
+      <div>
+        <span class="eyebrow">Marketplace d'art indépendant</span>
+        <h1>L'art qui fait <em>des vagues.</em></h1>
+        <p>Des pièces uniques ou déclinées, en direct des artistes qui les créent. Peinture, mode, bijoux, céramique&nbsp;: trouvez celle qui vous ressemble.</p>
         <div class="hero-cta">
-          <a href="#/galerie" class="text-link">Découvrir la galerie</a>
-          <a href="#/profil" class="text-link">Vendre mes œuvres</a>
+          <a href="#/galerie" class="btn">Explorer la galerie</a>
+          <a href="#/profil" class="btn btn-outline">Vendre mes œuvres</a>
+        </div>
+        <div class="hero-note"><span><b>90 %</b> reversés à l'artiste</span><span><b>${state.artists.length * 61}</b> artistes</span></div>
+      </div>
+      <div class="hero-visual">
+        <div class="sun" aria-hidden="true"></div>
+        <a class="arch a1" href="#/oeuvre/${left.id}" aria-label="${esc(left.title)}">${visual(left)}</a>
+        <a class="arch a2" href="#/oeuvre/${right.id}" aria-label="${esc(right.title)}">${visual(right)}</a>
+        <div class="sticker" aria-hidden="true">
+          <svg viewBox="0 0 100 100"><defs><path id="circle" d="M50,50 m-37,0 a37,37 0 1,1 74,0 a37,37 0 1,1 -74,0" /></defs><text><textPath href="#circle">Pièces uniques · Fait main · </textPath></text></svg>
+          <b>✺</b>
         </div>
       </div>
     </section>
 
+    <div class="ribbon" aria-hidden="true"><div class="ribbon-track">${ribbon}</div></div>
+
     <section class="intro">
-      <p>ATYPIIK met en relation les collectionneurs en quête de pièces uniques ou déclinées et les artistes indépendants. Chaque achat se fait en direct&nbsp;: l'artiste reçoit 90&nbsp;% du prix.</p>
+      <p>ATYPIIK relie les collectionneurs et les artistes indépendants. Chaque achat se fait <em>en direct</em>, et l'artiste garde 90&nbsp;% du prix.</p>
     </section>
 
     <section class="section">
-      <div class="section-head"><h2>Art</h2><a href="#/galerie">Tout voir</a></div>
-      <div class="grid">${works.slice(0, 8).map((w) => card(w)).join("")}</div>
+      <div class="section-head"><div><span class="eyebrow">Nouveautés</span><h2>Fraîchement arrivées</h2></div><a href="#/galerie">Tout voir</a></div>
+      <div class="grid stagger">${works.slice(0, 8).map((w) => card(w)).join("")}</div>
     </section>
 
     <section class="section">
-      <div class="section-head"><h2>Par discipline</h2></div>
+      <div class="section-head"><div><span class="eyebrow">Explorer</span><h2>Par discipline</h2></div></div>
       <div class="cats">${cats
-        .map(([t, id]) => `<a class="cat" href="#/galerie" data-act="cat" data-type="${t}">${visual(byId(id))}<span>${t}</span></a>`)
+        .map(([t, id]) => `<a class="cat" href="#/galerie" data-act="cat" data-type="${t}"><div class="cat-media">${visual(byId(id))}</div><span>${t}</span></a>`)
         .join("")}</div>
     </section>
 
     <section class="section">
-      <div class="section-head"><h2>Les artistes</h2><a href="#/artistes">Tous les artistes</a></div>
+      <div class="section-head"><div><span class="eyebrow">La communauté</span><h2>Les artistes</h2></div><a href="#/artistes">Tous les artistes</a></div>
       <div class="grid">${state.artists.slice(0, 4).map(artistCard).join("")}</div>
     </section>
 
     <section class="section values">
-      <div><span class="tag green">Sécurisé</span><h3>Exposition protégée</h3><p>Chaque artiste est vérifié par notre équipe avant de pouvoir vendre.</p></div>
-      <div><span class="tag pink">Transparent</span><h3>90 / 10</h3><p>Paiement via Stripe Connect : 90 % pour l'artiste, 10 % de commission ATYPIIK.</p></div>
-      <div><span class="tag grey">Direct</span><h3>Parlez à l'artiste</h3><p>Messagerie privée, coulisses en vidéo et alertes à chaque nouvelle œuvre.</p></div>
+      <div><span class="tag">Sécurisé</span><h3>Exposition protégée</h3><p>Chaque artiste est vérifié par notre équipe avant de pouvoir vendre.</p></div>
+      <div><span class="tag">Transparent</span><h3>90 / 10</h3><p>Paiement via Stripe Connect : 90 % pour l'artiste, 10 % de commission ATYPIIK.</p></div>
+      <div><span class="tag">Direct</span><h3>Parlez à l'artiste</h3><p>Messagerie privée, coulisses en vidéo et alertes à chaque nouvelle œuvre.</p></div>
     </section>`;
 }
 
 function artistCard(a) {
   const n = visibleWorks().filter((w) => w.artist === a.id).length;
   return `
-    <article class="card" style="text-align:center">
-      <a href="#/artiste/${a.id}" class="card-media" style="display:grid;place-items:center;aspect-ratio:1">
-        <div class="avatar" style="width:58%;height:auto;aspect-ratio:1;font-size:3rem">${initials(a.name)}</div>
+    <article class="card artist-card" style="text-align:center">
+      <a href="#/artiste/${a.id}" class="card-media">
+        <div class="avatar" style="width:56%;height:auto;aspect-ratio:1;font-size:3rem">${initials(a.name)}</div>
       </a>
       <div class="card-body">
         <h3 class="card-title"><a href="#/artiste/${a.id}">${esc(a.name)}</a></h3>

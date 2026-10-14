@@ -1,41 +1,47 @@
 /* =========================================================
-   ATYPIIK — Thème « Atelier »
-   Épuré et lumineux : blanc cassé, beige et noir, un bordeaux
-   en touches discrètes et un soupçon de chrome argenté.
+   ATYPIIK — Thème « Golden Hour »
+   Chaleureux, esprit surf rétro : sable et crème, bordeaux
+   profond, encre brun foncé et quelques reflets de chrome.
    Ce fichier ne contient que les variables : copiez-le tel quel
    dans un autre projet pour en récupérer la palette.
    ========================================================= */
 
-/* Mise en page : grands visuels, beaucoup d'air, filets fins, titres en serif. */
+/* Mise en page : formes arrondies, images en arche, vagues entre les sections. */
 :root {
   color-scheme: light;
 
-  /* --- Base --- */
-  --paper: #faf8f4; /* blanc cassé : fond de page */
-  --paper-2: #efe8dc; /* beige : fonds d'œuvres, encarts, footer */
-  --white: #ffffff;
-  --ink: #1a1717; /* noir doux : texte, boutons */
-  --ink-2: #5a524d;
-  --ink-3: #9a918a;
-  --rule: #1a1717;
-  --rule-soft: #e2dbd0;
+  /* --- Base chaude --- */
+  --paper: #f8efe2; /* crème : fond de page */
+  --paper-2: #efdfc8; /* sable : encarts, fonds d'œuvres */
+  --sand: #e3c9a3; /* sable doré : détails, vagues */
+  --white: #fffaf3; /* blanc chaud : cartes, champs */
+  --ink: #2b1a17; /* brun très foncé : texte, boutons */
+  --ink-2: #5e4a43;
+  --ink-3: #9b857a;
+  --rule: #2b1a17;
+  --rule-soft: #e6d5bd;
 
-  /* --- Accent discret : bordeaux --- */
+  /* --- Bordeaux --- */
   --accent: #6d1a2a;
   --accent-deep: #4a0f1b;
-  --accent-soft: #f1e4e2;
+  --accent-2: #9a3a46; /* bordeaux délavé par le soleil */
+  --accent-soft: #f2dcd6;
 
-  /* --- Chrome argenté (avatars, badge « plusieurs versions ») --- */
+  /* --- Chrome argenté --- */
   --silver: #c9ccd3;
   --chrome: linear-gradient(135deg, #fbfbfc 0%, #c4c8cf 25%, #ffffff 45%, #9097a1 62%, #eceef1 80%, #b3b8c0 100%);
-  --chrome-edge: inset 0 1px 0 #fff, 0 1px 2px rgba(0, 0, 0, 0.12);
+  --chrome-edge: inset 0 1px 0 #fff, 0 2px 6px rgba(43, 26, 23, 0.15);
 
   /* --- Typo --- */
-  --font-logo: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
-  --font-display: "Instrument Serif", "Times New Roman", Georgia, serif;
-  --font-body: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-logo: "Fraunces", Georgia, serif;
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Karla", "Helvetica Neue", Arial, sans-serif;
 
   /* --- Formes --- */
-  --radius: 0;
+  --radius: 999px; /* boutons et pastilles */
+  --radius-lg: 28px; /* cartes et panneaux */
+  --radius-md: 18px;
+  --radius-sm: 12px;
+  --shadow: 0 18px 40px -22px rgba(74, 15, 27, 0.35);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }

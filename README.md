@@ -1,7 +1,8 @@
 # ATYPIIK — Marketplace d'art
 
-Front-end ATYPIIK, thème **« Atelier »** : épuré et lumineux, blanc cassé, beige et noir,
-un bordeaux en touches discrètes et un soupçon de chrome argenté.
+Front-end ATYPIIK, thème **« Golden Hour »** : chaleureux, esprit surf rétro. Sable et crème,
+bordeaux profond, encre brun foncé et quelques reflets de chrome ; formes arrondies,
+images en arche, vagues entre les sections et soleil couchant sur l'accueil.
 
 **Le plus simple :** ouvrez `dist/ATYPIIK.html` d'un double-clic (tout le site en un seul fichier).
 Après une modification des sources, régénérez-le avec `python3 tools/build.py`.
@@ -22,15 +23,16 @@ Puis ouvrir http://localhost:8000
 
 | Rôle | Couleur | Usage |
 | --- | --- | --- |
-| Fond | `#faf8f4` blanc cassé | fond de page |
-| Beige | `#efe8dc` | fonds d'œuvres, bandeau, footer |
-| Encre | `#1a1717` noir doux | texte, boutons |
-| Accent | `#6d1a2a` bordeaux | bouton panier, survols, compteurs, alertes |
-| Chrome | dégradé `--chrome` | avatars d'artistes, badge « Plusieurs versions » |
+| Fond | `#f8efe2` crème | fond de page |
+| Sable | `#efdfc8` / `#e3c9a3` | encarts, fonds d'œuvres, détails |
+| Blanc chaud | `#fffaf3` | cartes, panneaux, champs |
+| Encre | `#2b1a17` brun foncé | texte, boutons secondaires |
+| Bordeaux | `#6d1a2a` | boutons, soleil, ruban, footer, compteurs |
+| Chrome | dégradé `--chrome` | pastille tournante, avatars, bouton « Acheter maintenant », badge « Plusieurs versions » |
 
 Toutes les couleurs sont des variables CSS dans `css/theme.css`.
 
-Polices : **Instrument Serif** (titres) et **Instrument Sans** (logo, texte, navigation).
+Polices : **Fraunces** en version douce (logo et titres) et **Karla** (texte, navigation).
 
 ## Photos
 
