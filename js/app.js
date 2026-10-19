@@ -16,7 +16,7 @@ const clone = (o) => JSON.parse(JSON.stringify(o));
 const initials = (name) => name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
 
 /* ---------- Persistance ---------- */
-const DATA_VERSION = 3;
+const DATA_VERSION = 4;
 const store = {
   get(key, fallback) {
     try {
@@ -93,6 +93,8 @@ const visibleWorks = () => state.works.filter((w) => !w.hidden);
 const byId = (id) => state.works.find((w) => w.id === id);
 const artistById = (id) => state.artists.find((a) => a.id === id);
 const artistOf = (w) => artistById(w.artist) || { id: w.artist, name: "Artiste", city: "", bio: "", followers: 0, videos: [], press: [] };
+const shippingOf = (w) => w.ship ?? SHIPPING_BY_SIZE[w.size] ?? 15;
+const COMMISSION = 0.1;
 const totalStock = (w) => w.variants.reduce((s, v) => s + v.stock, 0);
 const STEPS = ["Confirmée", "En préparation", "Expédiée", "Livrée"];
 
@@ -234,7 +236,7 @@ function viewHome() {
 
     <section class="section story">
       <div class="story-media">
-        <div class="portrait"><span>${initials(STORY.founder)}</span></div>
+        <div class="portrait">${STORY.photo ? `<img src="${STORY.photo}" alt="${esc(STORY.founder)}, ${esc(STORY.role.toLowerCase())}" />` : `<span>${initials(STORY.founder)}</span>`}</div>
         <div class="story-caption mono"><span>${esc(STORY.founder)}</span><span>${esc(STORY.role)}</span></div>
       </div>
       <div class="story-text">
@@ -483,14 +485,14 @@ function viewStory() {
     <div class="page-head"><h1>Notre <span class="fun">histoire</span></h1><p>${esc(STORY.intro)}</p></div>
     <div class="story-page">
       <aside class="story-media">
-        <div class="portrait"><span>${initials(STORY.founder)}</span></div>
+        <div class="portrait">${STORY.photo ? `<img src="${STORY.photo}" alt="${esc(STORY.founder)}, ${esc(STORY.role.toLowerCase())}" />` : `<span>${initials(STORY.founder)}</span>`}</div>
         <div class="story-caption mono"><span>${esc(STORY.founder)}</span><span>${esc(STORY.role)}</span></div>
       </aside>
       <div class="chapters">
         ${STORY.chapters
           .map((c, i) => `<section class="chapter"><span class="ref">${String(i + 1).padStart(2, "0")}</span><h2>${esc(c.title)}</h2><p>${esc(c.text)}</p></section>`)
           .join("")}
-        <blockquote class="story-quote">« ${esc(STORY.quote)} »<cite class="mono">— ${esc(STORY.founder)}, ${esc(STORY.role.toLowerCase())}</cite></blockquote>
+        <blockquote class="story-quote">« ${esc(STORY.quote)} »<cite class="mono">— ${esc(STORY.founder)}</cite></blockquote>
         <div class="hero-cta">
           <a class="btn" href="#/galerie">Explorer la galerie</a>
           <a class="btn btn-outline" href="#/profil">Rejoindre en tant qu'artiste</a>
@@ -573,17 +575,32 @@ function viewCart() {
           </div>`;
         })
         .join("")}</div>
-      ${summaryBox(total, `<a class="btn btn-block" href="#/paiement" ${blocked ? "data-blocked" : ""} style="margin-top:16px${blocked ? ";opacity:.35;pointer-events:none" : ""}">Passer au paiement</a>`)}
+      ${summaryBox(lines, `<a class="btn btn-block" href="#/paiement" ${blocked ? "data-blocked" : ""} style="margin-top:16px${blocked ? ";opacity:.35;pointer-events:none" : ""}">Passer au paiement</a>`)}
     </div>`;
 }
-function summaryBox(total, cta = "") {
-  const ship = total >= 150 ? 0 : 12;
+function cartShipping(lines) {
+  return lines.reduce((sum, l) => sum + shippingOf(l.w), 0);
+}
+/* split = true sur la page de paiement : on y détaille la répartition du montant. */
+function summaryBox(lines, cta = "", split = false) {
+  const total = lines.reduce((s, l) => s + l.w.price * l.qty, 0);
+  const ship = cartShipping(lines);
   return `
     <aside class="summary">
       <h3>Récapitulatif</h3>
       <div class="summary-row"><span>Sous-total</span><span>${euro(total)}</span></div>
-      <div class="summary-row"><span>Livraison suivie</span><span>${ship ? euro(ship) : "Offerte"}</span></div>
+      <div class="summary-row"><span>Livraison suivie</span><span>${euro(ship)}</span></div>
       <div class="summary-row total"><span>Total TTC</span><span>${euro(total + ship)}</span></div>
+      ${
+        split
+          ? `<div class="split">
+              <span class="mono">Où va votre argent</span>
+              <div class="summary-row sub"><span>Aux artistes (90 % des œuvres)</span><span>${euro(total * (1 - COMMISSION))}</span></div>
+              <div class="summary-row sub"><span>Frais de port, reversés aux artistes</span><span>${euro(ship)}</span></div>
+              <div class="summary-row sub"><span>ATYPIIK (10 % des œuvres)</span><span>${euro(total * COMMISSION)}</span></div>
+            </div>`
+          : ""
+      }
       ${cta}
       <p class="secure">🔒 Paiement sécurisé Stripe Connect · PCI-DSS</p>
     </aside>`;
@@ -625,12 +642,12 @@ function viewCheckout() {
             <div class="field"><label for="cc-cvc">CVC</label><input id="cc-cvc" required inputmode="numeric" placeholder="123" autocomplete="cc-csc" /></div>
           </div>
           <p class="hint">Démo : aucun paiement réel n'est effectué. En production, la saisie de la carte est gérée par Stripe.</p>
-          <button class="btn btn-block">Payer ${euro(total + (total >= 150 ? 0 : 12))}</button>
+          <button class="btn btn-block">Payer ${euro(total + cartShipping(lines))}</button>
         </form>`;
   return `
     <div class="page-head"><h1>Commande</h1></div>
     <div class="checkout-steps">${steps}</div>
-    <div class="cart">${form}${summaryBox(total)}</div>`;
+    <div class="cart">${form}${summaryBox(lines, "", true)}</div>`;
 }
 
 function bindCheckout() {
@@ -662,7 +679,7 @@ function placeOrder() {
     toast(`« ${bad.w.title} » n'est plus disponible en quantité suffisante.`);
     return nav("#/panier");
   }
-  const total = lines.reduce((s, l) => s + l.w.price * l.qty, 0);
+  const total = lines.reduce((s, l) => s + l.w.price * l.qty, 0) + cartShipping(lines);
   const a = state.checkout.address;
   const id = "CMD-2026-" + String(1000 + state.orders.length + Math.floor(Math.random() * 8000)).padStart(4, "0");
   lines.forEach((l) => {
@@ -808,6 +825,10 @@ function loginForms() {
           <div class="field-row">
             <div class="field"><label for="su-city">Ville</label><input id="su-city" /></div>
             <div class="field"><label for="su-disc">Discipline</label><input id="su-disc" placeholder="Peinture, photo…" /></div>
+          </div>
+          <div class="seller-terms">
+            <strong>Comment vous êtes payé·e</strong>
+            <p>Vous fixez votre prix. Sur chaque vente, ATYPIIK prélève une commission de <b>10 %</b> et vous recevez <b>90 %</b>, versés par Stripe après la livraison. Les frais de port sont payés par l'acheteur et vous sont reversés en totalité.</p>
           </div>
         </div>
         <div class="field"><label for="su-pass">Mot de passe</label><input id="su-pass" type="password" required minlength="8" autocomplete="new-password" /></div>
@@ -1019,7 +1040,7 @@ function sellerSpace() {
               (w) => `<tr>
               <td><a href="#/oeuvre/${w.id}" style="display:flex;gap:10px;align-items:center">${visual(w, "display:block;width:44px;height:44px;flex:none")}<strong>${esc(w.title)}</strong></a></td>
               <td>${w.variants.map((v, i) => `<label style="display:flex;gap:6px;align-items:center;margin:2px 0"><span style="min-width:90px">${esc(v.label)}</span><input type="number" min="0" value="${v.stock}" style="width:64px;padding:4px;border:1px solid var(--ink)" data-act="edit-stock" data-id="${w.id}" data-i="${i}" aria-label="Stock ${esc(v.label)}" /></label>`).join("")}</td>
-              <td class="num"><input type="number" min="1" value="${w.price}" style="width:90px;padding:4px;border:1px solid var(--ink);text-align:right" data-act="edit-price" data-id="${w.id}" aria-label="Prix" /></td>
+              <td class="num"><input type="number" min="1" value="${w.price}" style="width:90px;padding:4px;border:1px solid var(--ink);text-align:right" data-act="edit-price" data-id="${w.id}" aria-label="Prix" /><div class="mono muted" style="margin-top:4px">net ${euro(w.price * (1 - COMMISSION))} + port</div></td>
               <td>${w.hidden ? '<span class="tag pink">Masquée</span>' : w.sold ? '<span class="tag grey">Vendue</span>' : totalStock(w) ? '<span class="tag green">En ligne</span>' : '<span class="tag pink">Rupture</span>'}</td>
               <td class="num"><button class="btn btn-small btn-outline" data-act="save-work" data-id="${w.id}">Enregistrer</button></td>
             </tr>`,
@@ -1090,7 +1111,11 @@ function addWorkForm() {
       <div class="field"><label for="wk-desc">Description</label><textarea id="wk-desc" rows="3"></textarea></div>
       <div class="field-row">
         <div class="field"><label for="wk-type">Type d'art</label><select id="wk-type"><option>Peinture</option><option>Sculpture</option><option>Photographie</option><option>Textile</option><option>Mode</option><option>Bijoux</option><option>Céramique</option><option>Dessin</option></select></div>
-        <div class="field"><label for="wk-price">Prix TTC (€)</label><input id="wk-price" type="number" min="1" required /></div>
+        <div class="field"><label for="wk-price">Prix de vente TTC (€)</label><input id="wk-price" type="number" min="1" required /></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label for="wk-ship">Frais de port payés par l'acheteur (€)</label><input id="wk-ship" type="number" min="0" step="0.5" value="15" /></div>
+        <div class="payout" id="payout" aria-live="polite"></div>
       </div>
       <div class="field-row">
         <div class="field"><label for="wk-color">Couleur dominante</label><select id="wk-color">${Object.keys(COLORS).map((c) => `<option>${c}</option>`).join("")}</select></div>
@@ -1112,8 +1137,28 @@ function addWorkForm() {
     </form>`;
 }
 
+function payoutHtml(price, ship) {
+  if (!price) return `<span class="mono">Ce que vous recevez</span><p class="hint">Saisissez un prix pour voir le calcul.</p>`;
+  return `
+    <span class="mono">Ce que vous recevez</span>
+    <div class="summary-row sub"><span>Prix de vente</span><span>${euro(price)}</span></div>
+    <div class="summary-row sub"><span>Commission ATYPIIK (10 %)</span><span>− ${euro(price * COMMISSION)}</span></div>
+    <div class="summary-row sub"><span>Frais de port reversés</span><span>+ ${euro(ship)}</span></div>
+    <div class="summary-row total"><span>Vous recevez</span><span>${euro(price * (1 - COMMISSION) + ship)}</span></div>`;
+}
+
 function bindSeller() {
   const wf = $("#work-form");
+  if (wf) {
+    const update = () => ($("#payout").innerHTML = payoutHtml(+$("#wk-price").value || 0, Math.max(0, +$("#wk-ship").value || 0)));
+    $("#wk-size").addEventListener("change", (e) => {
+      $("#wk-ship").value = SHIPPING_BY_SIZE[e.target.value];
+      update();
+    });
+    $("#wk-price").addEventListener("input", update);
+    $("#wk-ship").addEventListener("input", update);
+    update();
+  }
   if (wf)
     wf.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -1127,7 +1172,7 @@ function bindSeller() {
       const pick = () => palette[Math.floor(Math.random() * palette.length)];
       const w = {
         id: "u" + Date.now(), title: $("#wk-title").value.trim(), artist: state.user.artistId, type: $("#wk-type").value,
-        color: $("#wk-color").value, size: $("#wk-size").value, price: +$("#wk-price").value,
+        color: $("#wk-color").value, size: $("#wk-size").value, price: +$("#wk-price").value, ship: Math.max(0, +$("#wk-ship").value || 0),
         technique: $("#wk-tech").value.trim() || "—", dims: $("#wk-dims").value.trim() || "—", description: $("#wk-desc").value.trim(),
         art: `linear-gradient(${Math.floor(Math.random() * 360)}deg, ${pick()}, ${pick()} 55%, ${pick()})`,
         variants: variants.length ? variants : [{ label: "Original", stock: 1 }], isNew: true,
@@ -1231,7 +1276,7 @@ function adminSpace() {
 function viewLegal(key) {
   const pages = {
     mentions: ["Mentions légales", "<p>Éditeur : ATYPIIK SAS (à compléter : capital, RCS, siège social, directeur de la publication).</p><p>Hébergement : à compléter (nom, adresse et téléphone de l'hébergeur).</p><p>Contact : via la messagerie ou l'adresse e-mail de la société.</p>"],
-    cgu: ["CGU / CGV", "<p>Les présentes conditions encadrent l'utilisation de la marketplace ATYPIIK par les acheteurs et les artistes vendeurs.</p><p><strong>Commission :</strong> ATYPIIK prélève 10 % du prix de vente TTC de chaque transaction. L'artiste perçoit 90 %, versés via Stripe Connect après la livraison.</p><p><strong>Rétractation :</strong> 14 jours à compter de la réception, hors œuvres réalisées sur commande personnalisée.</p>"],
+    cgu: ["CGU / CGV", "<p>Les présentes conditions encadrent l'utilisation de la marketplace ATYPIIK par les acheteurs et les artistes vendeurs.</p><p><strong>Commission :</strong> ATYPIIK prélève 10 % du prix de vente TTC de chaque transaction. L'artiste perçoit 90 %, versés via Stripe Connect après la livraison.</p><p><strong>Livraison :</strong> les frais de port sont fixés par l'artiste pour chaque œuvre, payés par l'acheteur et reversés intégralement à l'artiste ; ils n'entrent pas dans le calcul de la commission.</p><p><strong>Rétractation :</strong> 14 jours à compter de la réception, hors œuvres réalisées sur commande personnalisée.</p>"],
   };
   if (key === "rgpd")
     return `

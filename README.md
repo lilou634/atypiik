@@ -64,11 +64,19 @@ et enregistrées dans le navigateur (localStorage).
 - **Notifications** : commande, expédition, livraison, baisse de prix, retour en stock,
   nouvelle œuvre d'un artiste suivi, offres.
 - **RGPD** : bandeau cookies, formulaire d'exercice des droits, pages légales.
-- **Notre histoire** : section sur l'accueil et page dédiée avec la fondatrice. Le texte est
-  provisoire : il se modifie dans l'objet `STORY` de `js/data.js` (nom, rôle, intro, citation, chapitres).
+- **Notre histoire** : section sur l'accueil et page dédiée, avec Lilou Capanni, fondatrice.
+  Texte, citation et photo se modifient dans l'objet `STORY` de `js/data.js`
+  (photo : `assets/photos/fondatrice.jpg`).
 
-Le partage 90 % / 10 % n'est affiché qu'aux artistes (espace artiste, back-office, CGU/CGV),
-pas sur les pages vues par les acheteurs.
+## Commission et frais de port
+
+- Commission ATYPIIK : **10 % du prix de vente** de l'œuvre ; l'artiste reçoit 90 %.
+- Les **frais de port** sont fixés par l'artiste pour chaque œuvre (valeur par défaut selon le format :
+  8 / 15 / 25 €), **payés par l'acheteur** et **reversés intégralement à l'artiste**. Ils n'entrent pas
+  dans le calcul de la commission.
+- Où c'est affiché : à l'inscription artiste, dans le formulaire de publication (calcul en direct de ce
+  que l'artiste reçoit), dans « Mes œuvres », au moment du paiement (« Où va votre argent »), dans
+  l'espace admin et les CGU/CGV. Pas sur l'accueil ni dans le panier.
 
 ## Structure
 

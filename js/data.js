@@ -188,26 +188,29 @@ const SEED_SALES = [
   { order: "CMD-2026-0980", date: "2026-10-10", buyer: "Yanis K.", work: "a2", qty: 1, price: 1650, status: 3 },
 ];
 
-/* « Notre histoire » — texte provisoire, à remplacer par celui de la fondatrice
-   (nom, rôle, parcours, citation). */
+/* « Notre histoire » — la citation est une proposition, à ajuster librement. */
 const STORY = {
-  founder: "La fondatrice",
+  founder: "Lilou Capanni",
   role: "Fondatrice d'ATYPIIK",
+  photo: "assets/photos/fondatrice.jpg",
   intro:
-    "ATYPIIK est né d'une envie simple : donner aux artistes indépendants un vrai lieu pour exposer et vendre leur travail, et à chacun l'occasion de vivre avec des pièces qui ont une histoire.",
-  quote: "Je voulais que les artistes n'aient plus à choisir entre créer et être vus.",
+    "J'ai lancé ATYPIIK pour que les artistes et les esprits créatifs aient enfin un endroit à eux : un lieu pour montrer leur talent, leur savoir-faire, et vendre ce qu'ils créent.",
+  quote: "Tout le monde n'a pas les moyens de créer sa marque. Tout le monde mérite d'être vu.",
   chapters: [
     {
       title: "Le constat",
-      text: "Beaucoup d'artistes talentueux restent invisibles : pas de galerie, pas de vitrine, et des plateformes généralistes où leurs créations se perdent entre deux annonces.",
+      text: "Autour de moi, je vois des gens incroyablement doués : peintres, créatrices de bijoux, couturiers, photographes. Beaucoup n'ont ni site, ni marque, ni budget pour se lancer, et leur travail reste dans l'atelier ou sur un compte Instagram.",
     },
     {
       title: "L'idée",
-      text: "Créer une marketplace dédiée à l'art dans sa globalité — peinture, sculpture, photographie, mode, bijoux, céramique — où chaque pièce est présentée avec l'artiste qui l'a faite.",
+      text: "Créer un espace qui leur appartient, où l'on vient pour l'art dans sa globalité. Chaque artiste y a sa page, ses œuvres, ses coulisses, et vend en direct, sans avoir à tout construire seul.",
     },
     {
       title: "La mission",
-      text: "Offrir aux artistes un espace d'exposition digital et sécurisé, et rendre la découverte et l'achat d'œuvres simples, directs et humains.",
+      text: "Mettre en avant le talent et le savoir-faire, permettre à chacun de vendre et de partager son art, et donner aux acheteurs l'envie de vivre avec des pièces qui ont une histoire.",
     },
   ],
 };
+
+/* Frais de port par défaut selon le format, payés par l'acheteur et reversés à l'artiste. */
+const SHIPPING_BY_SIZE = { S: 8, M: 15, L: 25 };
