@@ -217,11 +217,12 @@ h4 {
 }
 .nav {
   display: flex;
-  gap: 24px;
+  gap: clamp(14px, 1.8vw, 26px);
 }
 .nav a {
   position: relative;
   padding: 4px 0;
+  white-space: nowrap;
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -765,8 +766,10 @@ main {
   border-left: 1px solid var(--rule);
 }
 .cat {
+  min-width: 0;
   position: relative;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto 1fr;
   border-right: 1px solid var(--rule);
   border-bottom: 1px solid var(--rule);
@@ -800,6 +803,10 @@ main {
   padding: 12px 14px;
 }
 .cat-label span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--accent);
   font-family: var(--font-fun);
   font-size: 1.35rem;
@@ -2611,7 +2618,7 @@ td .btn + .btn {
 }
 
 /* ---------- Responsive ---------- */
-@media (max-width: 1080px) {
+@media (max-width: 1180px) {
   .grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
