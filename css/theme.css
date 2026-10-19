@@ -1,11 +1,27 @@
 /* =========================================================
    ATYPIIK — Thème « Studio »
    Graphique et net, inspiré du streetwear : angles vifs,
-   filets noirs, capitales condensées. Bordeaux, beige, blanc,
+   filets noirs, titres en Cubao et touches de Le Petit Cochon. Bordeaux, beige, blanc,
    noir, et le chrome en détail.
    Ce fichier ne contient que les variables : copiez-le tel quel
    dans un autre projet pour en récupérer la palette.
    ========================================================= */
+
+/* --- Polices de marque ---
+   Déposez les fichiers dans assets/fonts/ (voir le README de ce dossier).
+   Tant qu'ils sont absents, des polices proches de Google Fonts prennent le relais. */
+@font-face {
+  font-family: "Cubao";
+  src: local("Cubao"), local("Cubao Free"), url("../assets/fonts/Cubao.woff2") format("woff2"),
+    url("../assets/fonts/Cubao.otf") format("opentype"), url("../assets/fonts/Cubao.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "Le Petit Cochon";
+  src: local("Le Petit Cochon"), local("LePetitCochon"), url("../assets/fonts/LePetitCochon.woff2") format("woff2"),
+    url("../assets/fonts/LePetitCochon.otf") format("opentype"), url("../assets/fonts/LePetitCochon.ttf") format("truetype");
+  font-display: swap;
+}
 
 /* Mise en page : grille stricte à filets, visuels « accrochés au mur », références en mono. */
 :root {
@@ -25,13 +41,15 @@
   --accent: #6d1a2a;
   --accent-deep: #4a0f1b;
   --accent-soft: #f3e6e4;
+  --accent-bright: #b8384f; /* bordeaux lisible sur fond noir */
 
   /* --- Chrome argenté --- */
   --silver: #c9ccd3;
   --chrome: linear-gradient(115deg, #f7f8f9 0%, #b8bcc4 30%, #ffffff 48%, #8b919b 66%, #e8eaee 84%, #aeb3bb 100%);
 
   /* --- Typo --- */
-  --font-display: "Archivo", "Arial Narrow", Arial, sans-serif; /* utilisée condensée (wdth 75) */
+  --font-display: "Cubao", "Big Shoulders Display", "Arial Narrow", sans-serif; /* titres */
+  --font-fun: "Le Petit Cochon", "Gluten", "Comic Sans MS", cursive; /* mots d'accent, avec parcimonie */
   --font-body: "Archivo", "Helvetica Neue", Arial, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 

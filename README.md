@@ -31,7 +31,10 @@ Puis ouvrir http://localhost:8000
 
 Toutes les couleurs sont des variables CSS dans `css/theme.css`.
 
-Polices : **Archivo** (condensée pour les titres, élargie pour le logo, normale pour le texte) et **IBM Plex Mono** (références, prix, détails techniques).
+Polices : **Cubao** (titres), **Le Petit Cochon** (quelques mots d'accent), **Archivo** (logo élargi
+et texte) et **IBM Plex Mono** (références, détails techniques). Cubao et Le Petit Cochon ne sont
+pas sur Google Fonts : déposez leurs fichiers dans `assets/fonts/` (voir le README du dossier).
+En attendant, Big Shoulders Display et Gluten les remplacent.
 
 ## Photos
 

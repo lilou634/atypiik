@@ -9,18 +9,34 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Big+Shoulders+Display:wght@700;800;900&family=Gluten:wght@500;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
     <style>
 /* =========================================================
    ATYPIIK — Thème « Studio »
    Graphique et net, inspiré du streetwear : angles vifs,
-   filets noirs, capitales condensées. Bordeaux, beige, blanc,
+   filets noirs, titres en Cubao et touches de Le Petit Cochon. Bordeaux, beige, blanc,
    noir, et le chrome en détail.
    Ce fichier ne contient que les variables : copiez-le tel quel
    dans un autre projet pour en récupérer la palette.
    ========================================================= */
+
+/* --- Polices de marque ---
+   Déposez les fichiers dans assets/fonts/ (voir le README de ce dossier).
+   Tant qu'ils sont absents, des polices proches de Google Fonts prennent le relais. */
+@font-face {
+  font-family: "Cubao";
+  src: local("Cubao"), local("Cubao Free"), url("../assets/fonts/Cubao.woff2") format("woff2"),
+    url("../assets/fonts/Cubao.otf") format("opentype"), url("../assets/fonts/Cubao.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "Le Petit Cochon";
+  src: local("Le Petit Cochon"), local("LePetitCochon"), url("../assets/fonts/LePetitCochon.woff2") format("woff2"),
+    url("../assets/fonts/LePetitCochon.otf") format("opentype"), url("../assets/fonts/LePetitCochon.ttf") format("truetype");
+  font-display: swap;
+}
 
 /* Mise en page : grille stricte à filets, visuels « accrochés au mur », références en mono. */
 :root {
@@ -40,13 +56,15 @@
   --accent: #6d1a2a;
   --accent-deep: #4a0f1b;
   --accent-soft: #f3e6e4;
+  --accent-bright: #b8384f; /* bordeaux lisible sur fond noir */
 
   /* --- Chrome argenté --- */
   --silver: #c9ccd3;
   --chrome: linear-gradient(115deg, #f7f8f9 0%, #b8bcc4 30%, #ffffff 48%, #8b919b 66%, #e8eaee 84%, #aeb3bb 100%);
 
   /* --- Typo --- */
-  --font-display: "Archivo", "Arial Narrow", Arial, sans-serif; /* utilisée condensée (wdth 75) */
+  --font-display: "Cubao", "Big Shoulders Display", "Arial Narrow", sans-serif; /* titres */
+  --font-fun: "Le Petit Cochon", "Gluten", "Comic Sans MS", cursive; /* mots d'accent, avec parcimonie */
   --font-body: "Archivo", "Helvetica Neue", Arial, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 
@@ -121,8 +139,6 @@ h4 {
 .kpis b,
 .drawer a {
   font-family: var(--font-display);
-  font-stretch: 75%;
-  font-variation-settings: "wdth" 75;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: -0.005em;
@@ -289,7 +305,7 @@ h4 {
   right: 0;
 }
 .logo {
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-stretch: 125%;
   font-variation-settings: "wdth" 125;
   font-weight: 900;
@@ -353,8 +369,6 @@ h4 {
   border: 0;
   background: transparent;
   font-family: var(--font-display);
-  font-stretch: 75%;
-  font-variation-settings: "wdth" 75;
   font-weight: 800;
   font-size: 1.6rem;
   text-transform: uppercase;
@@ -547,7 +561,15 @@ main {
 }
 .hero h1 .accent {
   display: block;
-  -webkit-text-stroke: 1.5px var(--paper);
+  margin-top: 0.08em;
+  font-family: var(--font-fun);
+  font-weight: 400;
+  font-size: 0.82em;
+  text-transform: none;
+  line-height: 1.05;
+  background: var(--chrome);
+  -webkit-background-clip: text;
+  background-clip: text;
   color: transparent;
 }
 .hero p {
@@ -572,8 +594,6 @@ main {
 .hero-stats b {
   display: block;
   font-family: var(--font-display);
-  font-stretch: 75%;
-  font-variation-settings: "wdth" 75;
   font-weight: 800;
   font-size: 2rem;
   line-height: 1;
@@ -585,7 +605,7 @@ main {
   color: var(--ink-3);
 }
 .hero-stats .accent {
-  color: #d27a88;
+  color: var(--accent-bright);
 }
 
 /* Barre de catégories */
@@ -631,8 +651,10 @@ main {
   font-size: clamp(3.2rem, 8vw, 7.4rem);
 }
 .band h2 span {
-  -webkit-text-stroke: 1.5px var(--paper);
-  color: transparent;
+  font-family: var(--font-fun);
+  font-weight: 400;
+  font-size: 0.82em;
+  text-transform: none;
 }
 .band p {
   max-width: 460px;
@@ -687,8 +709,6 @@ main {
 }
 .cat-label span:first-child {
   font-family: var(--font-display);
-  font-stretch: 75%;
-  font-variation-settings: "wdth" 75;
   font-weight: 800;
   font-size: 1.5rem;
   text-transform: uppercase;
@@ -1224,8 +1244,6 @@ img.art {
   height: 150px;
   background: var(--chrome);
   font-family: var(--font-display);
-  font-stretch: 75%;
-  font-variation-settings: "wdth" 75;
   font-weight: 800;
   font-size: 2.6rem;
   color: var(--ink);
@@ -1921,13 +1939,11 @@ td .btn + .btn {
 }
 .footer-word {
   margin-top: 48px;
-  font-family: var(--font-display);
-  font-stretch: 125%;
-  font-variation-settings: "wdth" 125;
-  font-weight: 900;
-  font-size: clamp(4rem, 15.5vw, 15rem);
-  line-height: 0.8;
-  letter-spacing: 0.02em;
+  font-family: var(--font-fun);
+  font-weight: 400;
+  font-size: clamp(4rem, 17vw, 16rem);
+  line-height: 0.9;
+  letter-spacing: 0;
   background: var(--chrome);
   -webkit-background-clip: text;
   background-clip: text;
@@ -2106,9 +2122,9 @@ td .btn + .btn {
     z-index: 60;
     display: flex;
     justify-content: space-around;
-    padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
-    background: var(--paper);
-    border-top: 1px solid var(--ink);
+    padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px));
+    background: var(--ink);
+    color: var(--paper);
   }
   .bottom-bar a {
     position: relative;
@@ -2126,7 +2142,11 @@ td .btn + .btn {
     height: 20px;
   }
   .bottom-bar a.active {
-    color: var(--accent);
+    box-shadow: inset 0 -2px 0 var(--accent-bright);
+  }
+  .bottom-bar a[data-route="favoris"] svg {
+    color: var(--accent-bright);
+    fill: var(--accent-bright);
   }
   .bottom-bar .count {
     top: 0;
@@ -2249,7 +2269,7 @@ td .btn + .btn {
             </nav>
           </div>
         </div>
-        <div class="footer-word" aria-hidden="true">ATYPIIK</div>
+        <div class="footer-word" aria-hidden="true">atypiik</div>
         <div class="footer-bottom">
           <span>© <span id="year"></span> ATYPIIK</span>
           <span>Paiement sécurisé · Stripe Connect · HTTPS</span>
