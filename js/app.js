@@ -128,6 +128,8 @@ function updateChrome() {
 }
 
 /* ---------- Composants ---------- */
+/* Référence catalogue affichée en mono, ex. « N°A01 ». */
+const ref = (w) => "N°" + w.id.toUpperCase().replace(/^A(\d)$/, "A0$1").slice(0, 6);
 /* Visuel d'une œuvre : la photo si elle existe (js/photos.js), sinon un aplat généré. */
 function visual(w, style = "") {
   if (!w) return `<div class="art" style="background:var(--chrome);${style}"></div>`;
@@ -158,8 +160,9 @@ function card(w, extra = "") {
       <div class="badges">${badgesFor(w)}</div>
       <button class="fav-btn ${fav ? "on" : ""}" data-act="fav" data-id="${w.id}" aria-pressed="${fav}" aria-label="Favori">${heart}</button>
       <div class="card-body">
+        <span class="ref">${ref(w)} · ${esc(w.type)}</span>
         <h3 class="card-title"><a href="#/oeuvre/${w.id}">${esc(w.title)}</a></h3>
-        <div class="card-artist"><a href="#/artiste/${a.id}">${esc(a.name)}</a> · ${esc(w.type)}</div>
+        <div class="card-artist"><a href="#/artiste/${a.id}">${esc(a.name)}</a></div>
         <span class="price">${euro(w.price)}</span>
         ${extra}
       </div>
@@ -187,80 +190,89 @@ function emptyBox(title, text, cta = "") {
 
 function viewHome() {
   const works = visibleWorks();
-  const left = byId("a7");
-  const right = byId("a2");
+  const hero = byId("a1");
   const cats = [
     ["Peinture", "a1"],
     ["Mode", "a13"],
     ["Bijoux", "a15"],
     ["Photographie", "a8"],
   ];
-  const words = ["Pièces uniques", "Peinture", "Mode", "Bijoux", "Céramique", "Photographie", "Artistes indépendants"];
-  const ribbon = [...words, ...words].map((w) => `<span>${w}</span><span class="sun-dot">✺</span>`).join("");
+  const disciplines = ["Nouveautés", "Peinture", "Sculpture", "Photographie", "Mode", "Bijoux", "Céramique", "Textile"];
   return `
     <section class="hero">
+      <div class="hero-wall">
+        <div class="hero-corner mono"><span>Collection 01</span><span>Automne 2026</span></div>
+        <a class="hero-frame" href="#/oeuvre/${hero.id}" aria-label="${esc(hero.title)}">${visual(hero)}</a>
+        <div class="hero-plate mono"><span>${esc(hero.title)} — ${esc(artistOf(hero).name)}</span><span>${ref(hero)} · ${euro(hero.price)}</span></div>
+      </div>
+      <div class="hero-panel">
+        <span class="ref">ATYPIIK / Marketplace d'art indépendant</span>
+        <div>
+          <h1>L'art<br />sans<br /><span class="accent">filtre.</span></h1>
+          <p>Peinture, mode, bijoux, céramique&nbsp;: des pièces uniques ou en série limitée, vendues en direct par les artistes qui les créent.</p>
+          <div class="hero-cta">
+            <a href="#/galerie" class="btn btn-light">Explorer la galerie</a>
+            <a href="#/profil" class="btn btn-chrome">Vendre mes œuvres</a>
+          </div>
+        </div>
+        <div class="hero-stats">
+          <div><b>${state.works.length * 73}</b><span>Œuvres</span></div>
+          <div><b>${state.artists.length * 61}</b><span>Artistes</span></div>
+          <div><b class="accent">90 %</b><span>Pour l'artiste</span></div>
+        </div>
+      </div>
+    </section>
+
+    <nav class="catbar" aria-label="Disciplines">${disciplines
+      .map((d) => (d === "Nouveautés" ? `<a href="#/galerie" data-act="reset-gallery">${d}</a>` : `<a href="#/galerie" data-act="cat" data-type="${d}">${d}</a>`))
+      .join("")}</nav>
+
+    <section class="section">
+      <div class="section-head"><div><span class="ref">01 — Nouveautés</span><h2>Nouvelles pièces</h2></div><a href="#/galerie">Tout voir</a></div>
+      <div class="grid">${works.slice(0, 8).map((w) => card(w)).join("")}</div>
+    </section>
+
+    <section class="section band">
+      <div><span class="ref">02 — Modèle</span><h2>90 % pour<br /><span>l'artiste.</span></h2></div>
       <div>
-        <span class="eyebrow">Marketplace d'art indépendant</span>
-        <h1>L'art qui fait <em>des vagues.</em></h1>
-        <p>Des pièces uniques ou déclinées, en direct des artistes qui les créent. Peinture, mode, bijoux, céramique&nbsp;: trouvez celle qui vous ressemble.</p>
-        <div class="hero-cta">
-          <a href="#/galerie" class="btn">Explorer la galerie</a>
-          <a href="#/profil" class="btn btn-outline">Vendre mes œuvres</a>
-        </div>
-        <div class="hero-note"><span><b>90 %</b> reversés à l'artiste</span><span><b>${state.artists.length * 61}</b> artistes</span></div>
-      </div>
-      <div class="hero-visual">
-        <div class="sun" aria-hidden="true"></div>
-        <a class="arch a1" href="#/oeuvre/${left.id}" aria-label="${esc(left.title)}">${visual(left)}</a>
-        <a class="arch a2" href="#/oeuvre/${right.id}" aria-label="${esc(right.title)}">${visual(right)}</a>
-        <div class="sticker" aria-hidden="true">
-          <svg viewBox="0 0 100 100"><defs><path id="circle" d="M50,50 m-37,0 a37,37 0 1,1 74,0 a37,37 0 1,1 -74,0" /></defs><text><textPath href="#circle">Pièces uniques · Fait main · </textPath></text></svg>
-          <b>✺</b>
-        </div>
+        <p>Chaque vente passe par Stripe Connect. L'artiste reçoit 90 % du prix, ATYPIIK garde 10 % pour faire vivre la plateforme. Pas d'intermédiaire, pas de surprise.</p>
+        <a href="#/profil" class="btn btn-light">Ouvrir ma boutique</a>
       </div>
     </section>
 
-    <div class="ribbon" aria-hidden="true"><div class="ribbon-track">${ribbon}</div></div>
-
-    <section class="intro">
-      <p>ATYPIIK relie les collectionneurs et les artistes indépendants. Chaque achat se fait <em>en direct</em>, et l'artiste garde 90&nbsp;% du prix.</p>
-    </section>
-
     <section class="section">
-      <div class="section-head"><div><span class="eyebrow">Nouveautés</span><h2>Fraîchement arrivées</h2></div><a href="#/galerie">Tout voir</a></div>
-      <div class="grid stagger">${works.slice(0, 8).map((w) => card(w)).join("")}</div>
-    </section>
-
-    <section class="section">
-      <div class="section-head"><div><span class="eyebrow">Explorer</span><h2>Par discipline</h2></div></div>
+      <div class="section-head"><div><span class="ref">03 — Disciplines</span><h2>Par catégorie</h2></div></div>
       <div class="cats">${cats
-        .map(([t, id]) => `<a class="cat" href="#/galerie" data-act="cat" data-type="${t}"><div class="cat-media">${visual(byId(id))}</div><span>${t}</span></a>`)
+        .map(([t, id]) => {
+          const n = visibleWorks().filter((w) => w.type === t).length;
+          return `<a class="cat" href="#/galerie" data-act="cat" data-type="${t}"><div class="cat-media">${visual(byId(id))}</div><div class="cat-label"><span>${t}</span><span class="mono">${String(n).padStart(2, "0")}</span></div></a>`;
+        })
         .join("")}</div>
     </section>
 
     <section class="section">
-      <div class="section-head"><div><span class="eyebrow">La communauté</span><h2>Les artistes</h2></div><a href="#/artistes">Tous les artistes</a></div>
+      <div class="section-head"><div><span class="ref">04 — Communauté</span><h2>Les artistes</h2></div><a href="#/artistes">Tous les artistes</a></div>
       <div class="grid">${state.artists.slice(0, 4).map(artistCard).join("")}</div>
     </section>
 
     <section class="section values">
-      <div><span class="tag">Sécurisé</span><h3>Exposition protégée</h3><p>Chaque artiste est vérifié par notre équipe avant de pouvoir vendre.</p></div>
-      <div><span class="tag">Transparent</span><h3>90 / 10</h3><p>Paiement via Stripe Connect : 90 % pour l'artiste, 10 % de commission ATYPIIK.</p></div>
-      <div><span class="tag">Direct</span><h3>Parlez à l'artiste</h3><p>Messagerie privée, coulisses en vidéo et alertes à chaque nouvelle œuvre.</p></div>
+      <div><span class="tag">Vérifié</span><h3>Exposition protégée</h3><p>Chaque artiste est validé par notre équipe avant de pouvoir vendre.</p></div>
+      <div><span class="tag pink">Transparent</span><h3>Paiement sécurisé</h3><p>Stripe Connect, HTTPS et conformité PCI-DSS. Le montant est réparti automatiquement.</p></div>
+      <div><span class="tag">Direct</span><h3>Parlez à l'artiste</h3><p>Messagerie privée, vidéos coulisses et alertes à chaque nouvelle œuvre.</p></div>
     </section>`;
 }
 
 function artistCard(a) {
   const n = visibleWorks().filter((w) => w.artist === a.id).length;
   return `
-    <article class="card artist-card" style="text-align:center">
+    <article class="card artist-card">
       <a href="#/artiste/${a.id}" class="card-media">
-        <div class="avatar" style="width:56%;height:auto;aspect-ratio:1;font-size:3rem">${initials(a.name)}</div>
+        <div class="avatar">${initials(a.name)}</div>
       </a>
       <div class="card-body">
         <h3 class="card-title"><a href="#/artiste/${a.id}">${esc(a.name)}</a></h3>
         <div class="card-artist">${esc(a.city)} · ${n} œuvre${n > 1 ? "s" : ""}</div>
-        <div class="card-actions" style="justify-content:center">${followBtn(a.id, true)}</div>
+        <div class="card-actions">${followBtn(a.id, true)}</div>
       </div>
     </article>`;
 }
@@ -365,6 +377,7 @@ function viewProduct(id) {
       <div class="product-info">
         <div class="badges inline">${badgesFor(w)}</div>
         <h1>${esc(w.title)}</h1>
+        <span class="ref muted">${ref(w)} · ${esc(w.type)}</span>
         <div class="by">par <a href="#/artiste/${a.id}">${esc(a.name)}</a> · ${esc(a.city)}</div>
         <div class="product-price">${euro(w.price)} <small>TTC</small></div>
         <span class="variant-label label">Déclinaisons</span>
@@ -1276,6 +1289,9 @@ const actions = {
   },
   "tab-link"(el) {
     state.tab[el.dataset.key] = el.dataset.id;
+  },
+  "reset-gallery"() {
+    Object.assign(state.gallery, { type: [], color: [], size: [], artist: "", max: 2000, q: "" });
   },
   cat(el) {
     Object.assign(state.gallery, { type: [el.dataset.type], color: [], size: [], artist: "", max: 2000, q: "" });

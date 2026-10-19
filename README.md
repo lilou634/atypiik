@@ -1,8 +1,8 @@
 # ATYPIIK — Marketplace d'art
 
-Front-end ATYPIIK, thème **« Golden Hour »** : chaleureux, esprit surf rétro. Sable et crème,
-bordeaux profond, encre brun foncé et quelques reflets de chrome ; formes arrondies,
-images en arche, vagues entre les sections et soleil couchant sur l'accueil.
+Front-end ATYPIIK, thème **« Studio »** : graphique et net, inspiré du streetwear. Angles vifs,
+filets noirs, titres en capitales condensées, références catalogue en police mono ;
+bordeaux, beige, blanc, noir et le chrome en détail.
 
 **Le plus simple :** ouvrez `dist/ATYPIIK.html` d'un double-clic (tout le site en un seul fichier).
 Après une modification des sources, régénérez-le avec `python3 tools/build.py`.
@@ -23,16 +23,15 @@ Puis ouvrir http://localhost:8000
 
 | Rôle | Couleur | Usage |
 | --- | --- | --- |
-| Fond | `#f8efe2` crème | fond de page |
-| Sable | `#efdfc8` / `#e3c9a3` | encarts, fonds d'œuvres, détails |
-| Blanc chaud | `#fffaf3` | cartes, panneaux, champs |
-| Encre | `#2b1a17` brun foncé | texte, boutons secondaires |
-| Bordeaux | `#6d1a2a` | boutons, soleil, ruban, footer, compteurs |
-| Chrome | dégradé `--chrome` | pastille tournante, avatars, bouton « Acheter maintenant », badge « Plusieurs versions » |
+| Fond | `#ffffff` blanc | fond de page, header |
+| Mur | `#ebe6dd` beige | fond des visuels (œuvres « accrochées ») |
+| Encre | `#111010` noir | texte, filets, boutons, footer, panneau d'accueil |
+| Bordeaux | `#6d1a2a` | bande éditoriale, bouton panier, survols, compteurs, alertes |
+| Chrome | dégradé `--chrome` | bouton secondaire, badge « Plusieurs versions », avatars, logo géant du footer |
 
 Toutes les couleurs sont des variables CSS dans `css/theme.css`.
 
-Polices : **Fraunces** en version douce (logo et titres) et **Karla** (texte, navigation).
+Polices : **Archivo** (condensée pour les titres, élargie pour le logo, normale pour le texte) et **IBM Plex Mono** (références, prix, détails techniques).
 
 ## Photos
 
