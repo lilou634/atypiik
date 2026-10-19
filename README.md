@@ -1,7 +1,7 @@
 # ATYPIIK — Marketplace d'art
 
 Front-end ATYPIIK, thème **« Studio »** : graphique et net, inspiré du streetwear. Angles vifs,
-filets noirs, titres en capitales condensées, références catalogue en police mono ;
+filets noirs, titres en capitales condensées ;
 bordeaux, beige, blanc, noir et le chrome en détail.
 
 **Le plus simple :** ouvrez `dist/ATYPIIK.html` d'un double-clic (tout le site en un seul fichier).
@@ -31,8 +31,8 @@ Puis ouvrir http://localhost:8000
 
 Toutes les couleurs sont des variables CSS dans `css/theme.css`.
 
-Polices : **Cubao** (titres), **Le Petit Cochon** (quelques mots d'accent), **Archivo** (logo élargi
-et texte) et **IBM Plex Mono** (références, détails techniques). Cubao et Le Petit Cochon ne sont
+Polices : **Cubao** (titres), **Le Petit Cochon** (quelques mots d'accent) et **Archivo** (logo élargi,
+texte et petites étiquettes). Cubao et Le Petit Cochon ne sont
 pas sur Google Fonts : déposez leurs fichiers dans `assets/fonts/` (voir le README du dossier).
 En attendant, Big Shoulders Display et Gluten les remplacent.
 

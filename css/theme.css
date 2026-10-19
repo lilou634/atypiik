@@ -51,7 +51,7 @@
   --font-display: "Cubao", "Big Shoulders Display", "Arial Narrow", sans-serif; /* titres */
   --font-fun: "Le Petit Cochon", "Gluten", "Comic Sans MS", cursive; /* mots d'accent, avec parcimonie */
   --font-body: "Archivo", "Helvetica Neue", Arial, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --font-mono: "Archivo", "Helvetica Neue", Arial, sans-serif; /* petites étiquettes (plus de police « terminal ») */
 
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }

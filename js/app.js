@@ -138,8 +138,6 @@ function updateChrome() {
 }
 
 /* ---------- Composants ---------- */
-/* Référence catalogue affichée en mono, ex. « N°A01 ». */
-const ref = (w) => "N°" + w.id.toUpperCase().replace(/^A(\d)$/, "A0$1").slice(0, 6);
 /* Visuel d'une œuvre : la photo si elle existe (js/photos.js), sinon un aplat généré. */
 function visual(w, style = "") {
   if (!w) return `<div class="art" style="background:var(--chrome);${style}"></div>`;
@@ -155,7 +153,6 @@ function badgesFor(w) {
   const b = [];
   if (w.sold) b.push('<span class="badge badge-sold">Vendu</span>');
   else if (totalStock(w) === 0) b.push('<span class="badge badge-out">Rupture de stock</span>');
-  else b.push('<span class="badge badge-stock">● En stock</span>');
   if (w.variants.length > 1) b.push('<span class="badge badge-variants">Plusieurs versions</span>');
   if (w.isNew) b.push('<span class="badge badge-new">Nouveau</span>');
   return b.join("");
@@ -170,7 +167,7 @@ function card(w, extra = "") {
       <div class="badges">${badgesFor(w)}</div>
       <button class="fav-btn ${fav ? "on" : ""}" data-act="fav" data-id="${w.id}" aria-pressed="${fav}" aria-label="Favori">${heart}</button>
       <div class="card-body">
-        <span class="ref">${ref(w)} · ${esc(w.type)}</span>
+        <span class="ref">${esc(w.type)}</span>
         <h3 class="card-title"><a href="#/oeuvre/${w.id}">${esc(w.title)}</a></h3>
         <div class="card-artist"><a href="#/artiste/${a.id}">${esc(a.name)}</a></div>
         <span class="price">${euro(w.price)}</span>
@@ -220,6 +217,14 @@ function readPhotos(files, max = 4) {
   ).then((list) => list.filter(Boolean));
 }
 
+/* Avatar d'artiste : une de ses œuvres (comme sur un vrai profil), sinon ses initiales. */
+function avatar(a, small = false) {
+  const w = visibleWorks().find((x) => x.artist === a.id);
+  return w
+    ? `<div class="avatar has-img${small ? " sm" : ""}">${visual(w)}</div>`
+    : `<div class="avatar${small ? " sm" : ""}">${initials(a.name)}</div>`;
+}
+
 function followBtn(id, small = false) {
   const on = state.follows.includes(id);
   return `<button class="btn ${on ? "btn-outline" : ""} ${small ? "btn-small" : ""}" data-act="follow" data-id="${id}">${on ? "✓ Abonné·e" : "Suivre"}</button>`;
@@ -252,24 +257,17 @@ function viewHome() {
   return `
     <section class="hero">
       <div class="hero-wall">
-        <div class="hero-corner mono"><span>Collection 01</span><span>Automne 2026</span></div>
         <a class="hero-frame" href="#/oeuvre/${hero.id}" aria-label="${esc(hero.title)}">${visual(hero)}</a>
-        <div class="hero-plate mono"><span>${esc(hero.title)} — ${esc(artistOf(hero).name)}</span><span>${ref(hero)} · ${euro(hero.price)}</span></div>
+        <div class="hero-plate"><span><b>${esc(artistOf(hero).name)}</b>, <i>${esc(hero.title)}</i>, ${esc(hero.technique.toLowerCase())}</span><span>${euro(hero.price)}</span></div>
       </div>
       <div class="hero-panel">
-        <span class="ref">ATYPIIK / Marketplace d'art indépendant</span>
         <div>
           <h1>L'art<br />sans<br /><span class="accent">filtre.</span></h1>
           <p>Peinture, mode, bijoux, céramique&nbsp;: des pièces uniques ou en série limitée, vendues en direct par les artistes qui les créent.</p>
           <div class="hero-cta">
             <a href="#/galerie" class="btn btn-light">Explorer la galerie</a>
-            <a href="#/profil" class="btn btn-chrome">Vendre mes œuvres</a>
+            <a href="#/profil" class="btn btn-ghost">Vendre mes œuvres</a>
           </div>
-        </div>
-        <div class="hero-stats">
-          <div><b>${state.works.length * 73}</b><span>Œuvres</span></div>
-          <div><b>${state.artists.length * 61}</b><span>Artistes</span></div>
-          <div><b class="accent">${new Set(state.works.map((w) => w.type)).size}</b><span>Disciplines</span></div>
         </div>
       </div>
     </section>
@@ -279,7 +277,7 @@ function viewHome() {
       .join("")}</nav>
 
     <section class="section">
-      <div class="section-head"><div><span class="ref">01 — Nouveautés</span><h2>Nouvelles <span class="fun">pièces</span></h2></div><a href="#/galerie">Tout voir</a></div>
+      <div class="section-head"><div><h2>Nouvelles <span class="fun">pièces</span></h2></div><a href="#/galerie">Tout voir</a></div>
       <div class="grid">${works.slice(0, 8).map((w) => card(w)).join("")}</div>
     </section>
 
@@ -289,7 +287,7 @@ function viewHome() {
         <div class="story-caption mono"><span>${esc(STORY.founder)}</span><span>${esc(STORY.role)}</span></div>
       </div>
       <div class="story-text">
-        <span class="ref">02 — Notre histoire</span>
+        <span class="ref">Notre histoire</span>
         <h2>Née d'une <span class="fun">conviction</span></h2>
         <p>${esc(STORY.intro)}</p>
         <blockquote>« ${esc(STORY.quote)} »</blockquote>
@@ -298,7 +296,7 @@ function viewHome() {
     </section>
 
     <section class="section tone tone-wall">
-      <div class="section-head"><div><span class="ref">03 — Disciplines</span><h2>Par <span class="fun">catégorie</span></h2></div><a href="#/galerie">Toute la galerie</a></div>
+      <div class="section-head"><div><h2>Par <span class="fun">catégorie</span></h2></div><a href="#/galerie">Toute la galerie</a></div>
       <div class="cats">${cats
         .map(([t, id]) => {
           const n = visibleWorks().filter((w) => w.type === t).length;
@@ -308,14 +306,8 @@ function viewHome() {
     </section>
 
     <section class="section tone tone-ink">
-      <div class="section-head"><div><span class="ref">04 — Communauté</span><h2>Les <span class="fun">artistes</span></h2></div><a href="#/artistes">Tous les artistes</a></div>
+      <div class="section-head"><div><h2>Les <span class="fun">artistes</span></h2></div><a href="#/artistes">Tous les artistes</a></div>
       <div class="grid">${state.artists.slice(0, 4).map(artistCard).join("")}</div>
-    </section>
-
-    <section class="section values">
-      <div><span class="tag">Vérifié</span><h3>Exposition protégée</h3><p>Chaque artiste est validé par notre équipe avant de pouvoir vendre.</p></div>
-      <div><span class="tag pink">Transparent</span><h3>Paiement sécurisé</h3><p>Stripe Connect, HTTPS et conformité PCI-DSS. Vos données bancaires ne transitent jamais par nos serveurs.</p></div>
-      <div><span class="tag">Direct</span><h3>Parlez à l'artiste</h3><p>Messagerie privée, vidéos coulisses et alertes à chaque nouvelle œuvre.</p></div>
     </section>`;
 }
 
@@ -324,7 +316,7 @@ function artistCard(a) {
   return `
     <article class="card artist-card">
       <a href="#/artiste/${a.id}" class="card-media">
-        <div class="avatar">${initials(a.name)}</div>
+        ${avatar(a)}
       </a>
       <div class="card-body">
         <h3 class="card-title"><a href="#/artiste/${a.id}">${esc(a.name)}</a></h3>
@@ -433,7 +425,7 @@ function viewProduct(id) {
       <div class="product-info">
         <div class="badges inline">${badgesFor(w)}</div>
         <h1>${esc(w.title)}</h1>
-        <span class="ref muted">${ref(w)} · ${esc(w.type)}</span>
+        <span class="ref muted">${esc(w.type)}</span>
         <div class="by">par <a href="#/artiste/${a.id}">${esc(a.name)}</a> · ${esc(a.city)}</div>
         <div class="product-price">${euro(w.price)} <small>TTC</small></div>
         <span class="variant-label label">Déclinaisons</span>
@@ -453,7 +445,7 @@ function viewProduct(id) {
           <dt>Type</dt><dd>${esc(w.type)}</dd>
         </dl>
         <div class="artist-mini">
-          <div class="avatar sm">${initials(a.name)}</div>
+          ${avatar(a, true)}
           <div><strong>${esc(a.name)}</strong><div class="card-artist">${esc(a.bio)}</div></div>
           <a class="btn btn-small btn-outline" href="#/messages/${a.id}">Écrire</a>
         </div>
@@ -515,7 +507,7 @@ function artistFeature({ a, reason }) {
       <div class="mosaic">${tiles.join("")}</div>
       <div class="feature-body">
         <div class="feature-id">
-          <div class="avatar sm">${initials(a.name)}</div>
+          ${avatar(a, true)}
           <div><h3><a href="#/artiste/${a.id}">${esc(a.name)}</a></h3><span class="mono muted">${esc(disciplineOf(a.id))} · ${esc(a.city)}</span></div>
         </div>
         <span class="reason">${esc(reason)}</span>
@@ -529,8 +521,8 @@ function viewArtists() {
   const sugg = suggestedArtists().slice(0, 3);
   return `
     <div class="page-head"><h1>Les <span class="fun">artistes</span></h1><p>Découvrez les créateurs et créatrices d'ATYPIIK, leurs œuvres et leurs coulisses. Suivez-les pour être alerté·e de chaque nouveauté.</p></div>
-    ${sugg.length ? `<section><div class="section-head"><div><span class="ref">Pour vous</span><h2>Suggestions <span class="fun">d'artistes</span></h2></div></div><div class="features">${sugg.map(artistFeature).join("")}</div></section>` : ""}
-    <section class="section"><div class="section-head"><div><span class="ref">Annuaire</span><h2>Tous les <span class="fun">artistes</span></h2></div><span class="mono muted">${plural(state.artists.length, "artiste")}</span></div>
+    ${sugg.length ? `<section><div class="section-head"><div><h2>Suggestions <span class="fun">d'artistes</span></h2></div></div><div class="features">${sugg.map(artistFeature).join("")}</div></section>` : ""}
+    <section class="section"><div class="section-head"><div><h2>Tous les <span class="fun">artistes</span></h2></div><span class="mono muted">${plural(state.artists.length, "artiste")}</span></div>
       <div class="grid">${state.artists.map(artistCard).join("")}</div></section>`;
 }
 
@@ -564,7 +556,7 @@ function viewArtist(id) {
   return `
     ${works.length ? `<div class="artist-cover">${works.slice(0, 3).map((w) => `<a href="#/oeuvre/${w.id}" class="cover-item" aria-label="${esc(w.title)}">${visual(w)}</a>`).join("")}</div>` : ""}
     <div class="artist-head">
-      <div class="avatar">${initials(a.name)}</div>
+      ${avatar(a)}
       <div>
         <span class="label muted">${esc(disciplineOf(id))} · ${esc(a.city)}</span>
         <h1>${esc(a.name)}</h1>
@@ -601,7 +593,7 @@ function viewPost(id) {
   const others = postsOf(p.artist).filter((x) => x.id !== id).slice(0, 2);
   return `
     <article class="post-page">
-      <a class="post-author" href="#/artiste/${a.id}"><div class="avatar sm">${initials(a.name)}</div><span><strong>${esc(a.name)}</strong><span class="mono muted">${esc(disciplineOf(a.id))} · ${esc(a.city)}</span></span></a>
+      <a class="post-author" href="#/artiste/${a.id}">${avatar(a, true)}<span><strong>${esc(a.name)}</strong><span class="mono muted">${esc(disciplineOf(a.id))} · ${esc(a.city)}</span></span></a>
       <div class="post-hero">${postMedia(p)}</div>
       <span class="ref">${frDate(p.date)}${p.media?.video ? " · Vidéo coulisses" : ""}</span>
       <h1>${esc(p.title)}</h1>
@@ -622,7 +614,7 @@ function viewStory() {
       </aside>
       <div class="chapters">
         ${STORY.chapters
-          .map((c, i) => `<section class="chapter"><span class="ref">${String(i + 1).padStart(2, "0")}</span><h2>${esc(c.title)}</h2><p>${esc(c.text)}</p></section>`)
+          .map((c, i) => `<section class="chapter"><h2>${esc(c.title)}</h2><p>${esc(c.text)}</p></section>`)
           .join("")}
         <blockquote class="story-quote">« ${esc(STORY.quote)} »<cite class="mono">— ${esc(STORY.founder)}</cite></blockquote>
         <div class="hero-cta">
