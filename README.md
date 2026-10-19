@@ -64,6 +64,11 @@ et enregistrées dans le navigateur (localStorage).
 - **Notifications** : commande, expédition, livraison, baisse de prix, retour en stock,
   nouvelle œuvre d'un artiste suivi, offres.
 - **RGPD** : bandeau cookies, formulaire d'exercice des droits, pages légales.
+- **Notre histoire** : section sur l'accueil et page dédiée avec la fondatrice. Le texte est
+  provisoire : il se modifie dans l'objet `STORY` de `js/data.js` (nom, rôle, intro, citation, chapitres).
+
+Le partage 90 % / 10 % n'est affiché qu'aux artistes (espace artiste, back-office, CGU/CGV),
+pas sur les pages vues par les acheteurs.
 
 ## Structure
 

@@ -124,8 +124,9 @@ h4 {
 }
 
 /* ---------- Typo ---------- */
-/* Titres : Archivo condensée, grasse, en capitales */
+/* Titres : Cubao, en capitales */
 .page-head h1,
+.story-text h2,
 .section-head h2,
 .panel h2,
 .panel h3,
@@ -135,7 +136,6 @@ h4 {
 .product-info h1,
 .artist-head h1,
 .hero h1,
-.band h2,
 .kpis b,
 .drawer a {
   font-family: var(--font-display);
@@ -163,6 +163,7 @@ h4 {
 }
 /* Mot d'accent en Le Petit Cochon, mêlé aux titres en Cubao */
 .fun {
+  color: var(--accent);
   font-family: var(--font-fun);
   font-weight: 400;
   font-size: 0.86em;
@@ -261,7 +262,7 @@ h4 {
 
 /* ---------- Bandeau d'annonce ---------- */
 .announce {
-  background: var(--ink);
+  background: var(--accent);
   color: var(--paper);
   text-align: center;
   font-size: 0.68rem;
@@ -488,7 +489,7 @@ main {
 .section-head .ref {
   display: block;
   margin-bottom: 8px;
-  color: var(--ink-3);
+  color: var(--accent);
 }
 .section-head a {
   font-size: 0.72rem;
@@ -647,33 +648,180 @@ main {
   color: var(--paper);
 }
 
-/* Bande bordeaux éditoriale */
-.band {
+/* Notre histoire (accueil + page) */
+.story {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-  gap: 40px;
-  align-items: end;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
   margin-inline: calc(50% - 50vw);
-  padding: 72px max(16px, calc(50vw - 680px));
+}
+.story-media {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 56px 32px 72px;
+  background: var(--wall);
+}
+.portrait {
+  display: grid;
+  place-items: center;
+  width: min(70%, 340px);
+  aspect-ratio: 4 / 5;
+  background: var(--chrome);
+  box-shadow: 0 30px 50px -24px rgba(17, 16, 16, 0.55);
+}
+.portrait span {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 4.4rem;
+  color: var(--accent);
+}
+.story-caption {
+  position: absolute;
+  left: 32px;
+  right: 32px;
+  bottom: 22px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--ink-2);
+}
+.story-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 18px;
+  padding: 64px max(16px, calc(50vw - 680px)) 64px clamp(28px, 5vw, 72px);
   background: var(--accent);
   color: var(--paper);
 }
-.band h2 {
-  font-size: clamp(3.2rem, 8vw, 7.4rem);
+.story-text .ref {
+  color: #e2b4bc;
 }
-.band h2 span {
+.story-text h2 {
+  font-size: clamp(3rem, 6.4vw, 6rem);
+}
+.story-text .fun {
+  color: var(--paper);
+}
+.story-text p {
+  max-width: 520px;
+  margin: 0;
+  color: #f0dcdf;
+  font-size: 1.05rem;
+}
+.story-text blockquote {
+  max-width: 520px;
+  margin: 6px 0 8px;
   font-family: var(--font-fun);
-  font-weight: 400;
-  font-size: 0.82em;
-  text-transform: none;
+  font-size: 1.5rem;
+  line-height: 1.3;
 }
-.band p {
-  max-width: 460px;
-  margin: 0 0 22px;
-  color: #ead3d6;
+.story-page {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 56px;
+  align-items: start;
 }
-.band .ref {
-  color: #d8a7af;
+.story-page .story-media {
+  position: sticky;
+  top: calc(96px + env(safe-area-inset-top, 0px));
+  aspect-ratio: 4 / 5;
+}
+.chapters {
+  display: grid;
+  gap: 8px;
+}
+.chapter {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 4px 16px;
+  padding: 24px 0;
+  border-top: 1px solid var(--rule);
+}
+.chapter .ref {
+  grid-row: span 2;
+  color: var(--accent);
+  font-size: 0.9rem;
+}
+.chapter h2 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 0.95;
+}
+.chapter p {
+  margin: 8px 0 0;
+  max-width: 620px;
+  color: var(--ink-2);
+  font-size: 1.05rem;
+}
+.story-quote {
+  margin: 24px 0;
+  padding: 32px 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--font-fun);
+  font-size: clamp(1.8rem, 3.4vw, 2.8rem);
+  line-height: 1.2;
+  color: var(--accent);
+}
+.story-quote cite {
+  display: block;
+  margin-top: 16px;
+  font-style: normal;
+  color: var(--ink-3);
+}
+
+/* Sections à fond plein (alternance des couleurs) */
+.tone {
+  margin-inline: calc(50% - 50vw);
+  padding: 72px calc(50vw - 50%) 88px;
+}
+.tone-wall {
+  background: var(--wall);
+}
+.tone-wall .cat-media {
+  background: var(--paper-2);
+}
+.tone-wall .cat {
+  background: var(--paper);
+}
+.tone-ink {
+  background: var(--ink);
+  color: var(--paper);
+}
+.tone-ink .section-head {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+.tone-ink .ref,
+.tone-ink .fun {
+  color: var(--accent-bright);
+}
+.tone-ink .card-media {
+  background: #1f1d1d;
+}
+.tone-ink .card-artist {
+  color: #a9a4a1;
+}
+.tone-ink .btn {
+  background: var(--paper);
+  border-color: var(--paper);
+  color: var(--ink);
+}
+.tone-ink .btn:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.tone-ink .btn-outline {
+  background: transparent;
+  color: var(--paper);
+}
+.tone-ink + .values {
+  margin-top: 0;
+  border-top: 0;
 }
 
 /* Catégories */
@@ -719,12 +867,16 @@ main {
   padding: 12px 14px;
 }
 .cat-label span:first-child {
+  color: var(--accent);
   font-family: var(--font-fun);
   font-size: 1.35rem;
   text-transform: lowercase;
 }
 .cat:hover .cat-label {
-  background: var(--ink);
+  background: var(--accent);
+  color: var(--paper);
+}
+.cat:hover .cat-label span {
   color: var(--paper);
 }
 
@@ -820,6 +972,7 @@ main {
 .card .price {
   margin-top: 4px;
   font-size: 0.86rem;
+  color: var(--accent);
 }
 .card.sold .art,
 .card.sold img {
@@ -977,8 +1130,8 @@ img.art {
   border-color: var(--ink);
 }
 .chip.on {
-  background: var(--ink);
-  border-color: var(--ink);
+  background: var(--accent);
+  border-color: var(--accent);
   color: var(--paper);
 }
 .chip.na {
@@ -1143,6 +1296,7 @@ img.art {
 }
 .product-price {
   margin: 18px 0 0;
+  color: var(--accent);
   font-size: 1.5rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -1933,7 +2087,7 @@ td .btn + .btn {
   font-size: 0.66rem;
   font-weight: 400;
   text-transform: uppercase;
-  color: var(--ink-3);
+  color: var(--accent-bright);
 }
 .footer nav {
   display: grid;
@@ -2039,8 +2193,13 @@ td .btn + .btn {
   .gallery-layout,
   .two-col,
   .inbox,
-  .band {
+  .story,
+  .story-page {
     grid-template-columns: minmax(0, 1fr);
+  }
+  .story-page .story-media {
+    position: relative;
+    top: 0;
   }
   .hero-wall {
     min-height: 460px;
@@ -2180,7 +2339,7 @@ td .btn + .btn {
     </style>
   </head>
   <body>
-    <div class="announce">Livraison suivie offerte dès 150 € — 90 % reversés directement aux artistes</div>
+    <div class="announce">Livraison suivie offerte dès 150 € — Paiement sécurisé</div>
 
     <header class="header">
       <div class="container header-inner">
@@ -2188,6 +2347,7 @@ td .btn + .btn {
           <a href="#/galerie" data-route="galerie">Galerie</a>
           <a href="#/artistes" data-route="artistes">Artistes</a>
           <a href="#/selection" data-route="selection">Notre sélection</a>
+          <a href="#/histoire" data-route="histoire">Notre histoire</a>
           <a href="#/messages" data-route="messages">Contact</a>
         </nav>
         <button class="icon-link burger" id="burger" aria-label="Ouvrir le menu">
@@ -2233,6 +2393,7 @@ td .btn + .btn {
       <a href="#/galerie">Galerie</a>
       <a href="#/artistes">Artistes</a>
       <a href="#/selection">Notre sélection</a>
+      <a href="#/histoire">Notre histoire</a>
       <a href="#/favoris">Favoris</a>
       <a href="#/panier">Panier</a>
       <a href="#/notifications">Notifications</a>
@@ -2259,6 +2420,7 @@ td .btn + .btn {
               <a href="#/galerie">Galerie</a>
               <a href="#/artistes">Artistes</a>
               <a href="#/selection">Notre sélection</a>
+              <a href="#/histoire">Notre histoire</a>
             </nav>
           </div>
           <div>
@@ -2508,6 +2670,30 @@ const SEED_SALES = [
   { order: "CMD-2026-0975", date: "2026-10-09", buyer: "Jade P.", work: "a8", qty: 1, price: 210, status: 1 },
   { order: "CMD-2026-0980", date: "2026-10-10", buyer: "Yanis K.", work: "a2", qty: 1, price: 1650, status: 3 },
 ];
+
+/* « Notre histoire » — texte provisoire, à remplacer par celui de la fondatrice
+   (nom, rôle, parcours, citation). */
+const STORY = {
+  founder: "La fondatrice",
+  role: "Fondatrice d'ATYPIIK",
+  intro:
+    "ATYPIIK est né d'une envie simple : donner aux artistes indépendants un vrai lieu pour exposer et vendre leur travail, et à chacun l'occasion de vivre avec des pièces qui ont une histoire.",
+  quote: "Je voulais que les artistes n'aient plus à choisir entre créer et être vus.",
+  chapters: [
+    {
+      title: "Le constat",
+      text: "Beaucoup d'artistes talentueux restent invisibles : pas de galerie, pas de vitrine, et des plateformes généralistes où leurs créations se perdent entre deux annonces.",
+    },
+    {
+      title: "L'idée",
+      text: "Créer une marketplace dédiée à l'art dans sa globalité — peinture, sculpture, photographie, mode, bijoux, céramique — où chaque pièce est présentée avec l'artiste qui l'a faite.",
+    },
+    {
+      title: "La mission",
+      text: "Offrir aux artistes un espace d'exposition digital et sécurisé, et rendre la découverte et l'achat d'œuvres simples, directs et humains.",
+    },
+  ],
+};
 /* Photos des œuvres.
    Associez l'identifiant d'une œuvre (voir js/data.js) au chemin de sa photo.
    Tant qu'une œuvre n'a pas de photo, un visuel généré s'affiche à la place.
@@ -2736,7 +2922,7 @@ function viewHome() {
         <div class="hero-stats">
           <div><b>${state.works.length * 73}</b><span>Œuvres</span></div>
           <div><b>${state.artists.length * 61}</b><span>Artistes</span></div>
-          <div><b class="accent">90 %</b><span>Pour l'artiste</span></div>
+          <div><b class="accent">${new Set(state.works.map((w) => w.type)).size}</b><span>Disciplines</span></div>
         </div>
       </div>
     </section>
@@ -2750,16 +2936,22 @@ function viewHome() {
       <div class="grid">${works.slice(0, 8).map((w) => card(w)).join("")}</div>
     </section>
 
-    <section class="section band">
-      <div><span class="ref">02 — Modèle</span><h2>90 % pour<br /><span>l'artiste.</span></h2></div>
-      <div>
-        <p>Chaque vente passe par Stripe Connect. L'artiste reçoit 90 % du prix, ATYPIIK garde 10 % pour faire vivre la plateforme. Pas d'intermédiaire, pas de surprise.</p>
-        <a href="#/profil" class="btn btn-light">Ouvrir ma boutique</a>
+    <section class="section story">
+      <div class="story-media">
+        <div class="portrait"><span>${initials(STORY.founder)}</span></div>
+        <div class="story-caption mono"><span>${esc(STORY.founder)}</span><span>${esc(STORY.role)}</span></div>
+      </div>
+      <div class="story-text">
+        <span class="ref">02 — Notre histoire</span>
+        <h2>Née d'une <span class="fun">conviction</span></h2>
+        <p>${esc(STORY.intro)}</p>
+        <blockquote>« ${esc(STORY.quote)} »</blockquote>
+        <a href="#/histoire" class="btn btn-light">Lire notre histoire</a>
       </div>
     </section>
 
-    <section class="section">
-      <div class="section-head"><div><span class="ref">03 — Disciplines</span><h2>Par <span class="fun">catégorie</span></h2></div></div>
+    <section class="section tone tone-wall">
+      <div class="section-head"><div><span class="ref">03 — Disciplines</span><h2>Par <span class="fun">catégorie</span></h2></div><a href="#/galerie">Toute la galerie</a></div>
       <div class="cats">${cats
         .map(([t, id]) => {
           const n = visibleWorks().filter((w) => w.type === t).length;
@@ -2768,14 +2960,14 @@ function viewHome() {
         .join("")}</div>
     </section>
 
-    <section class="section">
+    <section class="section tone tone-ink">
       <div class="section-head"><div><span class="ref">04 — Communauté</span><h2>Les <span class="fun">artistes</span></h2></div><a href="#/artistes">Tous les artistes</a></div>
       <div class="grid">${state.artists.slice(0, 4).map(artistCard).join("")}</div>
     </section>
 
     <section class="section values">
       <div><span class="tag">Vérifié</span><h3>Exposition protégée</h3><p>Chaque artiste est validé par notre équipe avant de pouvoir vendre.</p></div>
-      <div><span class="tag pink">Transparent</span><h3>Paiement sécurisé</h3><p>Stripe Connect, HTTPS et conformité PCI-DSS. Le montant est réparti automatiquement.</p></div>
+      <div><span class="tag pink">Transparent</span><h3>Paiement sécurisé</h3><p>Stripe Connect, HTTPS et conformité PCI-DSS. Vos données bancaires ne transitent jamais par nos serveurs.</p></div>
       <div><span class="tag">Direct</span><h3>Parlez à l'artiste</h3><p>Messagerie privée, vidéos coulisses et alertes à chaque nouvelle œuvre.</p></div>
     </section>`;
 }
@@ -2989,6 +3181,28 @@ function viewArtist(id) {
     ${body}`;
 }
 
+/* ---------- Notre histoire ---------- */
+function viewStory() {
+  return `
+    <div class="page-head"><h1>Notre <span class="fun">histoire</span></h1><p>${esc(STORY.intro)}</p></div>
+    <div class="story-page">
+      <aside class="story-media">
+        <div class="portrait"><span>${initials(STORY.founder)}</span></div>
+        <div class="story-caption mono"><span>${esc(STORY.founder)}</span><span>${esc(STORY.role)}</span></div>
+      </aside>
+      <div class="chapters">
+        ${STORY.chapters
+          .map((c, i) => `<section class="chapter"><span class="ref">${String(i + 1).padStart(2, "0")}</span><h2>${esc(c.title)}</h2><p>${esc(c.text)}</p></section>`)
+          .join("")}
+        <blockquote class="story-quote">« ${esc(STORY.quote)} »<cite class="mono">— ${esc(STORY.founder)}, ${esc(STORY.role.toLowerCase())}</cite></blockquote>
+        <div class="hero-cta">
+          <a class="btn" href="#/galerie">Explorer la galerie</a>
+          <a class="btn btn-outline" href="#/profil">Rejoindre en tant qu'artiste</a>
+        </div>
+      </div>
+    </div>`;
+}
+
 /* ---------- Sélection ---------- */
 function viewSelection() {
   const seen = [...state.views, ...state.favs].map(byId).filter(Boolean);
@@ -3072,8 +3286,6 @@ function summaryBox(total, cta = "") {
     <aside class="summary">
       <h3>Récapitulatif</h3>
       <div class="summary-row"><span>Sous-total</span><span>${euro(total)}</span></div>
-      <div class="summary-row sub"><span>dont artistes (90 %)</span><span>${euro(total * 0.9)}</span></div>
-      <div class="summary-row sub"><span>dont commission ATYPIIK (10 %)</span><span>${euro(total * 0.1)}</span></div>
       <div class="summary-row"><span>Livraison suivie</span><span>${ship ? euro(ship) : "Offerte"}</span></div>
       <div class="summary-row total"><span>Total TTC</span><span>${euro(total + ship)}</span></div>
       ${cta}
@@ -3116,7 +3328,7 @@ function viewCheckout() {
             <div class="field"><label for="cc-exp">Expiration</label><input id="cc-exp" required placeholder="MM/AA" autocomplete="cc-exp" /></div>
             <div class="field"><label for="cc-cvc">CVC</label><input id="cc-cvc" required inputmode="numeric" placeholder="123" autocomplete="cc-csc" /></div>
           </div>
-          <p class="hint">Démo : aucun paiement réel n'est effectué. En production, la saisie est gérée par Stripe et le montant est réparti automatiquement : 90 % à l'artiste, 10 % à ATYPIIK.</p>
+          <p class="hint">Démo : aucun paiement réel n'est effectué. En production, la saisie de la carte est gérée par Stripe.</p>
           <button class="btn btn-block">Payer ${euro(total + (total >= 150 ? 0 : 12))}</button>
         </form>`;
   return `
@@ -4097,6 +4309,7 @@ function render(keepScroll = false, restoring = false) {
     galerie: [viewGallery, bindGallery],
     oeuvre: [() => viewProduct(param), () => bindProduct(param)],
     artistes: [viewArtists],
+    histoire: [viewStory],
     artiste: [() => viewArtist(param)],
     selection: [viewSelection],
     favoris: [viewFavs],

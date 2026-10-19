@@ -187,3 +187,27 @@ const SEED_SALES = [
   { order: "CMD-2026-0975", date: "2026-10-09", buyer: "Jade P.", work: "a8", qty: 1, price: 210, status: 1 },
   { order: "CMD-2026-0980", date: "2026-10-10", buyer: "Yanis K.", work: "a2", qty: 1, price: 1650, status: 3 },
 ];
+
+/* « Notre histoire » — texte provisoire, à remplacer par celui de la fondatrice
+   (nom, rôle, parcours, citation). */
+const STORY = {
+  founder: "La fondatrice",
+  role: "Fondatrice d'ATYPIIK",
+  intro:
+    "ATYPIIK est né d'une envie simple : donner aux artistes indépendants un vrai lieu pour exposer et vendre leur travail, et à chacun l'occasion de vivre avec des pièces qui ont une histoire.",
+  quote: "Je voulais que les artistes n'aient plus à choisir entre créer et être vus.",
+  chapters: [
+    {
+      title: "Le constat",
+      text: "Beaucoup d'artistes talentueux restent invisibles : pas de galerie, pas de vitrine, et des plateformes généralistes où leurs créations se perdent entre deux annonces.",
+    },
+    {
+      title: "L'idée",
+      text: "Créer une marketplace dédiée à l'art dans sa globalité — peinture, sculpture, photographie, mode, bijoux, céramique — où chaque pièce est présentée avec l'artiste qui l'a faite.",
+    },
+    {
+      title: "La mission",
+      text: "Offrir aux artistes un espace d'exposition digital et sécurisé, et rendre la découverte et l'achat d'œuvres simples, directs et humains.",
+    },
+  ],
+};

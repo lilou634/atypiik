@@ -218,7 +218,7 @@ function viewHome() {
         <div class="hero-stats">
           <div><b>${state.works.length * 73}</b><span>Œuvres</span></div>
           <div><b>${state.artists.length * 61}</b><span>Artistes</span></div>
-          <div><b class="accent">90 %</b><span>Pour l'artiste</span></div>
+          <div><b class="accent">${new Set(state.works.map((w) => w.type)).size}</b><span>Disciplines</span></div>
         </div>
       </div>
     </section>
@@ -232,16 +232,22 @@ function viewHome() {
       <div class="grid">${works.slice(0, 8).map((w) => card(w)).join("")}</div>
     </section>
 
-    <section class="section band">
-      <div><span class="ref">02 — Modèle</span><h2>90 % pour<br /><span>l'artiste.</span></h2></div>
-      <div>
-        <p>Chaque vente passe par Stripe Connect. L'artiste reçoit 90 % du prix, ATYPIIK garde 10 % pour faire vivre la plateforme. Pas d'intermédiaire, pas de surprise.</p>
-        <a href="#/profil" class="btn btn-light">Ouvrir ma boutique</a>
+    <section class="section story">
+      <div class="story-media">
+        <div class="portrait"><span>${initials(STORY.founder)}</span></div>
+        <div class="story-caption mono"><span>${esc(STORY.founder)}</span><span>${esc(STORY.role)}</span></div>
+      </div>
+      <div class="story-text">
+        <span class="ref">02 — Notre histoire</span>
+        <h2>Née d'une <span class="fun">conviction</span></h2>
+        <p>${esc(STORY.intro)}</p>
+        <blockquote>« ${esc(STORY.quote)} »</blockquote>
+        <a href="#/histoire" class="btn btn-light">Lire notre histoire</a>
       </div>
     </section>
 
-    <section class="section">
-      <div class="section-head"><div><span class="ref">03 — Disciplines</span><h2>Par <span class="fun">catégorie</span></h2></div></div>
+    <section class="section tone tone-wall">
+      <div class="section-head"><div><span class="ref">03 — Disciplines</span><h2>Par <span class="fun">catégorie</span></h2></div><a href="#/galerie">Toute la galerie</a></div>
       <div class="cats">${cats
         .map(([t, id]) => {
           const n = visibleWorks().filter((w) => w.type === t).length;
@@ -250,14 +256,14 @@ function viewHome() {
         .join("")}</div>
     </section>
 
-    <section class="section">
+    <section class="section tone tone-ink">
       <div class="section-head"><div><span class="ref">04 — Communauté</span><h2>Les <span class="fun">artistes</span></h2></div><a href="#/artistes">Tous les artistes</a></div>
       <div class="grid">${state.artists.slice(0, 4).map(artistCard).join("")}</div>
     </section>
 
     <section class="section values">
       <div><span class="tag">Vérifié</span><h3>Exposition protégée</h3><p>Chaque artiste est validé par notre équipe avant de pouvoir vendre.</p></div>
-      <div><span class="tag pink">Transparent</span><h3>Paiement sécurisé</h3><p>Stripe Connect, HTTPS et conformité PCI-DSS. Le montant est réparti automatiquement.</p></div>
+      <div><span class="tag pink">Transparent</span><h3>Paiement sécurisé</h3><p>Stripe Connect, HTTPS et conformité PCI-DSS. Vos données bancaires ne transitent jamais par nos serveurs.</p></div>
       <div><span class="tag">Direct</span><h3>Parlez à l'artiste</h3><p>Messagerie privée, vidéos coulisses et alertes à chaque nouvelle œuvre.</p></div>
     </section>`;
 }
@@ -471,6 +477,28 @@ function viewArtist(id) {
     ${body}`;
 }
 
+/* ---------- Notre histoire ---------- */
+function viewStory() {
+  return `
+    <div class="page-head"><h1>Notre <span class="fun">histoire</span></h1><p>${esc(STORY.intro)}</p></div>
+    <div class="story-page">
+      <aside class="story-media">
+        <div class="portrait"><span>${initials(STORY.founder)}</span></div>
+        <div class="story-caption mono"><span>${esc(STORY.founder)}</span><span>${esc(STORY.role)}</span></div>
+      </aside>
+      <div class="chapters">
+        ${STORY.chapters
+          .map((c, i) => `<section class="chapter"><span class="ref">${String(i + 1).padStart(2, "0")}</span><h2>${esc(c.title)}</h2><p>${esc(c.text)}</p></section>`)
+          .join("")}
+        <blockquote class="story-quote">« ${esc(STORY.quote)} »<cite class="mono">— ${esc(STORY.founder)}, ${esc(STORY.role.toLowerCase())}</cite></blockquote>
+        <div class="hero-cta">
+          <a class="btn" href="#/galerie">Explorer la galerie</a>
+          <a class="btn btn-outline" href="#/profil">Rejoindre en tant qu'artiste</a>
+        </div>
+      </div>
+    </div>`;
+}
+
 /* ---------- Sélection ---------- */
 function viewSelection() {
   const seen = [...state.views, ...state.favs].map(byId).filter(Boolean);
@@ -554,8 +582,6 @@ function summaryBox(total, cta = "") {
     <aside class="summary">
       <h3>Récapitulatif</h3>
       <div class="summary-row"><span>Sous-total</span><span>${euro(total)}</span></div>
-      <div class="summary-row sub"><span>dont artistes (90 %)</span><span>${euro(total * 0.9)}</span></div>
-      <div class="summary-row sub"><span>dont commission ATYPIIK (10 %)</span><span>${euro(total * 0.1)}</span></div>
       <div class="summary-row"><span>Livraison suivie</span><span>${ship ? euro(ship) : "Offerte"}</span></div>
       <div class="summary-row total"><span>Total TTC</span><span>${euro(total + ship)}</span></div>
       ${cta}
@@ -598,7 +624,7 @@ function viewCheckout() {
             <div class="field"><label for="cc-exp">Expiration</label><input id="cc-exp" required placeholder="MM/AA" autocomplete="cc-exp" /></div>
             <div class="field"><label for="cc-cvc">CVC</label><input id="cc-cvc" required inputmode="numeric" placeholder="123" autocomplete="cc-csc" /></div>
           </div>
-          <p class="hint">Démo : aucun paiement réel n'est effectué. En production, la saisie est gérée par Stripe et le montant est réparti automatiquement : 90 % à l'artiste, 10 % à ATYPIIK.</p>
+          <p class="hint">Démo : aucun paiement réel n'est effectué. En production, la saisie de la carte est gérée par Stripe.</p>
           <button class="btn btn-block">Payer ${euro(total + (total >= 150 ? 0 : 12))}</button>
         </form>`;
   return `
@@ -1579,6 +1605,7 @@ function render(keepScroll = false, restoring = false) {
     galerie: [viewGallery, bindGallery],
     oeuvre: [() => viewProduct(param), () => bindProduct(param)],
     artistes: [viewArtists],
+    histoire: [viewStory],
     artiste: [() => viewArtist(param)],
     selection: [viewSelection],
     favoris: [viewFavs],
