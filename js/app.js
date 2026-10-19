@@ -16,7 +16,7 @@ const clone = (o) => JSON.parse(JSON.stringify(o));
 const initials = (name) => name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
 
 /* ---------- Persistance ---------- */
-const DATA_VERSION = 4;
+const DATA_VERSION = 5;
 const store = {
   get(key, fallback) {
     try {
@@ -29,7 +29,10 @@ const store = {
   set(key, value) {
     try {
       localStorage.setItem("atypiik:" + key, JSON.stringify(value));
-    } catch {}
+      return true;
+    } catch {
+      return false;
+    }
   },
 };
 if (store.get("version", 0) !== DATA_VERSION) {
@@ -43,7 +46,7 @@ if (store.get("version", 0) !== DATA_VERSION) {
 
 const PERSISTED = [
   "user", "favs", "cart", "views", "follows", "orders", "threads", "notifs", "works", "artists",
-  "pending", "disputes", "sales", "cookies", "prefs", "media",
+  "pending", "disputes", "sales", "cookies", "prefs", "media", "posts",
 ];
 const state = {
   user: store.get("user", null),
@@ -73,6 +76,7 @@ const state = {
   artists: store.get("artists", clone(ARTISTS)),
   pending: store.get("pending", clone(SEED_PENDING_SELLERS)),
   disputes: store.get("disputes", clone(SEED_DISPUTES)),
+  posts: store.get("posts", clone(SEED_POSTS)),
   sales: store.get("sales", clone(SEED_SALES)),
   cookies: store.get("cookies", null),
   prefs: store.get("prefs", { orders: true, prices: true, news: true, promos: false, email: true }),
@@ -82,8 +86,13 @@ const state = {
   checkout: { step: 1, address: null },
 };
 
+let storageWarned = false;
 function save() {
-  PERSISTED.forEach((k) => store.set(k, state[k]));
+  const ok = PERSISTED.map((k) => store.set(k, state[k])).every(Boolean);
+  if (!ok && !storageWarned) {
+    storageWarned = true;
+    toast("Le stockage du navigateur est plein : certaines photos ne seront pas conservées.");
+  }
   updateChrome();
 }
 
@@ -168,6 +177,47 @@ function card(w, extra = "") {
         ${extra}
       </div>
     </article>`;
+}
+
+const cut = (t, n) => (t.length > n ? t.slice(0, n).replace(/\s+\S*$/, "") + "…" : t);
+const plural = (n, word) => `${n} ${word}${n > 1 ? "s" : ""}`;
+
+/* Discipline principale d'un artiste (la plus fréquente parmi ses œuvres). */
+function disciplineOf(id) {
+  const count = {};
+  state.works.filter((w) => w.artist === id).forEach((w) => (count[w.type] = (count[w.type] || 0) + 1));
+  return Object.entries(count).sort((a, b) => b[1] - a[1])[0]?.[0] || "Artiste";
+}
+const postsOf = (id) => state.posts.filter((p) => p.artist === id).sort((a, b) => (a.date < b.date ? 1 : -1));
+function videosOf(a) {
+  return [...(a.videos || []), ...((state.media[a.id] || {}).videos || [])];
+}
+
+/* Réduit les photos choisies (max 1000 px, JPEG) pour pouvoir les stocker. */
+function readPhotos(files, max = 4) {
+  return Promise.all(
+    [...files].slice(0, max).map(
+      (f) =>
+        new Promise((resolve) => {
+          const r = new FileReader();
+          r.onload = () => {
+            const img = new Image();
+            img.onload = () => {
+              const k = Math.min(1, 1000 / Math.max(img.width, img.height));
+              const c = document.createElement("canvas");
+              c.width = Math.round(img.width * k);
+              c.height = Math.round(img.height * k);
+              c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+              resolve({ src: c.toDataURL("image/jpeg", 0.72), caption: f.name.replace(/\.[^.]+$/, "") });
+            };
+            img.onerror = () => resolve(null);
+            img.src = r.result;
+          };
+          r.onerror = () => resolve(null);
+          r.readAsDataURL(f);
+        }),
+    ),
+  ).then((list) => list.filter(Boolean));
 }
 
 function followBtn(id, small = false) {
@@ -436,45 +486,129 @@ function refreshAvailability(w) {
 }
 
 /* ---------- Artistes ---------- */
-function viewArtists() {
+/* Suggestions : artistes non suivis, en priorité ceux des disciplines que l'on regarde. */
+function suggestedArtists() {
+  const liked = new Set([...state.views, ...state.favs].map(byId).filter(Boolean).map((w) => w.type));
+  return state.artists
+    .filter((a) => !state.follows.includes(a.id))
+    .map((a) => {
+      const d = disciplineOf(a.id);
+      let score = a.followers / 1000;
+      let reason = "Très suivi·e sur ATYPIIK";
+      if (liked.has(d)) (score += 5), (reason = `Parce que vous aimez : ${d.toLowerCase()}`);
+      else if (postsOf(a.id).length) (score += 1), (reason = "Actif·ve en ce moment");
+      return { a, score, reason };
+    })
+    .sort((x, y) => y.score - x.score);
+}
+function artistFeature({ a, reason }) {
+  const works = visibleWorks().filter((w) => w.artist === a.id);
+  const videos = videosOf(a);
+  const last = postsOf(a.id)[0];
+  const tiles = [works[0], works[1], works[2]].map((w, i) =>
+    i === 2 && videos.length
+      ? `<button class="mosaic-item video" data-act="play" aria-label="Lire ${esc(videos[0])}">${visual(works[2] || works[0])}<div class="play"></div><span class="mono">Vidéo</span></button>`
+      : `<a class="mosaic-item" href="${w ? `#/oeuvre/${w.id}` : `#/artiste/${a.id}`}">${visual(w || works[0])}</a>`,
+  );
   return `
-    <div class="page-head"><h1>Les <span class="fun">artistes</span></h1><p>Suivez vos artistes préférés pour être alerté·e de chaque nouvelle œuvre.</p></div>
-    <div class="grid">${state.artists.map(artistCard).join("")}</div>`;
+    <article class="artist-feature">
+      <div class="mosaic">${tiles.join("")}</div>
+      <div class="feature-body">
+        <div class="feature-id">
+          <div class="avatar sm">${initials(a.name)}</div>
+          <div><h3><a href="#/artiste/${a.id}">${esc(a.name)}</a></h3><span class="mono muted">${esc(disciplineOf(a.id))} · ${esc(a.city)}</span></div>
+        </div>
+        <span class="reason">${esc(reason)}</span>
+        <p class="hint">${esc(a.bio)}</p>
+        ${last ? `<a class="feature-post" href="#/post/${last.id}"><span class="mono">Dernier post · ${frDate(last.date)}</span>${esc(last.title)}</a>` : ""}
+        <div class="card-actions">${followBtn(a.id, true)}<a class="btn btn-small btn-outline" href="#/artiste/${a.id}">Voir le profil</a></div>
+      </div>
+    </article>`;
+}
+function viewArtists() {
+  const sugg = suggestedArtists().slice(0, 3);
+  return `
+    <div class="page-head"><h1>Les <span class="fun">artistes</span></h1><p>Découvrez les créateurs et créatrices d'ATYPIIK, leurs œuvres et leurs coulisses. Suivez-les pour être alerté·e de chaque nouveauté.</p></div>
+    ${sugg.length ? `<section><div class="section-head"><div><span class="ref">Pour vous</span><h2>Suggestions <span class="fun">d'artistes</span></h2></div></div><div class="features">${sugg.map(artistFeature).join("")}</div></section>` : ""}
+    <section class="section"><div class="section-head"><div><span class="ref">Annuaire</span><h2>Tous les <span class="fun">artistes</span></h2></div><span class="mono muted">${plural(state.artists.length, "artiste")}</span></div>
+      <div class="grid">${state.artists.map(artistCard).join("")}</div></section>`;
 }
 
 function viewArtist(id) {
   const a = artistById(id);
   if (!a) return viewNotFound();
   const works = visibleWorks().filter((w) => w.artist === id);
+  const posts = postsOf(id);
   const media = state.media[id] || {};
-  const videos = [...a.videos, ...(media.videos || [])];
+  const videos = videosOf(a);
   const press = [...a.press, ...(media.press || [])];
-  const tab = state.tab.artist || "oeuvres";
+  const tab = state.tab.artist || "accueil";
+  const videoTile = (v, i) =>
+    `<button class="video-tile" style="border:0;padding:0" data-act="play" aria-label="Lire ${esc(v)}">${visual(works[i % Math.max(works.length, 1)])}<div class="play"></div><span>${esc(v)}</span></button>`;
+  const sub = (title, link = "") => `<div class="sub-head"><h3>${title}</h3>${link}</div>`;
   let body = "";
+  if (tab === "accueil") {
+    body = `
+      ${posts.length ? `<section class="artist-block">${sub("À la <span class=\"fun\">une</span>", posts.length > 2 ? `<button class="text-link" data-act="tab" data-key="artist" data-id="posts">Tous les posts (${posts.length})</button>` : "")}<div class="posts">${posts.slice(0, 2).map((p) => postCard(p)).join("")}</div></section>` : ""}
+      <section class="artist-block">${sub("Les <span class=\"fun\">œuvres</span>", works.length > 4 ? `<button class="text-link" data-act="tab" data-key="artist" data-id="oeuvres">Toutes les œuvres (${works.length})</button>` : "")}
+        ${works.length ? `<div class="grid">${works.slice(0, 4).map((w) => card(w)).join("")}</div>` : emptyBox("Bientôt", "Cet artiste n'a pas encore publié d'œuvre.")}</section>
+      ${videos.length ? `<section class="artist-block">${sub("En <span class=\"fun\">coulisses</span>")}<div class="grid cols-3">${videos.slice(0, 3).map(videoTile).join("")}</div></section>` : ""}`;
+  }
   if (tab === "oeuvres") body = works.length ? `<div class="grid">${works.map((w) => card(w)).join("")}</div>` : emptyBox("Bientôt", "Cet artiste n'a pas encore publié d'œuvre.");
-  if (tab === "coulisses")
-    body = videos.length
-      ? `<div class="grid cols-3">${videos
-          .map((v, i) => `<button class="video-tile" style="border:0;padding:0" data-act="play" aria-label="Lire ${esc(v)}">${visual(works[i % Math.max(works.length, 1)])}<div class="play"></div><span>${esc(v)}</span></button>`)
-          .join("")}</div>`
-      : emptyBox("Pas encore de vidéo", "Les vidéos coulisses de l'artiste apparaîtront ici.");
+  if (tab === "posts") body = posts.length ? `<div class="posts">${posts.map((p) => postCard(p)).join("")}</div>` : emptyBox("Pas encore de post", "Les nouvelles de l'atelier apparaîtront ici.");
+  if (tab === "coulisses") body = videos.length ? `<div class="grid cols-3">${videos.map(videoTile).join("")}</div>` : emptyBox("Pas encore de vidéo", "Les vidéos coulisses de l'artiste apparaîtront ici.");
   if (tab === "presse")
     body = press.length
       ? press.map((p) => `<div class="doc-row"><span><strong>${esc(p)}</strong> <span class="muted">· PDF</span></span><button class="btn btn-small btn-outline" data-act="download">Consulter</button></div>`).join("")
       : emptyBox("Aucun document", "Le dossier de presse sera bientôt disponible.");
   return `
+    ${works.length ? `<div class="artist-cover">${works.slice(0, 3).map((w) => `<a href="#/oeuvre/${w.id}" class="cover-item" aria-label="${esc(w.title)}">${visual(w)}</a>`).join("")}</div>` : ""}
     <div class="artist-head">
       <div class="avatar">${initials(a.name)}</div>
       <div>
-        <span class="label muted">${esc(a.city)}</span>
+        <span class="label muted">${esc(disciplineOf(id))} · ${esc(a.city)}</span>
         <h1>${esc(a.name)}</h1>
         <p>${esc(a.bio)}</p>
-        <div class="artist-stats"><span><b>${a.followers + (state.follows.includes(id) ? 1 : 0)}</b> abonné·e·s</span><span><b>${works.length}</b> œuvres</span></div>
+        <div class="artist-stats"><span><b>${a.followers + (state.follows.includes(id) ? 1 : 0)}</b> abonné·e·s</span><span><b>${works.length}</b> œuvres</span><span><b>${posts.length}</b> posts</span></div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">${followBtn(id)}<a class="btn btn-outline" href="#/messages/${id}">Contacter</a></div>
     </div>
-    ${tabs("artist", [["oeuvres", "Œuvres"], ["coulisses", "Coulisses"], ["presse", "Dossier de presse"]], tab)}
+    ${tabs("artist", [["accueil", "Accueil"], ["oeuvres", "Œuvres", works.length], ["posts", "Posts", posts.length], ["coulisses", "Coulisses"], ["presse", "Presse"]], tab)}
     ${body}`;
+}
+
+/* ---------- Posts des artistes ---------- */
+function postMedia(p) {
+  if (p.media?.src) return `<img class="art" src="${p.media.src}" alt="${esc(p.title)}" loading="lazy" />`;
+  return visual(byId(p.media?.work)) + (p.media?.video ? '<div class="play"></div>' : "");
+}
+function postCard(p, full = false) {
+  return `
+    <article class="post">
+      <a class="post-media" href="#/post/${p.id}" aria-label="${esc(p.title)}">${postMedia(p)}</a>
+      <div class="post-body">
+        <span class="ref">${frDate(p.date)}${p.media?.video ? " · Vidéo" : ""}</span>
+        <h3><a href="#/post/${p.id}">${esc(p.title)}</a></h3>
+        <p>${esc(full ? p.text : cut(p.text, 150))}</p>
+        ${full ? "" : `<a class="text-link" href="#/post/${p.id}">Lire la suite</a>`}
+      </div>
+    </article>`;
+}
+function viewPost(id) {
+  const p = state.posts.find((x) => x.id === id);
+  if (!p) return viewNotFound();
+  const a = artistOf({ artist: p.artist });
+  const others = postsOf(p.artist).filter((x) => x.id !== id).slice(0, 2);
+  return `
+    <article class="post-page">
+      <a class="post-author" href="#/artiste/${a.id}"><div class="avatar sm">${initials(a.name)}</div><span><strong>${esc(a.name)}</strong><span class="mono muted">${esc(disciplineOf(a.id))} · ${esc(a.city)}</span></span></a>
+      <div class="post-hero">${postMedia(p)}</div>
+      <span class="ref">${frDate(p.date)}${p.media?.video ? " · Vidéo coulisses" : ""}</span>
+      <h1>${esc(p.title)}</h1>
+      <p class="post-text">${esc(p.text)}</p>
+      <div class="card-actions">${followBtn(a.id)}<a class="btn btn-outline" href="#/artiste/${a.id}">Voir le profil</a></div>
+    </article>
+    ${others.length ? `<section class="section"><div class="section-head"><h2>Autres <span class="fun">posts</span></h2></div><div class="posts">${others.map((x) => postCard(x)).join("")}</div></section>` : ""}`;
 }
 
 /* ---------- Notre histoire ---------- */
@@ -914,7 +1048,11 @@ function orderCard(o, withActions = true) {
           ? `<div class="order-foot"><span class="hint">Livraison : ${esc(o.address)}</span>
               <div style="display:flex;gap:6px;flex-wrap:wrap">
                 ${o.status === 3 ? `<button class="btn btn-small btn-outline" data-act="return" data-id="${o.id}">Demander un retour</button>` : ""}
-                <button class="btn btn-small btn-outline" data-act="dispute" data-id="${o.id}">Signaler un problème</button>
+                ${
+                  disputeOf(o.id)
+                    ? `<a class="btn btn-small" href="#/litige/${disputeOf(o.id).id}">Litige ${disputeOf(o.id).id} · ${disputeOf(o.id).status}</a>`
+                    : `<a class="btn btn-small btn-outline" href="#/signaler/${o.id}">Signaler un problème</a>`
+                }
               </div></div>`
           : ""
       }
@@ -1020,6 +1158,7 @@ function sellerSpace() {
       </div>
       <div class="two-col">
         <div class="panel"><h3>À faire</h3>
+          ${state.disputes.filter((d) => disputeOpen(d) && disputeWork(d)?.artist === id).map((d) => `<p><a class="tag pink" href="#/litige/${d.id}">Litige ${d.id}</a> ${esc(d.reason)}</p>`).join("")}
           ${toShip ? `<p>${toShip} commande${toShip > 1 ? "s" : ""} à préparer ou expédier.</p><button class="btn btn-small" data-act="tab" data-key="seller" data-id="ventes">Voir les ventes</button>` : '<p class="hint">Aucune commande en attente.</p>'}
         </div>
         <div class="panel"><h3>Votre vitrine</h3><p class="hint">${works.length} œuvre${works.length > 1 ? "s" : ""} en ligne · ${works.filter((w) => totalStock(w) === 0).length} en rupture.</p>
@@ -1053,7 +1192,7 @@ function sellerSpace() {
             .map(
               (s) => `<tr><td>${s.order}</td><td>${frDate(s.date)}</td><td>${esc(s.buyer)}</td><td>${esc(byId(s.work)?.title)} × ${s.qty}</td>
               <td class="num">${euro(s.price * s.qty)}</td><td class="num">${euro(s.price * s.qty * 0.9)}</td>
-              <td><span class="tag ${s.status === 3 ? "green" : s.status === 2 ? "grey" : "pink"}">${STEPS[s.status]}</span></td>
+              <td><span class="tag ${s.status === 3 ? "green" : s.status === 2 ? "grey" : "pink"}">${STEPS[s.status]}</span>${disputeOf(s.order) ? ` <a class="tag pink" href="#/litige/${disputeOf(s.order).id}">Litige</a>` : ""}</td>
               <td class="num">${s.status < 3 ? `<button class="btn btn-small" data-act="advance" data-src="${s.src}" data-id="${s.order}">${s.status < 2 ? "Marquer expédiée" : "Marquer livrée"}</button>` : ""}</td></tr>`,
             )
             .join("")}</tbody></table></div>`
@@ -1083,6 +1222,27 @@ function sellerSpace() {
       </div>`;
   }
   if (tab === "messages") body = `<p><a class="btn" href="#/messages/${id}">Ouvrir la messagerie</a></p>`;
+  if (tab === "posts") {
+    const mine = postsOf(id);
+    body = `
+      <div class="two-col">
+        <form class="panel" id="post-form">
+          <h3>Nouveau post</h3>
+          <div class="field"><label for="ps-title">Titre</label><input id="ps-title" required placeholder="Ex. Nouvelle série en préparation" /></div>
+          <div class="field"><label for="ps-text">Texte</label><textarea id="ps-text" rows="5" required placeholder="Racontez ce qui se passe à l'atelier…"></textarea></div>
+          <div class="field"><label for="ps-work">Illustration</label><select id="ps-work"><option value="">Aucune</option>${works.map((w) => `<option value="${w.id}">${esc(w.title)}</option>`).join("")}</select></div>
+          <div class="field"><label for="ps-photo">Ou une photo</label><input id="ps-photo" type="file" accept="image/*" /></div>
+          <label class="check"><input type="checkbox" id="ps-video" /> C'est une vidéo coulisses</label>
+          <button class="btn">Publier le post</button>
+          <p class="hint">Les deux derniers posts s'affichent en extrait sur votre page publique.</p>
+        </form>
+        <div class="stack">${
+          mine.length
+            ? mine.map((p) => `<div class="post-row">${postCard(p)}<button class="link-btn" data-act="post-delete" data-id="${p.id}">Supprimer</button></div>`).join("")
+            : emptyBox("Aucun post", "Partagez vos nouvelles, expositions et coulisses.")
+        }</div>
+      </div>`;
+  }
   return (
     tabs(
       "seller",
@@ -1091,6 +1251,7 @@ function sellerSpace() {
         ["oeuvres", "Mes œuvres"],
         ["ajouter", "Publier"],
         ["ventes", "Ventes", toShip],
+        ["posts", "Posts", postsOf(id).length],
         ["profil", "Profil & médias"],
         ["messages", "Messages"],
       ],
@@ -1195,7 +1356,7 @@ function adminSpace() {
   const sales = allSales();
   const gmv = sales.reduce((s, x) => s + x.price * x.qty, 0);
   const pending = state.pending.filter((p) => p.status === "en attente");
-  const openDisputes = state.disputes.filter((d) => d.status === "ouvert");
+  const openDisputes = state.disputes.filter(disputeOpen);
   let body = "";
   if (tab === "vendeurs") {
     body = state.pending.length
@@ -1231,11 +1392,11 @@ function adminSpace() {
   }
   if (tab === "litiges") {
     body = state.disputes.length
-      ? `<div class="table-wrap"><table><thead><tr><th>Litige</th><th>Commande</th><th>Acheteur</th><th>Motif</th><th class="num">Montant</th><th>Statut</th><th></th></tr></thead><tbody>${state.disputes
+      ? `<div class="table-wrap"><table><thead><tr><th>Litige</th><th>Commande</th><th>Acheteur</th><th>Motif</th><th class="num">Photos</th><th class="num">Montant</th><th>Statut</th><th></th></tr></thead><tbody>${state.disputes
           .map(
-            (d) => `<tr><td>${d.id}</td><td>${d.order}</td><td>${esc(d.buyer)}</td><td>${esc(d.reason)}</td><td class="num">${euro(d.amount)}</td>
-            <td><span class="tag ${d.status === "ouvert" ? "pink" : "green"}">${d.status}</span></td>
-            <td class="num">${d.status === "ouvert" ? `<button class="btn btn-small" data-act="dispute-refund" data-id="${d.id}">Rembourser</button><button class="btn btn-small btn-outline" data-act="dispute-close" data-id="${d.id}">Clore</button>` : ""}</td></tr>`,
+            (d) => `<tr><td><a href="#/litige/${d.id}"><strong>${d.id}</strong></a></td><td>${d.order}</td><td>${esc(d.buyer)}</td><td>${esc(d.reason)}</td><td class="num">${d.photos?.length || 0}</td><td class="num">${euro(d.amount)}</td>
+            <td><span class="tag ${DISPUTE_TAG[d.status] || ""}">${d.status}</span></td>
+            <td class="num"><a class="btn btn-small ${disputeOpen(d) ? "" : "btn-outline"}" href="#/litige/${d.id}">Ouvrir le dossier</a></td></tr>`,
           )
           .join("")}</tbody></table></div>`
       : emptyBox("Aucun litige", "Tout va bien.");
@@ -1258,6 +1419,145 @@ function adminSpace() {
       tab,
     )}
     ${body}`;
+}
+
+/* ---------- Litiges ---------- */
+const DISPUTE_TAG = { ouvert: "pink", "en attente d'infos": "pink", remboursé: "green", "remboursement partiel": "green", refusé: "grey", clos: "grey" };
+const ROLE_LABEL = { buyer: "Acheteur", artist: "Artiste", admin: "ATYPIIK" };
+const disputeOpen = (d) => d.status === "ouvert" || d.status === "en attente d'infos";
+const disputeOf = (orderId) => state.disputes.find((d) => d.order === orderId);
+function disputeWork(d) {
+  const o = state.orders.find((x) => x.id === d.order);
+  return byId(d.work) || byId(o?.lines[0]?.id);
+}
+function myDisputeRole() {
+  return state.user?.role === "admin" ? "admin" : state.user?.role === "vendeur" ? "artist" : "buyer";
+}
+function canSeeDispute(d) {
+  if (!state.user) return false;
+  if (state.user.role === "vendeur") return disputeWork(d)?.artist === state.user.artistId;
+  return true;
+}
+function photoInner(p, big = false) {
+  if (p.src) return `<img src="${p.src}" alt="${esc(p.caption || "Photo")}" />`;
+  const style = p.zoom ? "transform:scale(2.4);transform-origin:88% 88%" : p.tone === "carton" ? "filter:sepia(.85) saturate(.55) brightness(1.15)" : "";
+  return visual(byId(p.work), style) + (big ? "" : "");
+}
+function photoTile(d, p, i) {
+  return `<button class="photo" data-act="zoom-photo" data-id="${d.id}" data-i="${i}" aria-label="Agrandir ${esc(p.caption || "la photo")}">${photoInner(p)}<span class="mono">${esc(p.caption || "Photo " + (i + 1))}${p.src ? "" : " · démo"}</span></button>`;
+}
+function photoInput(id, label) {
+  return `<div class="field"><label for="${id}">${label}</label><input id="${id}" type="file" accept="image/*" multiple /><span class="hint">Jusqu'à 4 photos. Montrez l'œuvre, le défaut de près et l'emballage.</span></div>`;
+}
+
+function viewReport(orderId) {
+  if (!state.user) return needLogin("Connectez-vous pour signaler un problème.");
+  const o = state.orders.find((x) => x.id === orderId);
+  if (!o) return viewNotFound();
+  const d = disputeOf(orderId);
+  if (d) return `<div class="page-head"><h1>Signaler un <span class="fun">problème</span></h1></div>${emptyBox("Déjà signalé", `Un litige (${d.id}) est déjà ouvert pour cette commande.`, `<a class="btn" href="#/litige/${d.id}">Voir le dossier</a>`)}`;
+  return `
+    <div class="page-head"><div><span class="ref">Commande ${o.id} · ${frDate(o.date)}</span><h1>Signaler un <span class="fun">problème</span></h1></div><p>Décrivez ce qui ne va pas et ajoutez des photos : l'artiste et l'équipe ATYPIIK pourront vous répondre dans le dossier.</p></div>
+    <form class="panel report" id="report-form" data-order="${o.id}">
+      <div class="order-lines">${o.lines.map((l) => (byId(l.id) ? `${visual(byId(l.id))}<span class="hint">${esc(byId(l.id).title)} × ${l.qty}</span>` : "")).join("")}</div>
+      <div class="field"><label for="rp-reason">Motif</label>
+        <select id="rp-reason" required>
+          <option value="">Choisir…</option>
+          <option>Colis abîmé à la livraison</option>
+          <option>Œuvre non conforme à la description</option>
+          <option>Colis non reçu</option>
+          <option>Œuvre cassée ou défectueuse</option>
+          <option>Autre</option>
+        </select></div>
+      <div class="field"><label for="rp-text">Ce qui s'est passé</label><textarea id="rp-text" rows="5" required placeholder="Ex. le cadre est arrivé fissuré dans un coin…"></textarea></div>
+      ${photoInput("rp-photos", "Photos du problème")}
+      <div class="photos" id="rp-preview"></div>
+      <button class="btn">Envoyer le signalement</button>
+    </form>`;
+}
+
+function viewDispute(id) {
+  const d = state.disputes.find((x) => x.id === id);
+  if (!d) return viewNotFound();
+  if (!state.user) return needLogin("Connectez-vous pour consulter ce litige.");
+  if (!canSeeDispute(d)) return emptyBox("Accès réservé", "Ce dossier n'est visible que par l'acheteur, l'artiste concerné et l'équipe ATYPIIK.");
+  const w = disputeWork(d);
+  const a = w ? artistOf(w) : null;
+  const me = myDisputeRole();
+  const open = disputeOpen(d);
+  const who = (m) => (m.from === "artist" && a ? a.name : m.from === "buyer" ? d.buyer : "Équipe ATYPIIK");
+  return `
+    <div class="page-head"><div><span class="ref">Dossier litige · commande ${d.order}</span><h1>Litige <span class="fun">${d.id}</span></h1></div><span class="tag ${DISPUTE_TAG[d.status] || ""}">${d.status}</span></div>
+    <div class="dispute">
+      <div class="dispute-main">
+        <section class="panel">
+          <span class="mono muted">Motif · signalé le ${frDate(d.date)} par ${esc(d.buyer)}</span>
+          <h2>${esc(d.reason)}</h2>
+          <p class="dispute-text">${esc(d.description || "Aucune description.")}</p>
+        </section>
+        <section class="dispute-block">
+          <div class="sub-head"><h3>Photos du <span class="fun">problème</span></h3><span class="mono muted">${plural(d.photos?.length || 0, "photo")}</span></div>
+          ${d.photos?.length ? `<div class="photos">${d.photos.map((p, i) => photoTile(d, p, i)).join("")}</div>` : '<p class="hint">Aucune photo pour le moment.</p>'}
+        </section>
+        <section class="dispute-block">
+          <div class="sub-head"><h3><span class="fun">Échanges</span></h3></div>
+          <div class="msgs">${(d.messages || [])
+            .map(
+              (m) => `<div class="msg from-${m.from} ${m.from === me ? "mine" : ""}">
+                <div class="msg-meta mono"><span class="role">${ROLE_LABEL[m.from]}</span> ${esc(who(m))} · ${frDate(m.date)}</div>
+                ${m.text ? `<p>${esc(m.text)}</p>` : ""}
+                ${m.photos?.length ? `<div class="msg-photos">${m.photos.map((p) => `<img src="${p.src}" alt="Photo jointe" />`).join("")}</div>` : ""}
+              </div>`,
+            )
+            .join("")}</div>
+          ${
+            open
+              ? `<form class="reply" id="dispute-reply" data-id="${d.id}">
+                  <div class="field"><label for="dr-text">Votre message (${ROLE_LABEL[me].toLowerCase()})</label><textarea id="dr-text" rows="3" placeholder="Écrire une réponse…"></textarea></div>
+                  ${photoInput("dr-photos", "Ajouter des photos")}
+                  <button class="btn btn-small">Envoyer</button>
+                </form>`
+              : '<p class="hint">Ce dossier est clos : il n\'est plus possible d\'y répondre.</p>'
+          }
+        </section>
+      </div>
+      <aside class="dispute-side">
+        <div class="panel">
+          <span class="mono muted">Commande ${d.order}</span>
+          ${w ? `<a class="dispute-work" href="#/oeuvre/${w.id}">${visual(w)}<span><strong>${esc(w.title)}</strong><span class="hint">${esc(a.name)}</span></span></a>` : ""}
+          <div class="summary-row"><span>Montant concerné</span><span>${euro(d.amount)}</span></div>
+          <div class="summary-row"><span>Acheteur</span><span>${esc(d.buyer)}</span></div>
+          ${a ? `<div class="summary-row"><span>Artiste</span><span><a href="#/artiste/${a.id}" class="by">${esc(a.name)}</a></span></div>` : ""}
+        </div>
+        ${
+          me === "admin" && open
+            ? `<form class="panel decision" id="dispute-decision" data-id="${d.id}">
+                <h3>Décision</h3>
+                <label class="check"><input type="radio" name="dec" value="full" checked /> Rembourser intégralement (${euro(d.amount)})</label>
+                <label class="check"><input type="radio" name="dec" value="partial" /> Remboursement partiel</label>
+                <div class="field"><input id="dec-amount" type="number" min="1" max="${d.amount}" placeholder="Montant en €" aria-label="Montant du remboursement partiel" /></div>
+                <label class="check"><input type="radio" name="dec" value="info" /> Demander des précisions</label>
+                <label class="check"><input type="radio" name="dec" value="reject" /> Refuser le litige</label>
+                <div class="field"><label for="dec-note">Explication envoyée aux deux parties</label><textarea id="dec-note" rows="3" required></textarea></div>
+                <button class="btn btn-block">Valider la décision</button>
+              </form>`
+            : ""
+        }
+        <div class="panel">
+          <h3>Historique</h3>
+          <ol class="timeline">${(d.history || []).map((h) => `<li><span class="mono">${frDate(h.date)}</span>${esc(h.text)}</li>`).join("")}</ol>
+        </div>
+      </aside>
+    </div>`;
+}
+
+function bindReport() {
+  const input = $("#rp-photos");
+  if (!input) return;
+  input.addEventListener("change", async () => {
+    const photos = await readPhotos(input.files);
+    $("#rp-preview").innerHTML = photos.map((p) => `<div class="photo"><img src="${p.src}" alt="" /><span class="mono">${esc(p.caption)}</span></div>`).join("");
+  });
 }
 
 /* ---------- Pages légales ---------- */
@@ -1459,13 +1759,6 @@ const actions = {
     if (state.prefs.orders) notify(`Retour demandé pour la commande ${el.dataset.id}.`, "#/profil");
     save();
   },
-  dispute(el) {
-    const o = state.orders.find((x) => x.id === el.dataset.id);
-    if (state.disputes.some((d) => d.order === o.id && d.status === "ouvert")) return toast("Un signalement est déjà en cours pour cette commande.");
-    state.disputes.unshift({ id: "L-" + (1043 + state.disputes.length), order: o.id, buyer: o.buyer, reason: "Signalé par l'acheteur", amount: o.total, status: "ouvert" });
-    save();
-    toast("Signalement transmis à l'équipe ATYPIIK.");
-  },
   advance(el) {
     const s = findSale(el.dataset.src, el.dataset.id);
     s.status = s.status < 2 ? 2 : 3;
@@ -1519,15 +1812,20 @@ const actions = {
     toast(w.hidden ? "Œuvre masquée du catalogue" : "Œuvre de nouveau visible");
     render(true);
   },
-  "dispute-refund"(el) {
-    state.disputes.find((d) => d.id === el.dataset.id).status = "remboursé";
-    save();
-    toast("Remboursement lancé via Stripe.");
-    render(true);
+  "zoom-photo"(el) {
+    const d = state.disputes.find((x) => x.id === el.dataset.id);
+    const p = d.photos[+el.dataset.i];
+    const box = document.createElement("div");
+    box.className = "lightbox";
+    box.setAttribute("role", "dialog");
+    box.innerHTML = `<div class="lightbox-media">${photoInner(p, true)}</div><p class="mono">${esc(p.caption || "Photo")} — cliquez pour fermer</p>`;
+    box.addEventListener("click", () => box.remove());
+    document.body.appendChild(box);
   },
-  "dispute-close"(el) {
-    state.disputes.find((d) => d.id === el.dataset.id).status = "clos";
+  "post-delete"(el) {
+    state.posts = state.posts.filter((p) => p.id !== el.dataset.id);
     save();
+    toast("Post supprimé");
     render(true);
   },
   "cookies-save"() {
@@ -1561,6 +1859,9 @@ document.addEventListener("click", (e) => {
     save();
   }
 });
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") $$(".lightbox").forEach((b) => b.remove());
+});
 document.addEventListener("change", (e) => {
   const el = e.target;
   if (el.dataset.act === "pref") actions.pref(el);
@@ -1573,8 +1874,71 @@ document.addEventListener("change", (e) => {
     render(true);
   }
 });
-document.addEventListener("submit", (e) => {
+document.addEventListener("submit", async (e) => {
   const f = e.target;
+  if (f.id === "report-form") {
+    e.preventDefault();
+    const o = state.orders.find((x) => x.id === f.dataset.order);
+    const photos = await readPhotos($("#rp-photos").files);
+    const d = {
+      id: "L-" + (1043 + state.disputes.length), order: o.id, work: o.lines[0]?.id, buyer: o.buyer, date: today(),
+      reason: $("#rp-reason").value, description: $("#rp-text").value.trim(), amount: o.total, status: "ouvert", photos,
+      messages: [], history: [{ date: today(), text: `Litige ouvert par l'acheteur${photos.length ? ` avec ${plural(photos.length, "photo")}` : ""}` }],
+    };
+    state.disputes.unshift(d);
+    notify(`Votre signalement ${d.id} a été transmis à l'artiste et à l'équipe ATYPIIK.`, "#/litige/" + d.id);
+    save();
+    return nav("#/litige/" + d.id);
+  }
+  if (f.id === "dispute-reply") {
+    e.preventDefault();
+    const d = state.disputes.find((x) => x.id === f.dataset.id);
+    const text = $("#dr-text").value.trim();
+    const photos = await readPhotos($("#dr-photos").files);
+    if (!text && !photos.length) return toast("Écrivez un message ou ajoutez une photo.");
+    const from = myDisputeRole();
+    d.messages.push({ from, date: today(), text, photos });
+    if (photos.length) d.photos.push(...photos);
+    d.history.push({ date: today(), text: `Message de ${ROLE_LABEL[from].toLowerCase()}${photos.length ? ` (+ ${plural(photos.length, "photo")})` : ""}` });
+    save();
+    toast("Message envoyé");
+    return render(true);
+  }
+  if (f.id === "dispute-decision") {
+    e.preventDefault();
+    const d = state.disputes.find((x) => x.id === f.dataset.id);
+    const dec = f.querySelector("input[name=dec]:checked").value;
+    const note = $("#dec-note").value.trim();
+    const part = Math.min(d.amount, Math.max(0, +$("#dec-amount").value || 0));
+    if (dec === "partial" && !part) return toast("Indiquez le montant du remboursement partiel.");
+    const outcome = {
+      full: ["remboursé", `Remboursement intégral de ${euro(d.amount)} via Stripe`],
+      partial: ["remboursement partiel", `Remboursement partiel de ${euro(part)} via Stripe`],
+      info: ["en attente d'infos", "Précisions demandées par ATYPIIK"],
+      reject: ["refusé", "Litige refusé par ATYPIIK"],
+    }[dec];
+    d.status = outcome[0];
+    d.messages.push({ from: "admin", date: today(), text: `${outcome[1]}. ${note}` });
+    d.history.push({ date: today(), text: outcome[1] });
+    notify(`Litige ${d.id} : ${outcome[1].toLowerCase()}.`, "#/litige/" + d.id);
+    save();
+    toast("Décision enregistrée — l'acheteur et l'artiste sont notifiés.");
+    return render(true);
+  }
+  if (f.id === "post-form") {
+    e.preventDefault();
+    const photo = (await readPhotos($("#ps-photo").files, 1))[0];
+    const work = $("#ps-work").value;
+    const p = {
+      id: "p" + Date.now(), artist: state.user.artistId, date: today(), title: $("#ps-title").value.trim(), text: $("#ps-text").value.trim(),
+      media: photo ? { src: photo.src, video: $("#ps-video").checked } : work ? { work, video: $("#ps-video").checked } : null,
+    };
+    state.posts.unshift(p);
+    if (state.follows.includes(p.artist) && state.prefs.news) notify(`${artistById(p.artist).name} a publié un nouveau post : « ${p.title} ».`, "#/post/" + p.id);
+    save();
+    toast("Post publié");
+    return render(true);
+  }
   if (f.id === "account-form") {
     e.preventDefault();
     Object.assign(state.user, { name: $("#ac-name").value.trim(), email: $("#ac-email").value.trim() });
@@ -1647,7 +2011,7 @@ function render(keepScroll = false, restoring = false) {
   if (route === "galerie") scrollMemory[currentHash] = galleryScroll;
   currentRoute = route;
   currentParam = param;
-  if (route === "artiste" && !keepScroll) state.tab.artist = "oeuvres";
+  if (route === "artiste" && !keepScroll) state.tab.artist = "accueil";
 
   const views = {
     "": [viewHome],
@@ -1655,6 +2019,9 @@ function render(keepScroll = false, restoring = false) {
     oeuvre: [() => viewProduct(param), () => bindProduct(param)],
     artistes: [viewArtists],
     histoire: [viewStory],
+    post: [() => viewPost(param)],
+    litige: [() => viewDispute(param), () => bindLogin()],
+    signaler: [() => viewReport(param), () => (bindReport(), bindLogin())],
     artiste: [() => viewArtist(param)],
     selection: [viewSelection],
     favoris: [viewFavs],

@@ -175,10 +175,74 @@ const SEED_PENDING_SELLERS = [
   { id: "p2", name: "Studio Ghost", email: "hello@studioghost.fr", city: "Toulouse", discipline: "Sérigraphie", status: "en attente" },
 ];
 
+/* Litiges (démo). Les photos de démonstration réutilisent le visuel de l'œuvre concernée ;
+   les vraies photos envoyées par les acheteurs sont stockées en image (data URL). */
 const SEED_DISPUTES = [
-  { id: "L-1042", order: "CMD-2025-0871", buyer: "Camille R.", reason: "Colis abîmé à la livraison", amount: 210, status: "ouvert" },
+  {
+    id: "L-1042",
+    order: "CMD-2026-0975",
+    work: "a8",
+    buyer: "Jade P.",
+    date: "2026-10-12",
+    reason: "Colis abîmé à la livraison",
+    description:
+      "Le carton était enfoncé sur un côté et le verre du cadre est fêlé dans le coin inférieur droit. Le tirage lui-même a l'air intact mais je ne peux pas l'accrocher comme ça.",
+    amount: 210,
+    status: "ouvert",
+    photos: [
+      { work: "a8", caption: "Œuvre à la réception" },
+      { work: "a8", caption: "Détail du coin fêlé", zoom: true },
+      { work: "a8", caption: "Emballage", tone: "carton" },
+    ],
+    messages: [
+      { from: "buyer", date: "2026-10-12", text: "Bonjour, le colis est arrivé abîmé, j'ai mis les photos. Que peut-on faire ?" },
+      { from: "artist", date: "2026-10-13", text: "Je suis désolée ! Je peux renvoyer un nouveau cadre, ou vous rembourser la différence si vous gardez le tirage." },
+    ],
+    history: [
+      { date: "2026-10-12", text: "Litige ouvert par l'acheteur" },
+      { date: "2026-10-13", text: "Réponse de l'artiste" },
+    ],
+  },
 ];
 
+/* Posts des artistes : nouvelles, coulisses, expositions. */
+const SEED_POSTS = [
+  {
+    id: "p-nova-1", artist: "nova", date: "2026-10-10", title: "Une nouvelle série en préparation",
+    text: "Je travaille depuis cet été sur une série de six toiles autour des lumières de Marseille la nuit. Les premières sont presque sèches, je vous montre bientôt le résultat. Merci à toutes les personnes qui suivent l'atelier !",
+    media: { work: "a7" },
+  },
+  {
+    id: "p-nova-2", artist: "nova", date: "2026-09-21", title: "Dans l'atelier",
+    text: "Petite visite de l'atelier : les pigments, les toiles en attente, et la fameuse table pleine de pots. Une vidéo des coulisses est disponible sur ma page.",
+    media: { work: "a1", video: true },
+  },
+  {
+    id: "p-nova-3", artist: "nova", date: "2026-08-30", title: "Exposition au Panier",
+    text: "Trois de mes toiles sont exposées tout le mois de septembre dans une petite galerie du quartier du Panier. Venez dire bonjour le samedi !",
+    media: { work: "a16" },
+  },
+  {
+    id: "p-ines-1", artist: "ines", date: "2026-10-08", title: "Nuit de prise de vue",
+    text: "Toute une nuit à Pigalle pour la nouvelle série. Quarante pellicules, trois images retenues. C'est ça aussi, l'argentique.",
+    media: { work: "a3", video: true },
+  },
+  {
+    id: "p-ines-2", artist: "ines", date: "2026-09-15", title: "Les tirages encadrés arrivent",
+    text: "Vous me l'avez beaucoup demandé : « Pluie d'argent » existe maintenant en version encadrée, en série limitée.",
+    media: { work: "a8" },
+  },
+  {
+    id: "p-kairo-1", artist: "kairo", date: "2026-10-02", title: "Le polissage, étape par étape",
+    text: "Une pièce miroir, c'est environ vingt heures de polissage. Je vous explique les grains, les pâtes et la patience qu'il faut.",
+    media: { work: "a5", video: true },
+  },
+  {
+    id: "p-zia-1", artist: "zia", date: "2026-09-27", title: "Fréquence, la suite",
+    text: "Après l'exposition de Lille, je reprends le tissage avec de la fibre optique pour une pièce encore plus grande.",
+    media: { work: "a6" },
+  },
+];
 /* Ventes passées (démo) pour l'espace artiste et les commissions. */
 const SEED_SALES = [
   { order: "CMD-2026-0912", date: "2026-09-28", buyer: "Hugo L.", work: "a7", qty: 1, price: 1250, status: 3 },

@@ -62,6 +62,14 @@ et enregistrées dans le navigateur (localStorage).
   et vidéos coulisses, messages des acheteurs.
 - **Administrateur** : validation des comptes vendeurs, modération des œuvres,
   commissions (10 %) et flux financiers, gestion des litiges.
+- **Litiges** : l'acheteur signale un problème depuis sa commande (motif, description, jusqu'à 4 photos).
+  Chaque litige a son dossier (`#/litige/…`) : photos agrandissables, échanges entre acheteur, artiste
+  et ATYPIIK (avec photos), historique, et décision de l'admin (remboursement total ou partiel,
+  demande de précisions, refus) envoyée aux deux parties.
+- **Mini-site artiste** : couverture, présentation, deux derniers posts en extrait, œuvres, coulisses,
+  presse. Les artistes publient des posts (texte, illustration, photo ou vidéo) depuis leur espace.
+- **Artistes** : page de suggestions personnalisées (selon les œuvres vues et aimées) avec visuels,
+  vidéo et dernier post, puis l'annuaire complet.
 - **Notifications** : commande, expédition, livraison, baisse de prix, retour en stock,
   nouvelle œuvre d'un artiste suivi, offres.
 - **RGPD** : bandeau cookies, formulaire d'exercice des droits, pages légales.
