@@ -228,7 +228,7 @@ function viewHome() {
       .join("")}</nav>
 
     <section class="section">
-      <div class="section-head"><div><span class="ref">01 — Nouveautés</span><h2>Nouvelles pièces</h2></div><a href="#/galerie">Tout voir</a></div>
+      <div class="section-head"><div><span class="ref">01 — Nouveautés</span><h2>Nouvelles <span class="fun">pièces</span></h2></div><a href="#/galerie">Tout voir</a></div>
       <div class="grid">${works.slice(0, 8).map((w) => card(w)).join("")}</div>
     </section>
 
@@ -241,7 +241,7 @@ function viewHome() {
     </section>
 
     <section class="section">
-      <div class="section-head"><div><span class="ref">03 — Disciplines</span><h2>Par catégorie</h2></div></div>
+      <div class="section-head"><div><span class="ref">03 — Disciplines</span><h2>Par <span class="fun">catégorie</span></h2></div></div>
       <div class="cats">${cats
         .map(([t, id]) => {
           const n = visibleWorks().filter((w) => w.type === t).length;
@@ -251,7 +251,7 @@ function viewHome() {
     </section>
 
     <section class="section">
-      <div class="section-head"><div><span class="ref">04 — Communauté</span><h2>Les artistes</h2></div><a href="#/artistes">Tous les artistes</a></div>
+      <div class="section-head"><div><span class="ref">04 — Communauté</span><h2>Les <span class="fun">artistes</span></h2></div><a href="#/artistes">Tous les artistes</a></div>
       <div class="grid">${state.artists.slice(0, 4).map(artistCard).join("")}</div>
     </section>
 
@@ -298,7 +298,7 @@ function viewGallery() {
   const chip = (group, v, label = v) =>
     `<button class="chip ${g[group].includes(v) ? "on" : ""}" data-act="filter" data-group="${group}" data-value="${v}">${label}</button>`;
   return `
-    <div class="page-head"><h1>Galerie</h1><p>${g.q ? `Résultats pour « ${esc(g.q)} »` : "Toutes les œuvres disponibles, filtrées en direct."}</p></div>
+    <div class="page-head"><h1>La <span class="fun">galerie</span></h1><p>${g.q ? `Résultats pour « ${esc(g.q)} »` : "Toutes les œuvres disponibles, filtrées en direct."}</p></div>
     <div class="gallery-layout">
       <aside class="filters" aria-label="Filtres">
         <details open><summary>Type d'art</summary><div class="opts">${types.map((t) => chip("type", t)).join("")}</div></details>
@@ -432,7 +432,7 @@ function refreshAvailability(w) {
 /* ---------- Artistes ---------- */
 function viewArtists() {
   return `
-    <div class="page-head"><h1>Artistes</h1><p>Suivez vos artistes préférés pour être alerté·e de chaque nouvelle œuvre.</p></div>
+    <div class="page-head"><h1>Les <span class="fun">artistes</span></h1><p>Suivez vos artistes préférés pour être alerté·e de chaque nouvelle œuvre.</p></div>
     <div class="grid">${state.artists.map(artistCard).join("")}</div>`;
 }
 
@@ -507,7 +507,7 @@ function viewSelection() {
 function viewFavs() {
   const works = state.favs.map(byId).filter((w) => w && !w.hidden);
   return `
-    <div class="page-head"><h1>Favoris</h1><p>Vous serez prévenu·e en cas de baisse de prix ou de retour en stock.</p></div>
+    <div class="page-head"><h1>Mes <span class="fun">favoris</span></h1><p>Vous serez prévenu·e en cas de baisse de prix ou de retour en stock.</p></div>
     ${works.length ? `<div class="grid">${works.map((w) => card(w)).join("")}</div>` : emptyBox("Aucun favori", "Touchez le cœur sur une œuvre pour la retrouver ici.", '<a class="btn" href="#/galerie">Explorer</a>')}`;
 }
 
@@ -518,11 +518,11 @@ function cartLines() {
 function viewCart() {
   const lines = cartLines();
   if (!lines.length)
-    return `<div class="page-head"><h1>Panier</h1></div>${emptyBox("Panier vide", "Vos articles sont conservés même après fermeture du navigateur.", '<a class="btn" href="#/galerie">Découvrir des œuvres</a>')}`;
+    return `<div class="page-head"><h1>Mon <span class="fun">panier</span></h1></div>${emptyBox("Panier vide", "Vos articles sont conservés même après fermeture du navigateur.", '<a class="btn" href="#/galerie">Découvrir des œuvres</a>')}`;
   const total = lines.reduce((s, l) => s + l.w.price * l.qty, 0);
   const blocked = lines.some((l) => l.w.sold || l.w.variants[l.variant].stock < l.qty);
   return `
-    <div class="page-head"><h1>Panier</h1></div>
+    <div class="page-head"><h1>Mon <span class="fun">panier</span></h1></div>
     <div class="cart">
       <div>${lines
         .map((l, i) => {
@@ -671,7 +671,7 @@ function viewOrderDone(id) {
 function viewNotifs() {
   const list = state.notifs;
   return `
-    <div class="page-head"><h1>Notifications</h1>
+    <div class="page-head"><h1>Mes <span class="fun">alertes</span></h1>
       <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-small btn-outline" data-act="notifs-read">Tout marquer comme lu</button><a class="btn btn-small btn-outline" href="#/profil" data-act="tab-link" data-key="profile" data-id="prefs">Préférences</a></div>
     </div>
     ${
@@ -706,7 +706,7 @@ function viewMessages(param) {
   const meFrom = seller && current !== "support" ? "artist" : "buyer";
   const label = (k) => (seller && k !== "support" ? "Acheteurs — Camille R." : threadName(k));
   return `
-    <div class="page-head"><h1>Messagerie</h1><p>${seller ? "Répondez aux questions des acheteurs sur vos œuvres." : "Échangez en privé avec les artistes, ou contactez l'équipe ATYPIIK."}</p></div>
+    <div class="page-head"><h1>Mes <span class="fun">messages</span></h1><p>${seller ? "Répondez aux questions des acheteurs sur vos œuvres." : "Échangez en privé avec les artistes, ou contactez l'équipe ATYPIIK."}</p></div>
     <div class="inbox">
       <div class="threads">${keys
         .map((k) => {

@@ -89,6 +89,14 @@ h4 {
 .muted {
   color: var(--ink-3);
 }
+/* Mot d'accent en Le Petit Cochon, mêlé aux titres en Cubao */
+.fun {
+  font-family: var(--font-fun);
+  font-weight: 400;
+  font-size: 0.86em;
+  text-transform: none;
+  letter-spacing: 0;
+}
 
 /* ---------- Boutons ---------- */
 .btn {
@@ -341,8 +349,11 @@ h4 {
   transform: none;
 }
 .drawer a {
-  padding: 8px 0;
-  font-size: 2.6rem;
+  padding: 10px 0;
+  font-family: var(--font-fun);
+  font-weight: 400;
+  text-transform: none;
+  font-size: 2.3rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.14);
 }
 .drawer a:hover {
@@ -636,10 +647,9 @@ main {
   padding: 12px 14px;
 }
 .cat-label span:first-child {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 1.5rem;
-  text-transform: uppercase;
+  font-family: var(--font-fun);
+  font-size: 1.35rem;
+  text-transform: lowercase;
 }
 .cat:hover .cat-label {
   background: var(--ink);
@@ -2060,10 +2070,10 @@ td .btn + .btn {
     place-items: center;
     gap: 2px;
     padding: 4px 8px;
-    font-size: 0.56rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    font-family: var(--font-fun);
+    font-size: 0.78rem;
+    font-weight: 400;
+    text-transform: lowercase;
   }
   .bottom-bar a svg {
     width: 20px;
