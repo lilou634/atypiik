@@ -16,7 +16,7 @@ const clone = (o) => JSON.parse(JSON.stringify(o));
 const initials = (name) => name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
 
 /* ---------- Persistance ---------- */
-const DATA_VERSION = 5;
+const DATA_VERSION = 6;
 const store = {
   get(key, fallback) {
     try {
@@ -50,7 +50,7 @@ const PERSISTED = [
 ];
 const state = {
   user: store.get("user", null),
-  favs: store.get("favs", ["a3"]),
+  favs: store.get("favs", ["a22"]),
   cart: store.get("cart", []),
   views: store.get("views", []),
   follows: store.get("follows", ["ines"]),
@@ -58,17 +58,17 @@ const state = {
     {
       id: "CMD-2026-0944", date: "2026-10-03", status: 2, buyer: "Camille Roux",
       address: "12 rue des Arts, 13001 Marseille",
-      lines: [{ id: "a1", variant: 0, qty: 1, price: 480 }], total: 480,
+      lines: [{ id: "a19", variant: 1, qty: 1, price: 95 }], total: 95,
     },
   ]),
   threads: store.get("threads", {
     nova: [
-      { from: "artist", text: "Bonjour ! Merci pour votre intérêt pour « Bordeaux Protocol ». Une question sur l'œuvre ?" },
+      { from: "artist", text: "Bonjour ! Merci pour votre intérêt pour « Deux nageurs ». Une question sur l'œuvre ?" },
     ],
     support: [{ from: "artist", text: "Bonjour, l'équipe ATYPIIK vous répond ici du lundi au vendredi, de 9 h à 18 h." }],
   }),
   notifs: store.get("notifs", [
-    { id: 1, date: "2026-10-11", text: "Inès Vale, que vous suivez, a publié une nouvelle œuvre : « Pluie d'argent ».", link: "#/oeuvre/a8", read: false },
+    { id: 1, date: "2026-10-11", text: "Inès Vale, que vous suivez, a publié une nouvelle œuvre : « Café de la Poste ».", link: "#/oeuvre/a4", read: false },
     { id: 2, date: "2026-10-09", text: "Week-end photo : −15 % sur une sélection de tirages jusqu'à dimanche.", link: "#/galerie", read: false },
     { id: 3, date: "2026-10-05", text: "Votre commande CMD-2026-0944 a été livrée.", link: "#/profil", read: true },
   ]),
@@ -248,16 +248,16 @@ function viewHome() {
   const works = visibleWorks();
   const hero = byId("a1");
   const cats = [
-    ["Peinture", "a1"],
-    ["Mode", "a13"],
-    ["Bijoux", "a15"],
-    ["Photographie", "a8"],
+    ["Peinture", "a2"],
+    ["Céramique", "a6"],
+    ["Mode", "a22"],
+    ["Crochet", "a19"],
   ];
-  const disciplines = ["Nouveautés", "Peinture", "Sculpture", "Photographie", "Mode", "Bijoux", "Céramique", "Textile"];
+  const disciplines = ["Nouveautés", "Peinture", "Photographie", "Céramique", "Mode", "Crochet", "Bijoux", "Maison & déco"];
   return `
     <section class="hero">
       <div class="hero-wall">
-        <a class="hero-frame" href="#/oeuvre/${hero.id}" aria-label="${esc(hero.title)}">${visual(hero)}</a>
+        <a class="hero-photo" href="#/oeuvre/${hero.id}" aria-label="${esc(hero.title)}">${visual(hero)}</a>
         <div class="hero-plate"><span><b>${esc(artistOf(hero).name)}</b>, <i>${esc(hero.title)}</i>, ${esc(hero.technique.toLowerCase())}</span><span>${euro(hero.price)}</span></div>
       </div>
       <div class="hero-panel">
@@ -273,7 +273,7 @@ function viewHome() {
     </section>
 
     <nav class="catbar" aria-label="Disciplines">${disciplines
-      .map((d) => (d === "Nouveautés" ? `<a href="#/galerie" data-act="reset-gallery">${d}</a>` : `<a href="#/galerie" data-act="cat" data-type="${d}">${d}</a>`))
+      .map((d) => (d === "Nouveautés" ? `<a href="#/galerie" data-act="reset-gallery">${d}</a>` : `<a href="#/galerie" data-act="cat" data-type="${esc(d)}">${esc(d)}</a>`))
       .join("")}</nav>
 
     <section class="section">
@@ -300,7 +300,7 @@ function viewHome() {
       <div class="cats">${cats
         .map(([t, id]) => {
           const n = visibleWorks().filter((w) => w.type === t).length;
-          return `<a class="cat" href="#/galerie" data-act="cat" data-type="${t}"><div class="cat-media">${visual(byId(id))}</div><div class="cat-label"><span>${t}</span><span class="mono">${String(n).padStart(2, "0")}</span></div></a>`;
+          return `<a class="cat" href="#/galerie" data-act="cat" data-type="${esc(t)}"><div class="cat-media">${visual(byId(id))}</div><div class="cat-label"><span>${t}</span><span class="mono">${String(n).padStart(2, "0")}</span></div></a>`;
         })
         .join("")}</div>
     </section>
@@ -419,7 +419,7 @@ function viewProduct(id) {
       <div>
         <div class="zoom" id="zoom">${visual(w)}</div>
         <div class="thumbs">${[0, 1, 2]
-          .map((i) => `<button class="${i ? "" : "on"}" data-act="thumb" data-i="${i}" aria-label="Vue ${i + 1}">${visual(w, `filter:brightness(${1 - i * 0.07}) saturate(${1 - i * 0.15})`)}</button>`)
+          .map((i) => `<button class="${i ? "" : "on"}" data-act="thumb" data-i="${i}" aria-label="Vue ${i + 1}">${visual(w, ["", "transform:scale(1.9);transform-origin:50% 45%", "transform:scale(1.9);transform-origin:25% 75%"][i])}</button>`)
           .join("")}</div>
       </div>
       <div class="product-info">
@@ -1259,7 +1259,7 @@ function addWorkForm() {
       <div class="field"><label for="wk-title">Titre</label><input id="wk-title" required /></div>
       <div class="field"><label for="wk-desc">Description</label><textarea id="wk-desc" rows="3"></textarea></div>
       <div class="field-row">
-        <div class="field"><label for="wk-type">Type d'art</label><select id="wk-type"><option>Peinture</option><option>Sculpture</option><option>Photographie</option><option>Textile</option><option>Mode</option><option>Bijoux</option><option>Céramique</option><option>Dessin</option></select></div>
+        <div class="field"><label for="wk-type">Type d'art</label><select id="wk-type"><option>Peinture</option><option>Photographie</option><option>Céramique</option><option>Mode</option><option>Crochet</option><option>Bijoux</option><option>Maison & déco</option></select></div>
         <div class="field"><label for="wk-price">Prix de vente TTC (€)</label><input id="wk-price" type="number" min="1" required /></div>
       </div>
       <div class="payout" id="payout" aria-live="polite"></div>
@@ -1674,7 +1674,7 @@ const actions = {
   },
   thumb(el) {
     $$('[data-act="thumb"]').forEach((x) => x.classList.toggle("on", x === el));
-    $("#zoom .art").style.filter = el.firstElementChild.style.filter;
+    $("#zoom .art").style.cssText = el.firstElementChild.style.cssText;
   },
   "add-cart"(el) {
     if (addToCart(el.dataset.id)) toast("Ajouté au panier");

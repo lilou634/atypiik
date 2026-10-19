@@ -38,53 +38,13 @@ En attendant, Big Shoulders Display et Gluten les remplacent.
 
 ## Photos
 
-Chaque œuvre affiche un visuel généré tant qu'elle n'a pas de photo. Pour mettre de vraies
-photos, déposez-les dans `assets/photos/` et déclarez-les dans `js/photos.js`
-(mode d'emploi dans `assets/photos/README.md`).
+Le catalogue de démonstration (29 pièces, 8 artistes, 7 catégories : Peinture, Photographie,
+Céramique, Mode, Crochet, Bijoux, Maison & déco) est illustré par des photos de référence dans
+`assets/photos/` (`a1.jpg` … `a29.jpg`, recadrées en 4:5). Elles servent uniquement à la maquette :
+pour la mise en ligne, il faudra les remplacer par les photos des artistes, avec leur accord.
 
-## Mode démo
-
-Sur la page Profil, trois boutons permettent d'entrer directement dans chaque espace :
-**Acheteur**, **Artiste** (Nova Lune) ou **Administrateur**. Les données sont simulées
-et enregistrées dans le navigateur (localStorage).
-
-## Fonctionnalités (cahier des charges)
-
-- **Visiteur** : navigation, recherche, galerie filtrable (type, couleur, taille, prix, artiste),
-  grille / liste, badges de stock, pages artistes. Un bouton **Retour** sur chaque page ramène à la
-  page précédente, à l'endroit exact où l'on était (le bouton retour du navigateur fait de même).
-  L'ajout au panier demande une connexion.
-- **Acheteur** : favoris, abonnements aux artistes, messagerie, panier persistant,
-  tunnel de paiement (adresse → paiement → confirmation), suivi de commande en 4 étapes,
-  retours et signalement de problème, préférences de notifications, export / suppression des données.
-- **Artiste** : tableau de bord, publication d'œuvres avec déclinaisons et stock, modification
-  prix / stock, ventes avec part nette (90 %) et expédition, profil public, dossier de presse
-  et vidéos coulisses, messages des acheteurs.
-- **Administrateur** : validation des comptes vendeurs, modération des œuvres,
-  commissions (10 %) et flux financiers, gestion des litiges.
-- **Litiges** : l'acheteur signale un problème depuis sa commande (motif, description, jusqu'à 4 photos).
-  Chaque litige a son dossier (`#/litige/…`) : photos agrandissables, échanges entre acheteur, artiste
-  et ATYPIIK (avec photos), historique, et décision de l'admin (remboursement total ou partiel,
-  demande de précisions, refus) envoyée aux deux parties.
-- **Mini-site artiste** : couverture, présentation, deux derniers posts en extrait, œuvres, coulisses,
-  presse. Les artistes publient des posts (texte, illustration, photo ou vidéo) depuis leur espace.
-- **Artistes** : page de suggestions personnalisées (selon les œuvres vues et aimées) avec visuels,
-  vidéo et dernier post, puis l'annuaire complet.
-- **Notifications** : commande, expédition, livraison, baisse de prix, retour en stock,
-  nouvelle œuvre d'un artiste suivi, offres.
-- **RGPD** : bandeau cookies, formulaire d'exercice des droits, pages légales.
-- **Notre histoire** : section sur l'accueil et page dédiée, avec Lilou Capanni, fondatrice.
-  Texte, citation et photo se modifient dans l'objet `STORY` de `js/data.js`
-  (photo : `assets/photos/fondatrice.jpg`).
-
-## Commission et frais de port
-
-- Commission ATYPIIK : **10 % du prix de vente** de l'œuvre ; l'artiste reçoit 90 %.
-- Les **frais de port** dépendent de la taille du colis : leur montant n'est pas encore défini. Ils sont
-  **payés par l'acheteur**, **reversés à l'artiste** et n'entrent pas dans le calcul de la commission.
-- Où c'est affiché : à l'inscription artiste, dans le formulaire de publication (calcul en direct de ce
-  que l'artiste reçoit), dans « Mes œuvres », au moment du paiement (« Où va votre argent »), dans
-  l'espace admin et les CGU/CGV. Pas sur l'accueil ni dans le panier.
+Chaque œuvre a un champ `img` dans `js/data.js` ; `js/photos.js` permet aussi de remplacer une
+photo sans toucher au catalogue. Le build intègre les photos dans `dist/ATYPIIK.html`.
 
 ## Structure
 
