@@ -219,10 +219,27 @@ function readPhotos(files, max = 4) {
 
 /* Avatar d'artiste : une de ses œuvres (comme sur un vrai profil), sinon ses initiales. */
 function avatar(a, small = false) {
+  if (a.photo) return `<div class="avatar has-img${small ? " sm" : ""}"><img class="art" src="${a.photo}" alt="${esc(a.name)}" /></div>`;
   const w = visibleWorks().find((x) => x.artist === a.id);
   return w
     ? `<div class="avatar has-img${small ? " sm" : ""}">${visual(w)}</div>`
     : `<div class="avatar${small ? " sm" : ""}">${initials(a.name)}</div>`;
+}
+
+/* Champ « photo de profil » avec aperçu de la photo actuelle. */
+function photoField(id, current, name, hint) {
+  return `
+    <div class="field photo-field">
+      <label for="${id}">Photo de profil</label>
+      <div class="photo-field-row">
+        ${current ? `<div class="avatar has-img"><img class="art" src="${current}" alt="${esc(name)}" /></div>` : `<div class="avatar">${initials(name)}</div>`}
+        <div>
+          <input id="${id}" type="file" accept="image/*" />
+          <span class="hint">${hint}</span>
+          ${current ? `<label class="check"><input type="checkbox" id="${id}-remove" /> Retirer la photo actuelle</label>` : ""}
+        </div>
+      </div>
+    </div>`;
 }
 
 function followBtn(id, small = false) {
@@ -876,11 +893,11 @@ function viewMessages(param) {
       <div class="threads">${keys
         .map((k) => {
           const last = (state.threads[k] || []).slice(-1)[0];
-          return `<a class="thread ${k === current ? "on" : ""}" href="#/messages/${k}"><div class="avatar sm">${k === "support" ? "A" : initials(label(k))}</div><div><strong>${esc(label(k))}</strong><small>${esc(last?.text || "Nouvelle conversation")}</small></div></a>`;
+          return `<a class="thread ${k === current ? "on" : ""}" href="#/messages/${k}">${k !== "support" && !seller && artistById(k) ? avatar(artistById(k), true) : `<div class="avatar sm">${k === "support" ? "A" : initials(label(k))}</div>`}<div><strong>${esc(label(k))}</strong><small>${esc(last?.text || "Nouvelle conversation")}</small></div></a>`;
         })
         .join("")}</div>
       <div class="conv">
-        <div class="conv-head"><div class="avatar sm">${current === "support" ? "A" : initials(label(current))}</div><strong>${esc(label(current))}</strong>${current !== "support" && !seller ? `<a class="link-btn" style="margin-left:auto" href="#/artiste/${current}">Voir le profil</a>` : ""}</div>
+        <div class="conv-head">${current !== "support" && !seller && artistById(current) ? avatar(artistById(current), true) : `<div class="avatar sm">${current === "support" ? "A" : initials(label(current))}</div>`}<strong>${esc(label(current))}</strong>${current !== "support" && !seller ? `<a class="link-btn" style="margin-left:auto" href="#/artiste/${current}">Voir le profil</a>` : ""}</div>
         <div class="chat" id="chat">${msgs.length ? msgs.map((m) => `<div class="bubble ${m.from === meFrom ? "me" : ""}">${esc(m.text)}</div>`).join("") : '<p class="hint">Posez votre question : dimensions, livraison, commande personnalisée…</p>'}</div>
         <form class="chat-form" id="chat-form" data-key="${current}" data-from="${meFrom}">
           <input id="chat-input" placeholder="Votre message…" aria-label="Votre message" autocomplete="off" />
@@ -1001,9 +1018,10 @@ function login(user) {
 function viewProfile() {
   if (!state.user) return `<div class="page-head"><h1>Mon compte</h1><p>Connectez-vous ou créez un compte acheteur ou artiste.</p></div>${loginForms()}`;
   const u = state.user;
+  const me = u.role === "vendeur" ? artistById(u.artistId) : u;
   const head = (title, sub) => `
     <div class="page-head">
-      <div><span class="label muted">${sub}</span><h1>${title}</h1></div>
+      <div class="profile-id">${me?.photo ? avatar({ ...me, name: u.name }) : ""}<div><span class="label muted">${sub}</span><h1>${title}</h1></div></div>
       <button class="btn btn-small btn-outline" data-act="logout">Se déconnecter</button>
     </div>`;
   if (u.role === "attente") {
@@ -1108,6 +1126,7 @@ function accountPanel() {
         <h3>Mes informations</h3>
         <div class="field"><label for="ac-name">Nom</label><input id="ac-name" required value="${esc(u.name)}" /></div>
         <div class="field"><label for="ac-email">E-mail</label><input id="ac-email" type="email" required value="${esc(u.email)}" /></div>
+        ${photoField("ac-photo", u.photo, u.name, "Elle s'affiche sur votre profil.")}
         <button class="btn">Enregistrer</button>
       </form>
       <div class="panel">
@@ -1199,6 +1218,7 @@ function sellerSpace() {
           <div class="field"><label for="ar-name">Nom d'artiste</label><input id="ar-name" required value="${esc(a.name)}" /></div>
           <div class="field"><label for="ar-city">Ville</label><input id="ar-city" value="${esc(a.city)}" /></div>
           <div class="field"><label for="ar-bio">Biographie</label><textarea id="ar-bio" rows="4">${esc(a.bio)}</textarea></div>
+          ${photoField("ar-photo", a.photo, a.name, "Une photo de vous, de face ou à l'atelier. Elle s'affiche sur votre page publique, dans les suggestions et dans la messagerie.")}
           <button class="btn">Enregistrer</button>
         </form>
         <div class="stack">
@@ -1327,13 +1347,17 @@ function bindSeller() {
     });
   const af = $("#artist-form");
   if (af)
-    af.addEventListener("submit", (e) => {
+    af.addEventListener("submit", async (e) => {
       e.preventDefault();
       const a = artistById(state.user.artistId);
+      const photo = (await readPhotos($("#ar-photo").files, 1))[0];
       Object.assign(a, { name: $("#ar-name").value.trim(), city: $("#ar-city").value.trim(), bio: $("#ar-bio").value.trim() });
+      if (photo) a.photo = photo.src;
+      if ($("#ar-photo-remove")?.checked) delete a.photo;
       state.user.name = a.name;
       save();
       toast("Profil mis à jour");
+      render(true);
     });
 }
 
@@ -1933,9 +1957,13 @@ document.addEventListener("submit", async (e) => {
   }
   if (f.id === "account-form") {
     e.preventDefault();
+    const photo = (await readPhotos($("#ac-photo").files, 1))[0];
     Object.assign(state.user, { name: $("#ac-name").value.trim(), email: $("#ac-email").value.trim() });
+    if (photo) state.user.photo = photo.src;
+    if ($("#ac-photo-remove")?.checked) delete state.user.photo;
     save();
     toast("Informations enregistrées");
+    render(true);
   }
   if (f.id === "rights-form") {
     e.preventDefault();
