@@ -1149,9 +1149,19 @@ img.art {
 }
 
 /* ---------- Fiche produit ---------- */
+.backbar {
+  padding-top: 20px;
+}
+.backbar + .page-head,
+.backbar + .artist-head {
+  padding-top: 18px;
+}
 .back-link {
   display: inline-block;
-  margin: 24px 0 20px;
+  padding: 0;
+  border: 0;
+  background: none;
+  margin: 0 0 4px;
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -2300,4 +2310,9 @@ td .btn + .btn {
     animation: none !important;
     transition: none !important;
   }
+}
+.backbar + .product,
+.backbar + .cart,
+.backbar + .empty {
+  margin-top: 18px;
 }

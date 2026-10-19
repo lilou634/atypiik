@@ -1221,9 +1221,19 @@ img.art {
 }
 
 /* ---------- Fiche produit ---------- */
+.backbar {
+  padding-top: 20px;
+}
+.backbar + .page-head,
+.backbar + .artist-head {
+  padding-top: 18px;
+}
 .back-link {
   display: inline-block;
-  margin: 24px 0 20px;
+  padding: 0;
+  border: 0;
+  background: none;
+  margin: 0 0 4px;
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -2373,6 +2383,11 @@ td .btn + .btn {
     transition: none !important;
   }
 }
+.backbar + .product,
+.backbar + .cart,
+.backbar + .empty {
+  margin-top: 18px;
+}
 
     </style>
   </head>
@@ -2732,9 +2747,6 @@ const STORY = {
     },
   ],
 };
-
-/* Frais de port par défaut selon le format, payés par l'acheteur et reversés à l'artiste. */
-const SHIPPING_BY_SIZE = { S: 8, M: 15, L: 25 };
 /* Photos des œuvres.
    Associez l'identifiant d'une œuvre (voir js/data.js) au chemin de sa photo.
    Tant qu'une œuvre n'a pas de photo, un visuel généré s'affiche à la place.
@@ -2838,7 +2850,6 @@ const visibleWorks = () => state.works.filter((w) => !w.hidden);
 const byId = (id) => state.works.find((w) => w.id === id);
 const artistById = (id) => state.artists.find((a) => a.id === id);
 const artistOf = (w) => artistById(w.artist) || { id: w.artist, name: "Artiste", city: "", bio: "", followers: 0, videos: [], press: [] };
-const shippingOf = (w) => w.ship ?? SHIPPING_BY_SIZE[w.size] ?? 15;
 const COMMISSION = 0.1;
 const totalStock = (w) => w.variants.reduce((s, v) => s + v.stock, 0);
 const STEPS = ["Confirmée", "En préparation", "Expédiée", "Livrée"];
@@ -3119,7 +3130,6 @@ function viewProduct(id) {
   store.set("views", state.views);
   const first = Math.max(0, w.variants.findIndex((v) => v.stock > 0));
   return `
-    <a class="back-link" href="#/galerie">← Retour à la galerie</a>
     <div class="product">
       <div>
         <div class="zoom" id="zoom">${visual(w)}</div>
@@ -3323,26 +3333,24 @@ function viewCart() {
       ${summaryBox(lines, `<a class="btn btn-block" href="#/paiement" ${blocked ? "data-blocked" : ""} style="margin-top:16px${blocked ? ";opacity:.35;pointer-events:none" : ""}">Passer au paiement</a>`)}
     </div>`;
 }
-function cartShipping(lines) {
-  return lines.reduce((sum, l) => sum + shippingOf(l.w), 0);
-}
-/* split = true sur la page de paiement : on y détaille la répartition du montant. */
+/* split = true sur la page de paiement : on y détaille la répartition du montant.
+   Les frais de port dépendent de la taille du colis : ils ne sont pas encore chiffrés. */
 function summaryBox(lines, cta = "", split = false) {
   const total = lines.reduce((s, l) => s + l.w.price * l.qty, 0);
-  const ship = cartShipping(lines);
   return `
     <aside class="summary">
       <h3>Récapitulatif</h3>
       <div class="summary-row"><span>Sous-total</span><span>${euro(total)}</span></div>
-      <div class="summary-row"><span>Livraison suivie</span><span>${euro(ship)}</span></div>
-      <div class="summary-row total"><span>Total TTC</span><span>${euro(total + ship)}</span></div>
+      <div class="summary-row"><span>Livraison suivie</span><span class="mono">Selon le colis</span></div>
+      <div class="summary-row total"><span>Total œuvres TTC</span><span>${euro(total)}</span></div>
+      <p class="hint">Les frais de port dépendent de la taille du colis et s'ajoutent au total.</p>
       ${
         split
           ? `<div class="split">
               <span class="mono">Où va votre argent</span>
               <div class="summary-row sub"><span>Aux artistes (90 % des œuvres)</span><span>${euro(total * (1 - COMMISSION))}</span></div>
-              <div class="summary-row sub"><span>Frais de port, reversés aux artistes</span><span>${euro(ship)}</span></div>
               <div class="summary-row sub"><span>ATYPIIK (10 % des œuvres)</span><span>${euro(total * COMMISSION)}</span></div>
+              <p class="hint">Les frais de port sont reversés aux artistes.</p>
             </div>`
           : ""
       }
@@ -3387,7 +3395,7 @@ function viewCheckout() {
             <div class="field"><label for="cc-cvc">CVC</label><input id="cc-cvc" required inputmode="numeric" placeholder="123" autocomplete="cc-csc" /></div>
           </div>
           <p class="hint">Démo : aucun paiement réel n'est effectué. En production, la saisie de la carte est gérée par Stripe.</p>
-          <button class="btn btn-block">Payer ${euro(total + cartShipping(lines))}</button>
+          <button class="btn btn-block">Payer ${euro(total)} + frais de port</button>
         </form>`;
   return `
     <div class="page-head"><h1>Commande</h1></div>
@@ -3424,7 +3432,7 @@ function placeOrder() {
     toast(`« ${bad.w.title} » n'est plus disponible en quantité suffisante.`);
     return nav("#/panier");
   }
-  const total = lines.reduce((s, l) => s + l.w.price * l.qty, 0) + cartShipping(lines);
+  const total = lines.reduce((s, l) => s + l.w.price * l.qty, 0);
   const a = state.checkout.address;
   const id = "CMD-2026-" + String(1000 + state.orders.length + Math.floor(Math.random() * 8000)).padStart(4, "0");
   lines.forEach((l) => {
@@ -3573,7 +3581,7 @@ function loginForms() {
           </div>
           <div class="seller-terms">
             <strong>Comment vous êtes payé·e</strong>
-            <p>Vous fixez votre prix. Sur chaque vente, ATYPIIK prélève une commission de <b>10 %</b> et vous recevez <b>90 %</b>, versés par Stripe après la livraison. Les frais de port sont payés par l'acheteur et vous sont reversés en totalité.</p>
+            <p>Vous fixez votre prix. Sur chaque vente, ATYPIIK prélève une commission de <b>10 %</b> et vous recevez <b>90 %</b>, versés par Stripe après la livraison. Les frais de port, qui dépendent de la taille du colis, sont payés par l'acheteur et vous sont reversés.</p>
           </div>
         </div>
         <div class="field"><label for="su-pass">Mot de passe</label><input id="su-pass" type="password" required minlength="8" autocomplete="new-password" /></div>
@@ -3858,10 +3866,7 @@ function addWorkForm() {
         <div class="field"><label for="wk-type">Type d'art</label><select id="wk-type"><option>Peinture</option><option>Sculpture</option><option>Photographie</option><option>Textile</option><option>Mode</option><option>Bijoux</option><option>Céramique</option><option>Dessin</option></select></div>
         <div class="field"><label for="wk-price">Prix de vente TTC (€)</label><input id="wk-price" type="number" min="1" required /></div>
       </div>
-      <div class="field-row">
-        <div class="field"><label for="wk-ship">Frais de port payés par l'acheteur (€)</label><input id="wk-ship" type="number" min="0" step="0.5" value="15" /></div>
-        <div class="payout" id="payout" aria-live="polite"></div>
-      </div>
+      <div class="payout" id="payout" aria-live="polite"></div>
       <div class="field-row">
         <div class="field"><label for="wk-color">Couleur dominante</label><select id="wk-color">${Object.keys(COLORS).map((c) => `<option>${c}</option>`).join("")}</select></div>
         <div class="field"><label for="wk-size">Format</label><select id="wk-size"><option value="S">Petit</option><option value="M">Moyen</option><option value="L">Grand</option></select></div>
@@ -3882,26 +3887,21 @@ function addWorkForm() {
     </form>`;
 }
 
-function payoutHtml(price, ship) {
+function payoutHtml(price) {
   if (!price) return `<span class="mono">Ce que vous recevez</span><p class="hint">Saisissez un prix pour voir le calcul.</p>`;
   return `
     <span class="mono">Ce que vous recevez</span>
     <div class="summary-row sub"><span>Prix de vente</span><span>${euro(price)}</span></div>
     <div class="summary-row sub"><span>Commission ATYPIIK (10 %)</span><span>− ${euro(price * COMMISSION)}</span></div>
-    <div class="summary-row sub"><span>Frais de port reversés</span><span>+ ${euro(ship)}</span></div>
-    <div class="summary-row total"><span>Vous recevez</span><span>${euro(price * (1 - COMMISSION) + ship)}</span></div>`;
+    <div class="summary-row total"><span>Vous recevez</span><span>${euro(price * (1 - COMMISSION))}</span></div>
+    <p class="hint">+ les frais de port, payés par l'acheteur selon la taille du colis.</p>`;
 }
 
 function bindSeller() {
   const wf = $("#work-form");
   if (wf) {
-    const update = () => ($("#payout").innerHTML = payoutHtml(+$("#wk-price").value || 0, Math.max(0, +$("#wk-ship").value || 0)));
-    $("#wk-size").addEventListener("change", (e) => {
-      $("#wk-ship").value = SHIPPING_BY_SIZE[e.target.value];
-      update();
-    });
+    const update = () => ($("#payout").innerHTML = payoutHtml(+$("#wk-price").value || 0));
     $("#wk-price").addEventListener("input", update);
-    $("#wk-ship").addEventListener("input", update);
     update();
   }
   if (wf)
@@ -3917,7 +3917,7 @@ function bindSeller() {
       const pick = () => palette[Math.floor(Math.random() * palette.length)];
       const w = {
         id: "u" + Date.now(), title: $("#wk-title").value.trim(), artist: state.user.artistId, type: $("#wk-type").value,
-        color: $("#wk-color").value, size: $("#wk-size").value, price: +$("#wk-price").value, ship: Math.max(0, +$("#wk-ship").value || 0),
+        color: $("#wk-color").value, size: $("#wk-size").value, price: +$("#wk-price").value,
         technique: $("#wk-tech").value.trim() || "—", dims: $("#wk-dims").value.trim() || "—", description: $("#wk-desc").value.trim(),
         art: `linear-gradient(${Math.floor(Math.random() * 360)}deg, ${pick()}, ${pick()} 55%, ${pick()})`,
         variants: variants.length ? variants : [{ label: "Original", stock: 1 }], isNew: true,
@@ -4021,7 +4021,7 @@ function adminSpace() {
 function viewLegal(key) {
   const pages = {
     mentions: ["Mentions légales", "<p>Éditeur : ATYPIIK SAS (à compléter : capital, RCS, siège social, directeur de la publication).</p><p>Hébergement : à compléter (nom, adresse et téléphone de l'hébergeur).</p><p>Contact : via la messagerie ou l'adresse e-mail de la société.</p>"],
-    cgu: ["CGU / CGV", "<p>Les présentes conditions encadrent l'utilisation de la marketplace ATYPIIK par les acheteurs et les artistes vendeurs.</p><p><strong>Commission :</strong> ATYPIIK prélève 10 % du prix de vente TTC de chaque transaction. L'artiste perçoit 90 %, versés via Stripe Connect après la livraison.</p><p><strong>Livraison :</strong> les frais de port sont fixés par l'artiste pour chaque œuvre, payés par l'acheteur et reversés intégralement à l'artiste ; ils n'entrent pas dans le calcul de la commission.</p><p><strong>Rétractation :</strong> 14 jours à compter de la réception, hors œuvres réalisées sur commande personnalisée.</p>"],
+    cgu: ["CGU / CGV", "<p>Les présentes conditions encadrent l'utilisation de la marketplace ATYPIIK par les acheteurs et les artistes vendeurs.</p><p><strong>Commission :</strong> ATYPIIK prélève 10 % du prix de vente TTC de chaque transaction. L'artiste perçoit 90 %, versés via Stripe Connect après la livraison.</p><p><strong>Livraison :</strong> les frais de port dépendent de la taille et du poids du colis. Ils sont payés par l'acheteur et reversés à l'artiste ; ils n'entrent pas dans le calcul de la commission.</p><p><strong>Rétractation :</strong> 14 jours à compter de la réception, hors œuvres réalisées sur commande personnalisée.</p>"],
   };
   if (key === "rgpd")
     return `
@@ -4105,6 +4105,9 @@ const actions = {
   },
   "tab-link"(el) {
     state.tab[el.dataset.key] = el.dataset.id;
+  },
+  "go-back"() {
+    goBack();
   },
   "reset-gallery"() {
     Object.assign(state.gallery, { type: [], color: [], size: [], artist: "", max: 2000, q: "" });
@@ -4358,6 +4361,7 @@ const historyStack = [];
 const scrollMemory = {};
 let galleryScroll = 0;
 let galleryLeftFor = null;
+let historyOk = false; // vrai si l'historique du navigateur est utilisable (pushState accepté)
 
 function nav(h) {
   if (h === currentHash) return render(true);
@@ -4366,8 +4370,20 @@ function nav(h) {
   currentHash = h;
   try {
     history.pushState({ h }, "", h);
-  } catch {}
+    historyOk = true;
+  } catch {
+    historyOk = false;
+  }
   render();
+}
+
+/* Retour à la page précédente, à l'endroit exact où l'on était. */
+function goBack() {
+  if (!historyStack.length) return nav("#/");
+  if (historyOk) return history.back(); // déclenche « popstate » ci-dessous
+  scrollMemory[currentHash] = window.scrollY;
+  currentHash = historyStack.pop();
+  render(false, true);
 }
 window.addEventListener("popstate", (e) => {
   scrollMemory[currentHash] = window.scrollY;
@@ -4409,7 +4425,8 @@ function render(keepScroll = false, restoring = false) {
   };
   const [view, bind] = views[route] || [viewNotFound];
   const y = window.scrollY;
-  app.innerHTML = `<div class="view"${keepScroll ? ' style="animation:none"' : ""}>${view()}</div>`;
+  const back = route ? `<div class="backbar"><button type="button" class="back-link" data-act="go-back">← Retour</button></div>` : "";
+  app.innerHTML = `<div class="view"${keepScroll ? ' style="animation:none"' : ""}>${back}${view()}</div>`;
   if (bind) bind();
 
   $$("[data-route]").forEach((a) => a.classList.toggle("active", a.dataset.route === route));

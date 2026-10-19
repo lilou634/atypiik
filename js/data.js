@@ -211,6 +211,3 @@ const STORY = {
     },
   ],
 };
-
-/* Frais de port par défaut selon le format, payés par l'acheteur et reversés à l'artiste. */
-const SHIPPING_BY_SIZE = { S: 8, M: 15, L: 25 };

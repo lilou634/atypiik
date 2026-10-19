@@ -51,7 +51,8 @@ et enregistrées dans le navigateur (localStorage).
 ## Fonctionnalités (cahier des charges)
 
 - **Visiteur** : navigation, recherche, galerie filtrable (type, couleur, taille, prix, artiste),
-  grille / liste, badges de stock, conservation du défilement, pages artistes.
+  grille / liste, badges de stock, pages artistes. Un bouton **Retour** sur chaque page ramène à la
+  page précédente, à l'endroit exact où l'on était (le bouton retour du navigateur fait de même).
   L'ajout au panier demande une connexion.
 - **Acheteur** : favoris, abonnements aux artistes, messagerie, panier persistant,
   tunnel de paiement (adresse → paiement → confirmation), suivi de commande en 4 étapes,
@@ -71,9 +72,8 @@ et enregistrées dans le navigateur (localStorage).
 ## Commission et frais de port
 
 - Commission ATYPIIK : **10 % du prix de vente** de l'œuvre ; l'artiste reçoit 90 %.
-- Les **frais de port** sont fixés par l'artiste pour chaque œuvre (valeur par défaut selon le format :
-  8 / 15 / 25 €), **payés par l'acheteur** et **reversés intégralement à l'artiste**. Ils n'entrent pas
-  dans le calcul de la commission.
+- Les **frais de port** dépendent de la taille du colis : leur montant n'est pas encore défini. Ils sont
+  **payés par l'acheteur**, **reversés à l'artiste** et n'entrent pas dans le calcul de la commission.
 - Où c'est affiché : à l'inscription artiste, dans le formulaire de publication (calcul en direct de ce
   que l'artiste reçoit), dans « Mes œuvres », au moment du paiement (« Où va votre argent »), dans
   l'espace admin et les CGU/CGV. Pas sur l'accueil ni dans le panier.
