@@ -376,3 +376,28 @@ const STORY = {
     },
   ],
 };
+
+/* Mise en avant éditoriale : l'artiste de la semaine et le prochain drop (édition limitée). */
+const FEATURED = {
+  artist: "rosa",
+  week: "Semaine du 19 octobre",
+  quote: "Je chine des canevas et des tapisseries oubliés, et je leur donne une deuxième vie sur des vestes qu'on a envie de porter tous les jours.",
+  works: ["a22", "a23", "a25"],
+};
+const DROP = {
+  title: "Céramiques d'hiver",
+  artist: "margaux",
+  date: "2026-11-07T18:00:00+01:00",
+  pieces: 24,
+  text: "24 pièces uniques — vases, bougeoirs et tasses — mises en ligne en même temps. Quand c'est parti, c'est parti.",
+  works: ["a6", "a14", "a7"],
+};
+
+/* Demandes de commande personnalisée (démo). */
+const SEED_REQUESTS = [
+  {
+    id: "R-201", artist: "nova", buyer: "Camille Roux", date: "2026-10-14", status: "nouvelle",
+    type: "Portrait d'animal", budget: "300 à 500 €", deadline: "Avant Noël",
+    text: "Bonjour ! J'adore « Promenade ». Est-ce que vous pourriez peindre mon dalmatien, Pistache, dans le même style ? Format moyen.",
+  },
+];

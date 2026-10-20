@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>ATYPIIK</title>
-    <meta name="description" content="ATYPIIK, la marketplace des artistes indépendants : œuvres uniques et déclinées." />
+    <meta name="description" content="ATYPIIK, la boutique des artistes émergents, sélectionnés un par un : peinture, céramique, mode, crochet, bijoux." />
     <meta name="theme-color" content="#ffffff" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -3089,10 +3089,259 @@ div.art::after {
   margin: 0;
 }
 
+/* ---------- Badge « Sélectionné·e » ---------- */
+.selected {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 0.3em 0.7em 0.3em 0.45em;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.selected svg {
+  width: 15px;
+  height: 15px;
+}
+.selected.sm {
+  margin: 0;
+  padding: 0;
+  background: none;
+  font-size: 0;
+  gap: 0;
+}
+.selected.sm svg {
+  width: 14px;
+  height: 14px;
+}
+.tone-ink .selected.sm {
+  color: var(--accent-bright);
+}
+
+/* ---------- Artiste de la semaine ---------- */
+.featured {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(24px, 4vw, 56px);
+  align-items: center;
+}
+.featured-text {
+  display: grid;
+  gap: 18px;
+  justify-items: start;
+}
+.featured-text .ref {
+  color: var(--accent);
+}
+.featured-text h2 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: clamp(2.4rem, 5vw, 3.8rem);
+  line-height: 0.95;
+}
+.featured-id {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.featured-id .avatar {
+  width: 72px;
+  height: 90px;
+}
+.featured-id > div {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+}
+.featured-id h3 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.8rem;
+  text-transform: uppercase;
+  line-height: 1;
+}
+.featured-id h3 a:hover {
+  color: var(--accent);
+}
+.featured blockquote {
+  margin: 0;
+  padding-left: 16px;
+  border-left: 3px solid var(--accent);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+.featured-works {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 6px;
+  aspect-ratio: 5 / 4;
+}
+.featured-item {
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  background: var(--wall);
+}
+.featured-item:first-child {
+  grid-row: span 2;
+}
+.featured-item .art,
+.featured-item img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s var(--ease);
+}
+.featured-item:hover img {
+  transform: scale(1.04);
+}
+.featured-item span {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  padding: 4px 8px;
+  background: var(--paper);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+/* ---------- Drop ---------- */
+.drop {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  margin-inline: calc(50% - 50vw);
+  background: var(--ink);
+  color: var(--paper);
+}
+.drop-visuals {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 3px;
+  min-height: 420px;
+}
+.drop-item {
+  position: relative;
+  overflow: hidden;
+}
+.drop-item .art,
+.drop-item img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(0.25) brightness(0.85);
+}
+.drop-text {
+  display: grid;
+  gap: 16px;
+  align-content: center;
+  justify-items: start;
+  padding: clamp(28px, 5vw, 64px);
+}
+.drop-text .ref {
+  color: var(--accent-bright);
+}
+.drop-text h2 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: clamp(2.6rem, 5.4vw, 4.4rem);
+  line-height: 0.92;
+}
+.drop-text p {
+  margin: 0;
+  max-width: 44ch;
+  color: #cfcac6;
+}
+.drop-text p.mono {
+  color: var(--paper);
+}
+.countdown {
+  display: flex;
+  gap: 8px;
+}
+.countdown div {
+  display: grid;
+  justify-items: center;
+  min-width: 70px;
+  padding: 10px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+.countdown b {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.countdown span {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #a9a4a1;
+}
+.countdown .live {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--accent-bright);
+}
+.drop .btn-outline {
+  border-color: var(--paper);
+  color: var(--paper);
+}
+
+/* ---------- Commande sur mesure ---------- */
+.request-artist {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+.request-artist .avatar {
+  width: 80px;
+  height: 100px;
+}
+.request-artist h3 {
+  margin-bottom: 6px;
+}
+.request-artist .hint {
+  margin: 8px 0 0;
+}
+
+@media (max-width: 860px) {
+  .featured,
+  .drop {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .drop-visuals {
+    min-height: 240px;
+  }
+}
+@media (max-width: 640px) {
+  .countdown div {
+    min-width: 0;
+    flex: 1;
+  }
+  .countdown b {
+    font-size: 1.7rem;
+  }
+}
+
     </style>
   </head>
   <body>
-    <div class="announce">Artistes vérifiés — Livraison suivie — Paiement sécurisé</div>
+    <div class="announce">Artistes sélectionnés un par un — Livraison suivie — Paiement sécurisé</div>
 
     <header class="header">
       <div class="container header-inner">
@@ -3611,6 +3860,31 @@ const STORY = {
     },
   ],
 };
+
+/* Mise en avant éditoriale : l'artiste de la semaine et le prochain drop (édition limitée). */
+const FEATURED = {
+  artist: "rosa",
+  week: "Semaine du 19 octobre",
+  quote: "Je chine des canevas et des tapisseries oubliés, et je leur donne une deuxième vie sur des vestes qu'on a envie de porter tous les jours.",
+  works: ["a22", "a23", "a25"],
+};
+const DROP = {
+  title: "Céramiques d'hiver",
+  artist: "margaux",
+  date: "2026-11-07T18:00:00+01:00",
+  pieces: 24,
+  text: "24 pièces uniques — vases, bougeoirs et tasses — mises en ligne en même temps. Quand c'est parti, c'est parti.",
+  works: ["a6", "a14", "a7"],
+};
+
+/* Demandes de commande personnalisée (démo). */
+const SEED_REQUESTS = [
+  {
+    id: "R-201", artist: "nova", buyer: "Camille Roux", date: "2026-10-14", status: "nouvelle",
+    type: "Portrait d'animal", budget: "300 à 500 €", deadline: "Avant Noël",
+    text: "Bonjour ! J'adore « Promenade ». Est-ce que vous pourriez peindre mon dalmatien, Pistache, dans le même style ? Format moyen.",
+  },
+];
 /* Photos des œuvres.
    Associez l'identifiant d'une œuvre (voir js/data.js) au chemin de sa photo.
    Tant qu'une œuvre n'a pas de photo, un visuel généré s'affiche à la place.
@@ -3637,7 +3911,7 @@ const clone = (o) => JSON.parse(JSON.stringify(o));
 const initials = (name) => name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
 
 /* ---------- Persistance ---------- */
-const DATA_VERSION = 6;
+const DATA_VERSION = 7;
 const store = {
   get(key, fallback) {
     try {
@@ -3667,7 +3941,7 @@ if (store.get("version", 0) !== DATA_VERSION) {
 
 const PERSISTED = [
   "user", "favs", "cart", "views", "follows", "orders", "threads", "notifs", "works", "artists",
-  "pending", "disputes", "sales", "cookies", "prefs", "media", "posts",
+  "pending", "disputes", "sales", "cookies", "prefs", "media", "posts", "requests", "dropAlert",
 ];
 const state = {
   user: store.get("user", null),
@@ -3698,6 +3972,8 @@ const state = {
   pending: store.get("pending", clone(SEED_PENDING_SELLERS)),
   disputes: store.get("disputes", clone(SEED_DISPUTES)),
   posts: store.get("posts", clone(SEED_POSTS)),
+  requests: store.get("requests", clone(SEED_REQUESTS)),
+  dropAlert: store.get("dropAlert", false),
   sales: store.get("sales", clone(SEED_SALES)),
   cookies: store.get("cookies", null),
   prefs: store.get("prefs", { orders: true, prices: true, news: true, promos: false, email: true }),
@@ -3863,6 +4139,10 @@ function photoField(id, current, name, hint) {
     </div>`;
 }
 
+/* Tous les artistes d'ATYPIIK sont validés à l'entrée : c'est le cœur de la promesse. */
+const selectedBadge = (small = false) =>
+  `<span class="selected${small ? " sm" : ""}" title="Profil vérifié et sélectionné par l'équipe ATYPIIK"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0l1.9 2.1 2.8-.4.4 2.8L15.2 6 14 8.6l1.2 2.5-2.1 1.5-.4 2.8-2.8-.4L8 16l-1.9-2.1-2.8.4-.4-2.8L.8 10 2 7.4.8 4.9l2.1-1.5.4-2.8 2.8.4z" fill="currentColor"/><path d="M5 8.2l2 2 4-4.2" stroke="#fff" stroke-width="1.6" fill="none"/></svg>Sélectionné·e</span>`;
+
 function followBtn(id, small = false) {
   const on = state.follows.includes(id);
   return `<button class="btn ${on ? "btn-outline" : ""} ${small ? "btn-small" : ""}" data-act="follow" data-id="${id}">${on ? "✓ Abonné·e" : "Suivre"}</button>`;
@@ -3901,7 +4181,7 @@ function viewHome() {
       <div class="hero-panel">
         <div>
           <h1>L'art<br />sans<br /><span class="accent">filtre.</span></h1>
-          <p>Peinture, mode, bijoux, céramique&nbsp;: des pièces uniques ou en série limitée, vendues en direct par les artistes qui les créent.</p>
+          <p>La boutique des artistes émergents, sélectionnés un par un. Peinture, céramique, mode, crochet, bijoux&nbsp;: des pièces uniques, vendues en direct par celles et ceux qui les créent.</p>
           <div class="hero-cta">
             <a href="#/galerie" class="btn btn-light">Explorer la galerie</a>
             <a href="#/profil" class="btn btn-ghost">Vendre mes œuvres</a>
@@ -3918,6 +4198,10 @@ function viewHome() {
       <div class="section-head"><div><h2>Nouvelles <span class="fun">pièces</span></h2></div><a href="#/galerie">Tout voir</a></div>
       <div class="grid">${works.slice(0, 8).map((w) => card(w)).join("")}</div>
     </section>
+
+    ${featuredSection()}
+
+    ${dropSection()}
 
     <section class="section story">
       <div class="story-media">
@@ -3957,7 +4241,7 @@ function artistCard(a) {
         ${avatar(a)}
       </a>
       <div class="card-body">
-        <h3 class="card-title"><a href="#/artiste/${a.id}">${esc(a.name)}</a></h3>
+        <h3 class="card-title"><a href="#/artiste/${a.id}">${esc(a.name)}</a> ${selectedBadge(true)}</h3>
         <div class="card-artist">${esc(a.city)} · ${n} œuvre${n > 1 ? "s" : ""}</div>
         <div class="card-actions">${followBtn(a.id, true)}</div>
       </div>
@@ -4085,7 +4369,7 @@ function viewProduct(id) {
         <div class="artist-mini">
           ${avatar(a, true)}
           <div><strong>${esc(a.name)}</strong><div class="card-artist">${esc(a.bio)}</div></div>
-          <a class="btn btn-small btn-outline" href="#/messages/${a.id}">Écrire</a>
+          <div class="card-actions" style="margin:0"><a class="btn btn-small btn-outline" href="#/commande-perso/${a.id}">Sur mesure</a><a class="btn btn-small btn-outline" href="#/messages/${a.id}">Écrire</a></div>
         </div>
       </div>
     </div>`;
@@ -4198,13 +4482,99 @@ function viewArtist(id) {
       <div>
         <span class="label muted">${esc(disciplineOf(id))} · ${esc(a.city)}</span>
         <h1>${esc(a.name)}</h1>
+        ${selectedBadge()}
         <p>${esc(a.bio)}</p>
         <div class="artist-stats"><span><b>${a.followers + (state.follows.includes(id) ? 1 : 0)}</b> abonné·e·s</span><span><b>${works.length}</b> œuvres</span><span><b>${posts.length}</b> posts</span></div>
       </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">${followBtn(id)}<a class="btn btn-outline" href="#/messages/${id}">Contacter</a></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">${followBtn(id)}<a class="btn btn-outline" href="#/commande-perso/${id}">Commande personnalisée</a><a class="btn btn-outline" href="#/messages/${id}">Contacter</a></div>
     </div>
     ${tabs("artist", [["accueil", "Accueil"], ["oeuvres", "Œuvres", works.length], ["posts", "Posts", posts.length], ["coulisses", "Coulisses"], ["presse", "Presse"]], tab)}
     ${body}`;
+}
+
+/* ---------- Mises en avant ---------- */
+function featuredSection() {
+  const a = artistById(FEATURED.artist);
+  if (!a) return "";
+  const works = FEATURED.works.map(byId).filter(Boolean);
+  return `
+    <section class="section featured">
+      <div class="featured-text">
+        <span class="ref">${esc(FEATURED.week)}</span>
+        <h2>L'artiste de la <span class="fun">semaine</span></h2>
+        <div class="featured-id">${avatar(a)}<div><h3><a href="#/artiste/${a.id}">${esc(a.name)}</a></h3>${selectedBadge(true)}<span class="mono muted">${esc(disciplineOf(a.id))} · ${esc(a.city)}</span></div></div>
+        <blockquote>« ${esc(FEATURED.quote)} »</blockquote>
+        <div class="card-actions"><a class="btn" href="#/artiste/${a.id}">Découvrir son univers</a>${followBtn(a.id)}</div>
+      </div>
+      <div class="featured-works">${works.map((w) => `<a href="#/oeuvre/${w.id}" class="featured-item">${visual(w)}<span>${esc(w.title)} · ${euro(w.price)}</span></a>`).join("")}</div>
+    </section>`;
+}
+
+function dropSection() {
+  const a = artistById(DROP.artist);
+  const at = new Date(DROP.date);
+  const when = at.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" }) + " à " + at.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+  return `
+    <section class="section drop">
+      <div class="drop-visuals">${DROP.works.map(byId).filter(Boolean).map((w) => `<div class="drop-item">${visual(w)}</div>`).join("")}</div>
+      <div class="drop-text">
+        <span class="ref">Prochain drop · édition limitée</span>
+        <h2>${esc(DROP.title)}</h2>
+        <p class="mono">${esc(a?.name || "")} · ${DROP.pieces} pièces · ${esc(when)}</p>
+        <div class="countdown" data-countdown="${DROP.date}" aria-live="polite">${countdownHtml(DROP.date)}</div>
+        <p>${esc(DROP.text)}</p>
+        <button class="btn ${state.dropAlert ? "btn-outline" : "btn-light"}" data-act="drop-alert">${state.dropAlert ? "✓ Vous serez prévenu·e" : "Me prévenir au lancement"}</button>
+      </div>
+    </section>`;
+}
+function countdownHtml(date) {
+  const ms = Math.max(0, new Date(date) - Date.now());
+  if (!ms) return '<b class="live">C\'est en ligne !</b>';
+  const d = Math.floor(ms / 864e5), h = Math.floor((ms % 864e5) / 36e5), m = Math.floor((ms % 36e5) / 6e4), sec = Math.floor((ms % 6e4) / 1e3);
+  const cell = (n, l) => `<div><b>${String(n).padStart(2, "0")}</b><span>${l}</span></div>`;
+  return cell(d, "jours") + cell(h, "heures") + cell(m, "min") + cell(sec, "sec");
+}
+setInterval(() => $$("[data-countdown]").forEach((el) => (el.innerHTML = countdownHtml(el.dataset.countdown))), 1000);
+
+/* ---------- Commandes personnalisées ---------- */
+const REQ_TAG = { nouvelle: "pink", "devis envoyé": "grey", acceptée: "green", déclinée: "grey" };
+function viewCustomRequest(id) {
+  const a = artistById(id);
+  if (!a) return viewNotFound();
+  if (!state.user) return needLogin("Connectez-vous pour demander une pièce sur mesure.");
+  const works = visibleWorks().filter((w) => w.artist === id).slice(0, 3);
+  return `
+    <div class="page-head"><div><span class="ref">${esc(a.name)} · ${esc(disciplineOf(id))}</span><h1>Commande <span class="fun">sur mesure</span></h1></div><p>Décrivez votre projet : ${esc(a.name)} vous répond avec un devis dans la messagerie. Rien n'est payé avant que vous acceptiez.</p></div>
+    <div class="two-col">
+      <form class="panel" id="request-form" data-artist="${id}">
+        <div class="field"><label for="rq-type">Ce que vous imaginez</label><input id="rq-type" required placeholder="Ex. un portrait de mon chien, un vase pour un cadeau…" /></div>
+        <div class="field"><label for="rq-text">Votre projet en détail</label><textarea id="rq-text" rows="5" required placeholder="Couleurs, format, usage, inspiration…"></textarea></div>
+        <div class="field-row">
+          <div class="field"><label for="rq-budget">Budget</label><select id="rq-budget"><option>Moins de 100 €</option><option>100 à 300 €</option><option selected>300 à 500 €</option><option>Plus de 500 €</option><option>À discuter</option></select></div>
+          <div class="field"><label for="rq-deadline">Pour quand ?</label><input id="rq-deadline" placeholder="Ex. avant Noël" /></div>
+        </div>
+        ${photoInput("rq-photos", "Images d'inspiration (facultatif)", "Jusqu'à 4 images : une photo de votre animal, une couleur, une pièce que vous aimez…")}
+        <button class="btn">Envoyer la demande</button>
+      </form>
+      <aside class="stack">
+        <div class="panel request-artist">${avatar(a)}<div><h3>${esc(a.name)}</h3>${selectedBadge(true)}<p class="hint">${esc(a.bio)}</p></div></div>
+        ${works.length ? `<div class="grid cols-3">${works.map((w) => `<a class="card-media" href="#/oeuvre/${w.id}">${visual(w)}</a>`).join("")}</div>` : ""}
+      </aside>
+    </div>`;
+}
+function requestCard(r, forArtist) {
+  return `
+    <div class="order">
+      <div class="order-top"><div><strong>${esc(r.type)}</strong> <span class="muted">· ${r.id} · ${frDate(r.date)}</span></div><span class="tag ${REQ_TAG[r.status] || ""}">${r.status}</span></div>
+      <p>${esc(r.text)}</p>
+      <div class="order-foot"><span class="hint">${forArtist ? `De ${esc(r.buyer)}` : `Pour ${esc(artistById(r.artist)?.name || "")}`} · Budget : ${esc(r.budget)}${r.deadline ? ` · ${esc(r.deadline)}` : ""}</span>
+        <div class="card-actions" style="margin:0">
+          ${forArtist && r.status === "nouvelle" ? `<button class="btn btn-small" data-act="req-quote" data-id="${r.id}">Envoyer un devis</button><button class="btn btn-small btn-outline" data-act="req-decline" data-id="${r.id}">Décliner</button>` : ""}
+          ${!forArtist && r.status === "devis envoyé" ? `<button class="btn btn-small" data-act="req-accept" data-id="${r.id}">Accepter le devis${r.quote ? ` (${euro(r.quote)})` : ""}</button>` : ""}
+          <a class="btn btn-small btn-outline" href="#/messages/${r.artist}">Messagerie</a>
+        </div>
+      </div>
+    </div>`;
 }
 
 /* ---------- Posts des artistes ---------- */
@@ -4710,6 +5080,10 @@ function buyerSpace() {
           .join("")
       : emptyBox("Aucune conversation", "Écrivez à un artiste depuis une fiche œuvre.");
   if (tab === "prefs") body = prefsPanel();
+  if (tab === "surmesure") {
+    const reqs = state.requests.filter((r) => r.buyer === state.user.name);
+    body = reqs.length ? reqs.map((r) => requestCard(r, false)).join("") : emptyBox("Aucune demande", "Demandez une pièce sur mesure depuis la page d'un artiste.", '<a class="btn" href="#/artistes">Voir les artistes</a>');
+  }
   if (tab === "compte") body = accountPanel();
   return (
     tabs(
@@ -4719,6 +5093,7 @@ function buyerSpace() {
         ["favoris", "Favoris"],
         ["abonnements", "Abonnements"],
         ["messages", "Messages"],
+        ["surmesure", "Sur mesure"],
         ["prefs", "Notifications"],
         ["compte", "Compte & RGPD"],
       ],
@@ -4858,6 +5233,10 @@ function sellerSpace() {
       </div>`;
   }
   if (tab === "messages") body = `<p><a class="btn" href="#/messages/${id}">Ouvrir la messagerie</a></p>`;
+  if (tab === "surmesure") {
+    const reqs = state.requests.filter((r) => r.artist === id);
+    body = reqs.length ? reqs.map((r) => requestCard(r, true)).join("") : emptyBox("Aucune demande", "Les demandes de pièces sur mesure de vos acheteurs apparaîtront ici.");
+  }
   if (tab === "posts") {
     const mine = postsOf(id);
     body = `
@@ -4888,6 +5267,7 @@ function sellerSpace() {
         ["ajouter", "Publier"],
         ["ventes", "Ventes", toShip],
         ["posts", "Posts", postsOf(id).length],
+        ["surmesure", "Sur mesure", state.requests.filter((r) => r.artist === id && r.status === "nouvelle").length],
         ["profil", "Profil & médias"],
         ["messages", "Messages"],
       ],
@@ -5086,8 +5466,8 @@ function photoInner(p, big = false) {
 function photoTile(d, p, i) {
   return `<button class="photo" data-act="zoom-photo" data-id="${d.id}" data-i="${i}" aria-label="Agrandir ${esc(p.caption || "la photo")}">${photoInner(p)}<span class="mono">${esc(p.caption || "Photo " + (i + 1))}${p.src ? "" : " · démo"}</span></button>`;
 }
-function photoInput(id, label) {
-  return `<div class="field"><label for="${id}">${label}</label><input id="${id}" type="file" accept="image/*" multiple /><span class="hint">Jusqu'à 4 photos. Montrez l'œuvre, le défaut de près et l'emballage.</span></div>`;
+function photoInput(id, label, hint = "Jusqu'à 4 photos. Montrez l'œuvre, le défaut de près et l'emballage.") {
+  return `<div class="field"><label for="${id}">${label}</label><input id="${id}" type="file" accept="image/*" multiple /><span class="hint">${hint}</span></div>`;
 }
 
 function viewReport(orderId) {
@@ -5288,6 +5668,38 @@ const actions = {
   },
   "tab-link"(el) {
     state.tab[el.dataset.key] = el.dataset.id;
+  },
+  "drop-alert"() {
+    if (!requireUser("Connectez-vous pour être prévenu·e du lancement.")) return;
+    state.dropAlert = !state.dropAlert;
+    if (state.dropAlert) notify(`Rappel activé : « ${DROP.title} » arrive bientôt. On vous prévient dès la mise en ligne.`, "#/");
+    save();
+    toast(state.dropAlert ? "C'est noté, on vous prévient au lancement." : "Rappel retiré");
+    render(true);
+  },
+  "req-quote"(el) {
+    const r = state.requests.find((x) => x.id === el.dataset.id);
+    const amount = 420;
+    r.status = "devis envoyé";
+    r.quote = amount;
+    (state.threads[r.artist] = state.threads[r.artist] || []).push({ from: "artist", text: `Devis pour « ${r.type} » : ${euro(amount)}, livraison sous 4 semaines. Vous pouvez l'accepter depuis votre espace, onglet « Sur mesure ».` });
+    notify(`${artistById(r.artist).name} vous a envoyé un devis de ${euro(amount)} pour votre commande sur mesure.`, "#/profil");
+    save();
+    toast("Devis envoyé (démo : 420 €)");
+    render(true);
+  },
+  "req-decline"(el) {
+    state.requests.find((x) => x.id === el.dataset.id).status = "déclinée";
+    save();
+    render(true);
+  },
+  "req-accept"(el) {
+    const r = state.requests.find((x) => x.id === el.dataset.id);
+    r.status = "acceptée";
+    (state.threads[r.artist] = state.threads[r.artist] || []).push({ from: "buyer", text: `J'accepte le devis de ${euro(r.quote)}, merci !` });
+    save();
+    toast("Devis accepté — le paiement sera demandé au moment de l'expédition (démo).");
+    render(true);
   },
   "go-back"() {
     goBack();
@@ -5516,6 +5928,22 @@ document.addEventListener("change", (e) => {
 });
 document.addEventListener("submit", async (e) => {
   const f = e.target;
+  if (f.id === "request-form") {
+    e.preventDefault();
+    const artist = f.dataset.artist;
+    const photos = await readPhotos($("#rq-photos").files);
+    const r = {
+      id: "R-" + (202 + state.requests.length), artist, buyer: state.user.name, date: today(), status: "nouvelle",
+      type: $("#rq-type").value.trim(), text: $("#rq-text").value.trim(), budget: $("#rq-budget").value, deadline: $("#rq-deadline").value.trim(), photos,
+    };
+    state.requests.unshift(r);
+    (state.threads[artist] = state.threads[artist] || []).push({ from: "buyer", text: `Demande sur mesure : ${r.type}. ${r.text} (budget ${r.budget}${r.deadline ? `, ${r.deadline}` : ""})` });
+    notify(`Votre demande sur mesure a été envoyée à ${artistById(artist).name}.`, "#/profil");
+    state.tab.profile = "surmesure";
+    save();
+    toast("Demande envoyée !");
+    return nav("#/profil");
+  }
   if (f.id === "report-form") {
     e.preventDefault();
     const o = state.orders.find((x) => x.id === f.dataset.order);
@@ -5663,6 +6091,7 @@ function render(keepScroll = false, restoring = false) {
     oeuvre: [() => viewProduct(param), () => bindProduct(param)],
     artistes: [viewArtists],
     histoire: [viewStory],
+    "commande-perso": [() => viewCustomRequest(param), () => bindLogin()],
     post: [() => viewPost(param)],
     litige: [() => viewDispute(param), () => bindLogin()],
     signaler: [() => viewReport(param), () => (bindReport(), bindLogin())],
