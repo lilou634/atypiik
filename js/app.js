@@ -622,23 +622,26 @@ function viewPost(id) {
 
 /* ---------- Notre histoire ---------- */
 function viewStory() {
+  const photo = STORY.photo ? `<img src="${STORY.photo}" alt="${esc(STORY.founder)}, ${esc(STORY.role.toLowerCase())}" />` : `<span>${initials(STORY.founder)}</span>`;
   return `
-    <div class="page-head"><h1>Notre <span class="fun">histoire</span></h1><p>${esc(STORY.intro)}</p></div>
-    <div class="story-page">
-      <aside class="story-media">
-        <div class="portrait">${STORY.photo ? `<img src="${STORY.photo}" alt="${esc(STORY.founder)}, ${esc(STORY.role.toLowerCase())}" />` : `<span>${initials(STORY.founder)}</span>`}</div>
-        <div class="story-caption mono"><span>${esc(STORY.founder)}</span><span>${esc(STORY.role)}</span></div>
-      </aside>
-      <div class="chapters">
-        ${STORY.chapters
-          .map((c, i) => `<section class="chapter"><h2>${esc(c.title)}</h2><p>${esc(c.text)}</p></section>`)
-          .join("")}
-        <blockquote class="story-quote">« ${esc(STORY.quote)} »<cite class="mono">— ${esc(STORY.founder)}</cite></blockquote>
-        <div class="hero-cta">
-          <a class="btn" href="#/galerie">Explorer la galerie</a>
-          <a class="btn btn-outline" href="#/profil">Rejoindre en tant qu'artiste</a>
-        </div>
+    <div class="page-head"><h1>Notre <span class="fun">histoire</span></h1></div>
+    <section class="story-intro">
+      <figure class="story-portrait">${photo}<figcaption><b>${esc(STORY.founder)}</b>${esc(STORY.role)}</figcaption></figure>
+      <div class="story-lead">
+        <span class="ref">Le mot de la fondatrice</span>
+        <p>${esc(STORY.intro)}</p>
       </div>
+    </section>
+    <section class="chapters">
+      ${STORY.chapters.map((c) => `<article class="chapter"><h2>${esc(c.title)}</h2><p>${esc(c.text)}</p></article>`).join("")}
+    </section>
+    <blockquote class="story-quote">
+      <p>« ${esc(STORY.quote)} »</p>
+      <cite>— ${esc(STORY.founder)}</cite>
+    </blockquote>
+    <div class="story-cta">
+      <a class="btn" href="#/galerie">Explorer la galerie</a>
+      <a class="btn btn-outline" href="#/profil">Rejoindre en tant qu'artiste</a>
     </div>`;
 }
 
