@@ -432,7 +432,7 @@ const FAQ = [
   ["Combien de temps pour recevoir ma commande ?", "Chaque fiche indique le délai d'expédition de l'artiste. Les pièces en stock partent en général sous 2 à 5 jours ; les pièces faites à la commande prennent plus de temps. La livraison est suivie."],
   ["Combien coûte la livraison ?", "Les frais de port dépendent de la taille et du poids du colis. Ils sont affichés avant le paiement et reversés à l'artiste."],
   ["Puis-je retourner une œuvre ?", "Oui, vous disposez de 14 jours après réception pour changer d'avis, sauf pour les commandes sur mesure. Les frais de retour sont à votre charge."],
-  ["Et si mon colis arrive abîmé ?", "Signalez-le depuis votre commande avec des photos, dans les 48 h. L'artiste et notre équipe vous répondent dans le dossier, et vous êtes remboursé·e si le problème est confirmé."],
+  ["Et si mon colis arrive abîmé ?", "Signalez-le depuis votre commande avec des photos, dans les 48 h. L'artiste et notre équipe vous répondent dans le dossier, et le remboursement est effectué si le problème est confirmé."],
   ["Le paiement est-il sécurisé ?", "Oui. Le paiement passe par Stripe : vos données bancaires ne transitent jamais par nos serveurs. L'artiste est payé une fois la commande livrée."],
   ["Puis-je demander une pièce sur mesure ?", "Oui, depuis la page d'un artiste. Vous décrivez votre projet, l'artiste vous envoie un devis, et rien n'est payé avant que vous l'acceptiez."],
 ];

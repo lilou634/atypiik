@@ -4351,7 +4351,7 @@ const FAQ = [
   ["Combien de temps pour recevoir ma commande ?", "Chaque fiche indique le délai d'expédition de l'artiste. Les pièces en stock partent en général sous 2 à 5 jours ; les pièces faites à la commande prennent plus de temps. La livraison est suivie."],
   ["Combien coûte la livraison ?", "Les frais de port dépendent de la taille et du poids du colis. Ils sont affichés avant le paiement et reversés à l'artiste."],
   ["Puis-je retourner une œuvre ?", "Oui, vous disposez de 14 jours après réception pour changer d'avis, sauf pour les commandes sur mesure. Les frais de retour sont à votre charge."],
-  ["Et si mon colis arrive abîmé ?", "Signalez-le depuis votre commande avec des photos, dans les 48 h. L'artiste et notre équipe vous répondent dans le dossier, et vous êtes remboursé·e si le problème est confirmé."],
+  ["Et si mon colis arrive abîmé ?", "Signalez-le depuis votre commande avec des photos, dans les 48 h. L'artiste et notre équipe vous répondent dans le dossier, et le remboursement est effectué si le problème est confirmé."],
   ["Le paiement est-il sécurisé ?", "Oui. Le paiement passe par Stripe : vos données bancaires ne transitent jamais par nos serveurs. L'artiste est payé une fois la commande livrée."],
   ["Puis-je demander une pièce sur mesure ?", "Oui, depuis la page d'un artiste. Vous décrivez votre projet, l'artiste vous envoie un devis, et rien n'est payé avant que vous l'acceptiez."],
 ];
@@ -4639,11 +4639,11 @@ function editionOf(w) {
 
 /* Tous les artistes d'ATYPIIK sont validés à l'entrée : c'est le cœur de la promesse. */
 const selectedBadge = (small = false) =>
-  `<span class="selected${small ? " sm" : ""}" title="Profil vérifié et sélectionné par l'équipe ATYPIIK"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0l1.9 2.1 2.8-.4.4 2.8L15.2 6 14 8.6l1.2 2.5-2.1 1.5-.4 2.8-2.8-.4L8 16l-1.9-2.1-2.8.4-.4-2.8L.8 10 2 7.4.8 4.9l2.1-1.5.4-2.8 2.8.4z" fill="currentColor"/><path d="M5 8.2l2 2 4-4.2" stroke="#fff" stroke-width="1.6" fill="none"/></svg>Sélectionné·e</span>`;
+  `<span class="selected${small ? " sm" : ""}" title="Profil vérifié et sélectionné par l'équipe ATYPIIK"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0l1.9 2.1 2.8-.4.4 2.8L15.2 6 14 8.6l1.2 2.5-2.1 1.5-.4 2.8-2.8-.4L8 16l-1.9-2.1-2.8.4-.4-2.8L.8 10 2 7.4.8 4.9l2.1-1.5.4-2.8 2.8.4z" fill="currentColor"/><path d="M5 8.2l2 2 4-4.2" stroke="#fff" stroke-width="1.6" fill="none"/></svg>Sélection ATYPIIK</span>`;
 
 function followBtn(id, small = false) {
   const on = state.follows.includes(id);
-  return `<button class="btn ${on ? "btn-outline" : ""} ${small ? "btn-small" : ""}" data-act="follow" data-id="${id}">${on ? "✓ Abonné·e" : "Suivre"}</button>`;
+  return `<button class="btn ${on ? "btn-outline" : ""} ${small ? "btn-small" : ""}" data-act="follow" data-id="${id}">${on ? "✓ Suivi" : "Suivre"}</button>`;
 }
 
 function tabs(key, list, current) {
@@ -4948,9 +4948,9 @@ function suggestedArtists() {
     .map((a) => {
       const d = disciplineOf(a.id);
       let score = a.followers / 1000;
-      let reason = "Très suivi·e sur ATYPIIK";
+      let reason = "Très suivi sur ATYPIIK";
       if (liked.has(d)) (score += 5), (reason = `Parce que vous aimez : ${d.toLowerCase()}`);
-      else if (postsOf(a.id).length) (score += 1), (reason = "Actif·ve en ce moment");
+      else if (postsOf(a.id).length) (score += 1), (reason = "Nouveautés récentes");
       return { a, score, reason };
     })
     .sort((x, y) => y.score - x.score);
@@ -4982,7 +4982,7 @@ function artistFeature({ a, reason }) {
 function viewArtists() {
   const sugg = suggestedArtists().slice(0, 3);
   return `
-    <div class="page-head"><h1>Les <span class="fun">artistes</span></h1><p>Découvrez les créateurs et créatrices d'ATYPIIK, leurs œuvres et leurs coulisses. Suivez-les pour être alerté·e de chaque nouveauté.</p></div>
+    <div class="page-head"><h1>Les <span class="fun">artistes</span></h1><p>Découvrez les créateurs et créatrices d'ATYPIIK, leurs œuvres et leurs coulisses. Suivez vos préférés pour ne manquer aucune nouveauté.</p></div>
     ${sugg.length ? `<section><div class="section-head"><div><h2>Suggestions <span class="fun">d'artistes</span></h2></div></div><div class="features">${sugg.map(artistFeature).join("")}</div></section>` : ""}
     <section class="section"><div class="section-head"><div><h2>Tous les <span class="fun">artistes</span></h2></div><span class="mono muted">${plural(state.artists.length, "artiste")}</span></div>
       <div class="grid">${state.artists.map(artistCard).join("")}</div></section>`;
@@ -5028,7 +5028,7 @@ function viewArtist(id) {
         <h1>${esc(a.name)}</h1>
         ${selectedBadge()}
         <p>${esc(a.bio)}</p>
-        <div class="artist-stats">${reviewsOf((r) => r.artist === id).length ? `<span>${stars(ratingOf(reviewsOf((r) => r.artist === id)))} ${plural(reviewsOf((r) => r.artist === id).length, "avis")}</span>` : ""}<span><b>${a.followers + (state.follows.includes(id) ? 1 : 0)}</b> abonné·e·s</span><span><b>${works.length}</b> œuvres</span><span><b>${posts.length}</b> posts</span></div>
+        <div class="artist-stats">${reviewsOf((r) => r.artist === id).length ? `<span>${stars(ratingOf(reviewsOf((r) => r.artist === id)))} ${plural(reviewsOf((r) => r.artist === id).length, "avis")}</span>` : ""}<span><b>${a.followers + (state.follows.includes(id) ? 1 : 0)}</b> abonnés</span><span><b>${works.length}</b> œuvres</span><span><b>${posts.length}</b> posts</span></div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">${followBtn(id)}<a class="btn btn-outline" href="#/commande-perso/${id}">Commande personnalisée</a><a class="btn btn-outline" href="#/messages/${id}">Contacter</a></div>
     </div>
@@ -5042,7 +5042,7 @@ function viewSell() {
     ["Candidatez", "Présentez votre travail en quelques minutes : vos œuvres, votre discipline, votre ville."],
     ["On regarde votre travail", "Notre équipe étudie chaque candidature à la main et vous répond sous une semaine."],
     ["Ouvrez votre boutique", "Votre page artiste, vos œuvres et vos déclinaisons, vos coulisses : tout est prêt en une soirée."],
-    ["Vendez et soyez payé·e", "Vous expédiez, l'acheteur reçoit, Stripe vous verse 90 % du prix et l'intégralité du port."],
+    ["Vendez, on s'occupe du reste", "Vous expédiez la pièce. Une fois qu'elle est livrée, vous recevez 90 % du prix de vente et la totalité des frais de port, versés par Stripe."],
   ];
   return `
     <section class="sell-hero">
@@ -5071,7 +5071,7 @@ function viewSell() {
       <div class="perks">
         <div><h3>Votre mini-site</h3><p>Une page à votre nom avec vos œuvres, vos posts, vos vidéos coulisses et votre dossier de presse.</p></div>
         <div><h3>Les commandes sur mesure</h3><p>Les acheteurs vous demandent des pièces personnalisées, vous répondez par un devis.</p></div>
-        <div><h3>Des abonné·e·s</h3><p>Chaque nouvelle œuvre et chaque post est envoyé à celles et ceux qui vous suivent.</p></div>
+        <div><h3>Une communauté</h3><p>Chaque nouvelle œuvre et chaque post est envoyé à celles et ceux qui vous suivent.</p></div>
         <div><h3>La mise en avant</h3><p>Artiste de la semaine, drops en édition limitée, sélection personnalisée des acheteurs.</p></div>
       </div>
     </section>
@@ -5085,7 +5085,7 @@ function viewSell() {
     </section>
 
     <section class="section sell-cta">
-      <h2>Prêt·e à <span class="fun">vous lancer</span> ?</h2>
+      <h2>Envie de <span class="fun">vous lancer</span> ?</h2>
       <p>La candidature prend cinq minutes. On vous répond sous une semaine.</p>
       <a class="btn" href="#/profil/artiste">Candidater maintenant</a>
     </section>`;
@@ -5144,7 +5144,7 @@ function dropSection() {
         <p class="mono">${esc(a?.name || "")} · ${DROP.pieces} pièces · ${esc(when)}</p>
         <div class="countdown" data-countdown="${DROP.date}" aria-live="polite">${countdownHtml(DROP.date)}</div>
         <p>${esc(DROP.text)}</p>
-        <button class="btn ${state.dropAlert ? "btn-outline" : "btn-light"}" data-act="drop-alert">${state.dropAlert ? "✓ Vous serez prévenu·e" : "Me prévenir au lancement"}</button>
+        <button class="btn ${state.dropAlert ? "btn-outline" : "btn-light"}" data-act="drop-alert">${state.dropAlert ? "✓ Rappel activé" : "Me prévenir au lancement"}</button>
       </div>
     </section>`;
 }
@@ -5269,7 +5269,7 @@ function viewSelection() {
       let reason = "Tendance sur ATYPIIK";
       if (types.has(w.type)) (score += 2), (reason = `Vous aimez : ${w.type}`);
       if (state.follows.includes(w.artist)) (score += 3), (reason = `Vous suivez ${artistOf(w).name}`);
-      else if (artists.has(w.artist)) (score += 2), (reason = `Artiste consulté·e récemment`);
+      else if (artists.has(w.artist)) (score += 2), (reason = `Artiste vu récemment`);
       if (state.favs.includes(w.id)) score -= 2;
       return { w, score, reason };
     })
@@ -5293,7 +5293,7 @@ function viewSelection() {
 function viewFavs() {
   const works = state.favs.map(byId).filter((w) => w && !w.hidden);
   return `
-    <div class="page-head"><h1>Mes <span class="fun">favoris</span></h1><p>Vous serez prévenu·e en cas de baisse de prix ou de retour en stock.</p></div>
+    <div class="page-head"><h1>Mes <span class="fun">favoris</span></h1><p>On vous prévient en cas de baisse de prix ou de retour en stock.</p></div>
     ${works.length ? `<div class="grid">${works.map((w) => card(w)).join("")}</div>` : emptyBox("Aucun favori", "Touchez le cœur sur une œuvre pour la retrouver ici.", '<a class="btn" href="#/galerie">Explorer</a>')}`;
 }
 
@@ -5572,7 +5572,7 @@ function loginForms() {
       <form class="panel" id="signup-form">
         <h2>Créer un compte</h2>
         <div class="field"><label for="su-role">Je suis</label>
-          <select id="su-role"><option value="acheteur">Acheteur·se</option><option value="vendeur">Artiste (vendeur)</option></select></div>
+          <select id="su-role"><option value="acheteur">Acheteur</option><option value="vendeur">Artiste (vendeur)</option></select></div>
         <div class="field"><label for="su-name">Nom</label><input id="su-name" required autocomplete="name" /></div>
         <div class="field"><label for="su-email">E-mail</label><input id="su-email" type="email" required autocomplete="email" /></div>
         <div class="field" id="su-artist" hidden>
@@ -5581,7 +5581,7 @@ function loginForms() {
             <div class="field"><label for="su-disc">Discipline</label><input id="su-disc" placeholder="Peinture, photo…" /></div>
           </div>
           <div class="seller-terms">
-            <strong>Comment vous êtes payé·e</strong>
+            <strong>Comment se passe le paiement</strong>
             <p>Vous fixez votre prix. Sur chaque vente, ATYPIIK prélève une commission de <b>10 %</b> et vous recevez <b>90 %</b>, versés par Stripe après la livraison. Les frais de port, qui dépendent de la taille du colis, sont payés par l'acheteur et vous sont reversés.</p>
           </div>
         </div>
@@ -5699,7 +5699,7 @@ function buyerSpace() {
   if (tab === "favoris") body = viewFavs().replace(/<div class="page-head">[\s\S]*?<\/div>/, "");
   if (tab === "abonnements") {
     const list = state.follows.map(artistById).filter(Boolean);
-    body = list.length ? `<div class="grid">${list.map(artistCard).join("")}</div>` : emptyBox("Aucun abonnement", "Suivez des artistes pour être alerté·e de leurs nouvelles œuvres.", '<a class="btn" href="#/artistes">Voir les artistes</a>');
+    body = list.length ? `<div class="grid">${list.map(artistCard).join("")}</div>` : emptyBox("Aucun abonnement", "Suivez des artistes pour découvrir leurs nouvelles œuvres en premier.", '<a class="btn" href="#/artistes">Voir les artistes</a>');
   }
   if (tab === "messages")
     body = Object.keys(state.threads).length
@@ -5792,7 +5792,7 @@ function sellerSpace() {
         <div><b>${euro(gross * 0.9)}</b><span>Revenus nets (90 %)</span></div>
         <div><b>${sales.length}</b><span>Ventes</span></div>
         <div><b class="${toShip ? "pink" : ""}">${toShip}</b><span>À expédier</span></div>
-        <div><b>${a.followers}</b><span>Abonné·e·s</span></div>
+        <div><b>${a.followers}</b><span>Abonnés</span></div>
       </div>
       <div class="two-col">
         <div class="panel"><h3>À faire</h3>
@@ -5931,7 +5931,7 @@ function addWorkForm() {
         <button type="button" class="link-btn" data-act="vrow-add" style="justify-self:start">+ Ajouter une déclinaison (taille, couleur, support…)</button>
       </div>
       <button class="btn btn-chrome">Publier l'œuvre</button>
-      <p class="hint">Vos abonné·e·s recevront une notification dès la publication.</p>
+      <p class="hint">Les personnes qui vous suivent recevront une notification dès la publication.</p>
     </form>`;
 }
 
@@ -6302,7 +6302,7 @@ const actions = {
     $("#avis")?.scrollIntoView({ behavior: "smooth" });
   },
   "drop-alert"() {
-    if (!requireUser("Connectez-vous pour être prévenu·e du lancement.")) return;
+    if (!requireUser("Connectez-vous pour recevoir un rappel au lancement.")) return;
     state.dropAlert = !state.dropAlert;
     if (state.dropAlert) notify(`Rappel activé : « ${DROP.title} » arrive bientôt. On vous prévient dès la mise en ligne.`, "#/");
     save();
@@ -6406,13 +6406,13 @@ const actions = {
   },
   "demo-login"(el) {
     login({ ...DEMO_USERS[el.dataset.id] });
-    toast(`Connecté·e : espace ${el.textContent.trim().toLowerCase()}`);
+    toast(`Bienvenue dans votre espace ${el.textContent.trim().toLowerCase()}`);
   },
   logout() {
     state.user = null;
     state.tab = {};
     save();
-    toast("Vous êtes déconnecté·e");
+    toast("Vous êtes bien déconnecté de votre compte");
     render(true);
   },
   pref(el) {
