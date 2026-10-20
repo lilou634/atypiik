@@ -16,7 +16,7 @@ const clone = (o) => JSON.parse(JSON.stringify(o));
 const initials = (name) => name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
 
 /* ---------- Persistance ---------- */
-const DATA_VERSION = 7;
+const DATA_VERSION = 8;
 const store = {
   get(key, fallback) {
     try {
@@ -46,7 +46,7 @@ if (store.get("version", 0) !== DATA_VERSION) {
 
 const PERSISTED = [
   "user", "favs", "cart", "views", "follows", "orders", "threads", "notifs", "works", "artists",
-  "pending", "disputes", "sales", "cookies", "prefs", "media", "posts", "requests", "dropAlert",
+  "pending", "disputes", "sales", "cookies", "prefs", "media", "posts", "requests", "dropAlert", "reviews",
 ];
 const state = {
   user: store.get("user", null),
@@ -79,11 +79,12 @@ const state = {
   posts: store.get("posts", clone(SEED_POSTS)),
   requests: store.get("requests", clone(SEED_REQUESTS)),
   dropAlert: store.get("dropAlert", false),
+  reviews: store.get("reviews", clone(SEED_REVIEWS)),
   sales: store.get("sales", clone(SEED_SALES)),
   cookies: store.get("cookies", null),
   prefs: store.get("prefs", { orders: true, prices: true, news: true, promos: false, email: true }),
   media: store.get("media", {}),
-  gallery: { type: [], color: [], size: [], artist: "", max: 2000, view: "grid", q: "" },
+  gallery: { type: [], color: [], size: [], artist: "", max: 2000, view: "grid", q: "", sort: "new" },
   tab: {},
   checkout: { step: 1, address: null },
 };
@@ -179,7 +180,7 @@ function card(w, extra = "") {
 }
 
 const cut = (t, n) => (t.length > n ? t.slice(0, n).replace(/\s+\S*$/, "") + "…" : t);
-const plural = (n, word) => `${n} ${word}${n > 1 ? "s" : ""}`;
+const plural = (n, word) => `${n} ${word}${n > 1 && !/[sx]$/.test(word) ? "s" : ""}`;
 
 /* Discipline principale d'un artiste (la plus fréquente parmi ses œuvres). */
 function disciplineOf(id) {
@@ -244,6 +245,33 @@ function photoField(id, current, name, hint) {
     </div>`;
 }
 
+/* ---------- Avis ---------- */
+const reviewsOf = (pred) => state.reviews.filter(pred).sort((a, b) => (a.date < b.date ? 1 : -1));
+function ratingOf(list) {
+  return list.length ? list.reduce((s, r) => s + r.rating, 0) / list.length : 0;
+}
+function stars(n, label = true) {
+  const full = Math.round(n);
+  return `<span class="stars" aria-label="${n.toFixed(1)} sur 5">${"★".repeat(full)}<span class="off">${"★".repeat(5 - full)}</span>${label ? `<b>${n.toFixed(1).replace(".", ",")}</b>` : ""}</span>`;
+}
+function reviewList(list, showWork = false) {
+  return list
+    .map(
+      (r) => `<article class="review">
+        <div class="review-top">${stars(r.rating, false)}<span class="mono muted">${esc(r.author)} · ${frDate(r.date)} · achat vérifié</span></div>
+        ${showWork && byId(r.work) ? `<a class="review-work" href="#/oeuvre/${r.work}">${esc(byId(r.work).title)}</a>` : ""}
+        <p>${esc(r.text)}</p>
+      </article>`,
+    )
+    .join("");
+}
+/* Pièce unique (un seul exemplaire) ou petite série. */
+function editionOf(w) {
+  const total = w.variants.reduce((s, v) => s + v.stock, 0) + (w.sold ? 1 : 0);
+  if (w.variants.length === 1 && total <= 1) return "Pièce unique";
+  return `Petite série · ${total} exemplaire${total > 1 ? "s" : ""} disponible${total > 1 ? "s" : ""}`;
+}
+
 /* Tous les artistes d'ATYPIIK sont validés à l'entrée : c'est le cœur de la promesse. */
 const selectedBadge = (small = false) =>
   `<span class="selected${small ? " sm" : ""}" title="Profil vérifié et sélectionné par l'équipe ATYPIIK"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0l1.9 2.1 2.8-.4.4 2.8L15.2 6 14 8.6l1.2 2.5-2.1 1.5-.4 2.8-2.8-.4L8 16l-1.9-2.1-2.8.4-.4-2.8L.8 10 2 7.4.8 4.9l2.1-1.5.4-2.8 2.8.4z" fill="currentColor"/><path d="M5 8.2l2 2 4-4.2" stroke="#fff" stroke-width="1.6" fill="none"/></svg>Sélectionné·e</span>`;
@@ -285,11 +313,11 @@ function viewHome() {
       </div>
       <div class="hero-panel">
         <div>
-          <h1>L'art<br />sans<br /><span class="accent">filtre.</span></h1>
-          <p>La boutique des artistes émergents, sélectionnés un par un. Peinture, céramique, mode, crochet, bijoux&nbsp;: des pièces uniques, vendues en direct par celles et ceux qui les créent.</p>
+          <h1>L'art des<br />artistes<br />émergents, <span class="accent">sélectionnés un par un.</span></h1>
+          <p>Peinture, céramique, mode, crochet, bijoux&nbsp;: des pièces uniques, vendues en direct par celles et ceux qui les créent.</p>
           <div class="hero-cta">
             <a href="#/galerie" class="btn btn-light">Explorer la galerie</a>
-            <a href="#/profil" class="btn btn-ghost">Vendre mes œuvres</a>
+            <a href="#/vendre" class="btn btn-ghost">Vendre mes œuvres</a>
           </div>
         </div>
       </div>
@@ -317,19 +345,16 @@ function viewHome() {
         <span class="ref">Notre histoire</span>
         <h2>Née d'une <span class="fun">conviction</span></h2>
         <p>${esc(STORY.intro)}</p>
-        <blockquote>« ${esc(STORY.quote)} »</blockquote>
         <a href="#/histoire" class="btn btn-light">Lire notre histoire</a>
       </div>
     </section>
 
-    <section class="section tone tone-wall">
-      <div class="section-head"><div><h2>Par <span class="fun">catégorie</span></h2></div><a href="#/galerie">Toute la galerie</a></div>
-      <div class="cats">${cats
-        .map(([t, id]) => {
-          const n = visibleWorks().filter((w) => w.type === t).length;
-          return `<a class="cat" href="#/galerie" data-act="cat" data-type="${esc(t)}"><div class="cat-media">${visual(byId(id))}</div><div class="cat-label"><span>${t}</span><span class="mono">${String(n).padStart(2, "0")}</span></div></a>`;
-        })
-        .join("")}</div>
+
+    <section class="section trust">
+      <div><b>Artistes sélectionnés</b><span>Chaque créateur est vérifié avant de vendre.</span></div>
+      <div><b>Paiement sécurisé</b><span>Par Stripe. L'artiste est payé après la livraison.</span></div>
+      <div><b>Retours sous 14 jours</b><span>Et un vrai suivi si le colis arrive abîmé.</span></div>
+      <a class="text-link" href="#/aide">Comment ça marche</a>
     </section>
 
     <section class="section tone tone-ink">
@@ -357,6 +382,12 @@ function artistCard(a) {
 function filteredWorks() {
   const g = state.gallery;
   const q = g.q.trim().toLowerCase();
+  const order = {
+    new: (a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0) || +b.id.slice(1) - +a.id.slice(1),
+    asc: (a, b) => a.price - b.price,
+    desc: (a, b) => b.price - a.price,
+    rating: (a, b) => ratingOf(reviewsOf((r) => r.artist === b.artist)) - ratingOf(reviewsOf((r) => r.artist === a.artist)),
+  }[g.sort || "new"];
   return visibleWorks().filter(
     (w) =>
       (!g.type.length || g.type.includes(w.type)) &&
@@ -364,8 +395,8 @@ function filteredWorks() {
       (!g.size.length || g.size.includes(w.size)) &&
       (!g.artist || g.artist === w.artist) &&
       w.price <= g.max &&
-      (!q || (w.title + " " + artistOf(w).name + " " + w.type).toLowerCase().includes(q)),
-  );
+      (!q || (w.title + " " + artistOf(w).name + " " + w.type + " " + w.technique).toLowerCase().includes(q)),
+  ).sort(order);
 }
 
 function viewGallery() {
@@ -399,6 +430,11 @@ function viewGallery() {
       <section>
         <div class="toolbar">
           <span id="result-count" class="label"></span>
+          <label class="sort"><span class="label">Trier</span>
+            <select class="select" id="sort" aria-label="Trier les œuvres">
+              ${[["new", "Nouveautés"], ["asc", "Prix croissant"], ["desc", "Prix décroissant"], ["rating", "Mieux notés"]].map(([v, l]) => `<option value="${v}" ${g.sort === v ? "selected" : ""}>${l}</option>`).join("")}
+            </select>
+          </label>
           <div class="toggle" role="group" aria-label="Affichage">
             <button data-act="view" data-id="grid" class="${g.view === "grid" ? "on" : ""}">Grille</button>
             <button data-act="view" data-id="list" class="${g.view === "list" ? "on" : ""}">Liste</button>
@@ -430,6 +466,10 @@ function bindGallery() {
     g.artist = e.target.value;
     renderResults();
   });
+  $("#sort").addEventListener("change", (e) => {
+    g.sort = e.target.value;
+    renderResults();
+  });
   renderResults();
 }
 
@@ -441,6 +481,12 @@ function viewProduct(id) {
   state.views = [w.id, ...state.views.filter((x) => x !== w.id)].slice(0, 20);
   store.set("views", state.views);
   const first = Math.max(0, w.variants.findIndex((v) => v.stock > 0));
+  const workReviews = reviewsOf((r) => r.work === w.id);
+  const artistReviews = reviewsOf((r) => r.artist === a.id);
+  const same = visibleWorks().filter((x) => x.artist === a.id && x.id !== w.id).slice(0, 4);
+  const similar = visibleWorks().filter((x) => x.type === w.type && x.artist !== a.id && !x.sold).slice(0, 4);
+  const shown = workReviews.length ? workReviews : artistReviews.slice(0, 3);
+  const canReview = state.user && state.orders.some((o) => o.status === 3 && o.lines.some((l) => l.id === w.id)) && !state.reviews.some((r) => r.work === w.id && r.author === state.user.name);
   return `
     <div class="product">
       <div>
@@ -453,8 +499,14 @@ function viewProduct(id) {
         <div class="badges inline">${badgesFor(w)}</div>
         <h1>${esc(w.title)}</h1>
         <span class="ref muted">${esc(w.type)}</span>
-        <div class="by">par <a href="#/artiste/${a.id}">${esc(a.name)}</a> · ${esc(a.city)}</div>
+        <div class="by">par <a href="#/artiste/${a.id}">${esc(a.name)}</a> ${selectedBadge(true)} · ${esc(a.city)}</div>
+        ${workReviews.length ? `<a class="rating-link" href="#avis" data-act="to-reviews">${stars(ratingOf(workReviews))} <span class="muted">(${plural(workReviews.length, "avis")})</span></a>` : ""}
         <div class="product-price">${euro(w.price)} <small>TTC</small></div>
+        <ul class="facts">
+          <li><b>${esc(editionOf(w))}</b></li>
+          <li>Expédié sous ${esc(LEAD_TIME[w.type] || "3 à 5 jours")} · livraison suivie</li>
+          <li>Retours acceptés sous 14 jours</li>
+        </ul>
         <span class="variant-label label">Déclinaisons</span>
         <div class="opts" style="display:flex;flex-wrap:wrap;gap:6px" id="variants">
           ${w.variants.map((v, i) => `<button class="chip ${i === first ? "on" : ""} ${v.stock ? "" : "na"}" data-act="variant" data-i="${i}">${esc(v.label)}<span class="dot"></span></button>`).join("")}
@@ -477,7 +529,25 @@ function viewProduct(id) {
           <div class="card-actions" style="margin:0"><a class="btn btn-small btn-outline" href="#/commande-perso/${a.id}">Sur mesure</a><a class="btn btn-small btn-outline" href="#/messages/${a.id}">Écrire</a></div>
         </div>
       </div>
-    </div>`;
+    </div>
+
+    <section class="section reviews" id="avis">
+      <div class="section-head"><div><h2>Les <span class="fun">avis</span></h2></div>${artistReviews.length ? `<span>${stars(ratingOf(artistReviews))} <span class="muted">${plural(artistReviews.length, "avis")} sur ${esc(a.name)}</span></span>` : ""}</div>
+      ${shown.length ? `${workReviews.length ? "" : `<p class="hint">Pas encore d'avis sur cette pièce. Voici ce que disent les clients de ${esc(a.name)} :</p>`}<div class="review-grid">${reviewList(shown, !workReviews.length)}</div>` : '<p class="hint">Pas encore d\'avis.</p>'}
+      ${
+        canReview
+          ? `<form class="panel review-form" id="review-form" data-id="${w.id}">
+              <h3>Votre avis</h3>
+              <div class="star-input" role="radiogroup" aria-label="Note">${[5, 4, 3, 2, 1].map((n) => `<input type="radio" name="rv-rating" id="rv-${n}" value="${n}" ${n === 5 ? "checked" : ""} /><label for="rv-${n}" title="${n} sur 5">★</label>`).join("")}</div>
+              <div class="field"><label for="rv-text">Votre commentaire</label><textarea id="rv-text" rows="3" required></textarea></div>
+              <button class="btn btn-small">Publier mon avis</button>
+            </form>`
+          : '<p class="hint">Seules les personnes ayant reçu cette pièce peuvent laisser un avis.</p>'
+      }
+    </section>
+
+    ${same.length ? `<section class="section"><div class="section-head"><div><h2>Du même <span class="fun">artiste</span></h2></div><a href="#/artiste/${a.id}">Voir son univers</a></div><div class="grid">${same.map((x) => card(x)).join("")}</div></section>` : ""}
+    ${similar.length ? `<section class="section"><div class="section-head"><div><h2>Vous aimerez <span class="fun">aussi</span></h2></div><a href="#/galerie" data-act="cat" data-type="${esc(w.type)}">Toute la catégorie</a></div><div class="grid">${similar.map((x) => card(x)).join("")}</div></section>` : ""}`;
 }
 
 let currentVariant = 0;
@@ -573,6 +643,10 @@ function viewArtist(id) {
         ${works.length ? `<div class="grid">${works.slice(0, 4).map((w) => card(w)).join("")}</div>` : emptyBox("Bientôt", "Cet artiste n'a pas encore publié d'œuvre.")}</section>
       ${videos.length ? `<section class="artist-block">${sub("En <span class=\"fun\">coulisses</span>")}<div class="grid cols-3">${videos.slice(0, 3).map(videoTile).join("")}</div></section>` : ""}`;
   }
+  if (tab === "avis") {
+    const list = reviewsOf((r) => r.artist === id);
+    body = list.length ? `<div class="review-grid">${reviewList(list, true)}</div>` : emptyBox("Pas encore d'avis", "Les avis des clients apparaîtront ici après leurs commandes.");
+  }
   if (tab === "oeuvres") body = works.length ? `<div class="grid">${works.map((w) => card(w)).join("")}</div>` : emptyBox("Bientôt", "Cet artiste n'a pas encore publié d'œuvre.");
   if (tab === "posts") body = posts.length ? `<div class="posts">${posts.map((p) => postCard(p)).join("")}</div>` : emptyBox("Pas encore de post", "Les nouvelles de l'atelier apparaîtront ici.");
   if (tab === "coulisses") body = videos.length ? `<div class="grid cols-3">${videos.map(videoTile).join("")}</div>` : emptyBox("Pas encore de vidéo", "Les vidéos coulisses de l'artiste apparaîtront ici.");
@@ -589,12 +663,89 @@ function viewArtist(id) {
         <h1>${esc(a.name)}</h1>
         ${selectedBadge()}
         <p>${esc(a.bio)}</p>
-        <div class="artist-stats"><span><b>${a.followers + (state.follows.includes(id) ? 1 : 0)}</b> abonné·e·s</span><span><b>${works.length}</b> œuvres</span><span><b>${posts.length}</b> posts</span></div>
+        <div class="artist-stats">${reviewsOf((r) => r.artist === id).length ? `<span>${stars(ratingOf(reviewsOf((r) => r.artist === id)))} ${plural(reviewsOf((r) => r.artist === id).length, "avis")}</span>` : ""}<span><b>${a.followers + (state.follows.includes(id) ? 1 : 0)}</b> abonné·e·s</span><span><b>${works.length}</b> œuvres</span><span><b>${posts.length}</b> posts</span></div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">${followBtn(id)}<a class="btn btn-outline" href="#/commande-perso/${id}">Commande personnalisée</a><a class="btn btn-outline" href="#/messages/${id}">Contacter</a></div>
     </div>
-    ${tabs("artist", [["accueil", "Accueil"], ["oeuvres", "Œuvres", works.length], ["posts", "Posts", posts.length], ["coulisses", "Coulisses"], ["presse", "Presse"]], tab)}
+    ${tabs("artist", [["accueil", "Accueil"], ["oeuvres", "Œuvres", works.length], ["posts", "Posts", posts.length], ["coulisses", "Coulisses"], ["avis", "Avis", reviewsOf((r) => r.artist === id).length], ["presse", "Presse"]], tab)}
     ${body}`;
+}
+
+/* ---------- Vendre sur ATYPIIK ---------- */
+function viewSell() {
+  const steps = [
+    ["Candidatez", "Présentez votre travail en quelques minutes : vos œuvres, votre discipline, votre ville."],
+    ["On regarde votre travail", "Notre équipe étudie chaque candidature à la main et vous répond sous une semaine."],
+    ["Ouvrez votre boutique", "Votre page artiste, vos œuvres et vos déclinaisons, vos coulisses : tout est prêt en une soirée."],
+    ["Vendez et soyez payé·e", "Vous expédiez, l'acheteur reçoit, Stripe vous verse 90 % du prix et l'intégralité du port."],
+  ];
+  return `
+    <section class="sell-hero">
+      <div>
+        <span class="ref">Vendre sur ATYPIIK</span>
+        <h1>Votre <span class="fun">boutique</span>, sans créer de site.</h1>
+        <p>ATYPIIK est fait pour les artistes et les créatifs qui n'ont ni site, ni marque, ni budget pour se lancer. Vous créez, on s'occupe de la vitrine, du paiement et de la mise en avant.</p>
+        <div class="card-actions"><a class="btn" href="#/profil/artiste">Candidater</a><a class="btn btn-outline" href="#/aide">Lire la FAQ</a></div>
+      </div>
+      <div class="sell-mosaic">${["a6", "a22", "a28", "a19"].map(byId).filter(Boolean).map((w) => `<div>${visual(w)}</div>`).join("")}</div>
+    </section>
+
+    <section class="section sell-numbers">
+      <div><b>10 %</b><span>de commission, tout compris. Pas d'abonnement, pas de frais d'annonce.</span></div>
+      <div><b>90 %</b><span>du prix pour vous, plus l'intégralité des frais de port.</span></div>
+      <div><b>0 €</b><span>pour ouvrir votre boutique. Vous ne payez que si vous vendez.</span></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><div><h2>Comment <span class="fun">ça marche</span></h2></div></div>
+      <ol class="steps-list">${steps.map(([t, d]) => `<li><h3>${t}</h3><p>${d}</p></li>`).join("")}</ol>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><div><h2>Ce que vous <span class="fun">avez</span></h2></div></div>
+      <div class="perks">
+        <div><h3>Votre mini-site</h3><p>Une page à votre nom avec vos œuvres, vos posts, vos vidéos coulisses et votre dossier de presse.</p></div>
+        <div><h3>Les commandes sur mesure</h3><p>Les acheteurs vous demandent des pièces personnalisées, vous répondez par un devis.</p></div>
+        <div><h3>Des abonné·e·s</h3><p>Chaque nouvelle œuvre et chaque post est envoyé à celles et ceux qui vous suivent.</p></div>
+        <div><h3>La mise en avant</h3><p>Artiste de la semaine, drops en édition limitée, sélection personnalisée des acheteurs.</p></div>
+      </div>
+    </section>
+
+    <section class="section tone tone-ink">
+      <div class="section-head"><div><h2>Ils <span class="fun">vendent</span> déjà</h2></div></div>
+      <div class="quotes">${ARTIST_QUOTES.map((q) => {
+        const a = artistById(q.artist);
+        return a ? `<figure>${avatar(a, true)}<blockquote>« ${esc(q.text)} »</blockquote><figcaption><a href="#/artiste/${a.id}">${esc(a.name)}</a> · ${esc(disciplineOf(a.id))}</figcaption></figure>` : "";
+      }).join("")}</div>
+    </section>
+
+    <section class="section sell-cta">
+      <h2>Prêt·e à <span class="fun">vous lancer</span> ?</h2>
+      <p>La candidature prend cinq minutes. On vous répond sous une semaine.</p>
+      <a class="btn" href="#/profil/artiste">Candidater maintenant</a>
+    </section>`;
+}
+
+/* ---------- Comment ça marche + FAQ ---------- */
+function viewHelp() {
+  const steps = [
+    ["Découvrez", "Parcourez la galerie, suivez vos artistes préférés, ou demandez une pièce sur mesure."],
+    ["Commandez", "Paiement sécurisé par Stripe. Les frais de port sont affichés avant de payer."],
+    ["Recevez", "L'artiste prépare et expédie votre pièce. Vous suivez chaque étape depuis votre compte."],
+    ["Profitez", "14 jours pour changer d'avis, et un dossier de suivi si quelque chose ne va pas."],
+  ];
+  return `
+    <div class="page-head"><h1>Comment <span class="fun">ça marche</span></h1><p>Acheter sur ATYPIIK, c'est acheter directement à l'artiste, avec les garanties d'une vraie boutique.</p></div>
+    <ol class="steps-list">${steps.map(([t, d]) => `<li><h3>${t}</h3><p>${d}</p></li>`).join("")}</ol>
+    <section class="section">
+      <div class="section-head"><div><h2>Questions <span class="fun">fréquentes</span></h2></div></div>
+      <div class="faq">${FAQ.map(([q, r]) => `<details><summary>${esc(q)}</summary><p>${esc(r)}</p></details>`).join("")}</div>
+    </section>
+    <section class="section sell-cta">
+      <h2>Une autre <span class="fun">question</span> ?</h2>
+      <p>Notre équipe vous répond du lundi au vendredi.</p>
+      <div class="card-actions" style="justify-content:center"><a class="btn" href="#/messages/support">Nous écrire</a><a class="btn btn-outline" href="#/vendre">Vous êtes artiste ?</a></div>
+    </section>`;
 }
 
 /* ---------- Mises en avant ---------- */
@@ -1075,6 +1226,13 @@ function loginForms() {
         <p class="hint">Les comptes artistes sont validés par l'équipe ATYPIIK avant la mise en vente.</p>
       </form>
     </div>`;
+}
+function presetSignup(param) {
+  const role = $("#su-role");
+  if (param !== "artiste" || !role) return;
+  role.value = "vendeur";
+  role.dispatchEvent(new Event("change"));
+  requestAnimationFrame(() => $("#signup-form").scrollIntoView({ block: "start" }));
 }
 function bindLogin() {
   const lf = $("#login-form");
@@ -1774,6 +1932,10 @@ const actions = {
   "tab-link"(el) {
     state.tab[el.dataset.key] = el.dataset.id;
   },
+  "to-reviews"(el, e) {
+    e.preventDefault();
+    $("#avis")?.scrollIntoView({ behavior: "smooth" });
+  },
   "drop-alert"() {
     if (!requireUser("Connectez-vous pour être prévenu·e du lancement.")) return;
     state.dropAlert = !state.dropAlert;
@@ -2033,6 +2195,14 @@ document.addEventListener("change", (e) => {
 });
 document.addEventListener("submit", async (e) => {
   const f = e.target;
+  if (f.id === "review-form") {
+    e.preventDefault();
+    const w = byId(f.dataset.id);
+    state.reviews.unshift({ work: w.id, artist: w.artist, author: state.user.name, date: today(), rating: +f.querySelector("input[name=rv-rating]:checked").value, text: $("#rv-text").value.trim() });
+    save();
+    toast("Merci pour votre avis !");
+    return render(true);
+  }
   if (f.id === "request-form") {
     e.preventDefault();
     const artist = f.dataset.artist;
@@ -2196,6 +2366,8 @@ function render(keepScroll = false, restoring = false) {
     oeuvre: [() => viewProduct(param), () => bindProduct(param)],
     artistes: [viewArtists],
     histoire: [viewStory],
+    vendre: [viewSell],
+    aide: [viewHelp],
     "commande-perso": [() => viewCustomRequest(param), () => bindLogin()],
     post: [() => viewPost(param)],
     litige: [() => viewDispute(param), () => bindLogin()],
@@ -2208,7 +2380,7 @@ function render(keepScroll = false, restoring = false) {
     commande: [() => viewOrderDone(param)],
     notifications: [viewNotifs],
     messages: [() => viewMessages(param), () => (bindMessages(), bindLogin())],
-    profil: [viewProfile, () => (bindLogin(), bindSeller())],
+    profil: [viewProfile, () => (bindLogin(), bindSeller(), presetSignup(param))],
     legal: [() => viewLegal(param)],
   };
   const [view, bind] = views[route] || [viewNotFound];
@@ -2219,6 +2391,10 @@ function render(keepScroll = false, restoring = false) {
 
   $$("[data-route]").forEach((a) => a.classList.toggle("active", a.dataset.route === route));
   $("#drawer").classList.remove("open");
+  if (route !== "galerie" && $("#search-sugg")) {
+    $("#search-sugg").innerHTML = "";
+    $("#search-bar").classList.remove("open");
+  }
   updateChrome();
 
   if (keepScroll) window.scrollTo(0, y);
@@ -2235,11 +2411,32 @@ $("#search-toggle").addEventListener("click", () => {
   bar.classList.toggle("open");
   if (bar.classList.contains("open")) $("#search").focus();
 });
+/* Recherche : suggestions pendant la frappe, Entrée pour voir tous les résultats. */
+function searchSuggestions(q) {
+  q = q.trim().toLowerCase();
+  if (q.length < 2) return "";
+  const works = visibleWorks().filter((w) => (w.title + " " + w.type + " " + w.technique).toLowerCase().includes(q)).slice(0, 5);
+  const artists = state.artists.filter((a) => (a.name + " " + a.city + " " + disciplineOf(a.id)).toLowerCase().includes(q)).slice(0, 3);
+  if (!works.length && !artists.length) return `<p class="hint">Aucun résultat pour « ${esc(q)} ».</p>`;
+  return `
+    ${artists.map((a) => `<a class="sugg" href="#/artiste/${a.id}">${avatar(a, true)}<span><b>${esc(a.name)}</b><span class="muted">Artiste · ${esc(disciplineOf(a.id))}</span></span></a>`).join("")}
+    ${works.map((w) => `<a class="sugg" href="#/oeuvre/${w.id}"><span class="sugg-img">${visual(w)}</span><span><b>${esc(w.title)}</b><span class="muted">${esc(artistOf(w).name)} · ${euro(w.price)}</span></span></a>`).join("")}
+    <button class="text-link" data-act="search-all">Voir tous les résultats</button>`;
+}
 $("#search").addEventListener("input", (e) => {
   state.gallery.q = e.target.value;
-  if (currentRoute !== "galerie") nav("#/galerie");
-  else renderResults();
+  $("#search-sugg").innerHTML = searchSuggestions(e.target.value);
+  if (currentRoute === "galerie") renderResults();
 });
+$("#search").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") actions["search-all"]();
+});
+actions["search-all"] = () => {
+  $("#search-sugg").innerHTML = "";
+  $("#search-bar").classList.remove("open");
+  if (currentRoute === "galerie") render(true);
+  else nav("#/galerie");
+};
 try {
   const h = location.hash;
   if (/^#\/[\w/-]*$/.test(h)) currentHash = h;

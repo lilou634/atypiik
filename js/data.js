@@ -401,3 +401,38 @@ const SEED_REQUESTS = [
     text: "Bonjour ! J'adore « Promenade ». Est-ce que vous pourriez peindre mon dalmatien, Pistache, dans le même style ? Format moyen.",
   },
 ];
+
+/* Avis clients (démo). Les vrais avis ne pourront être laissés qu'après une commande livrée. */
+const SEED_REVIEWS = [
+  { work: "a1", artist: "nova", author: "Sarah B.", date: "2026-10-08", rating: 5, text: "Encore plus belle en vrai. Emballage très soigné et un petit mot de Nova dans le colis." },
+  { work: "a2", artist: "nova", author: "Hugo L.", date: "2026-10-02", rating: 5, text: "La toile est immense et les couleurs sont parfaites. Elle a changé notre salon." },
+  { work: "a3", artist: "nova", author: "Marc D.", date: "2026-09-20", rating: 4, text: "Très jolie petite toile, livrée rapidement. Un peu plus petite que je l'imaginais." },
+  { work: "a6", artist: "margaux", author: "Yanis K.", date: "2026-10-12", rating: 5, text: "Deux vases achetés, aucun n'est pareil et c'est ce qui fait leur charme." },
+  { work: "a7", artist: "margaux", author: "Léna T.", date: "2026-09-30", rating: 5, text: "Les tasses passent au lave-vaisselle sans souci et s'empilent vraiment bien." },
+  { work: "a22", artist: "rosa", author: "Léa M.", date: "2026-10-15", rating: 5, text: "Une pièce unique qu'on me complimente à chaque fois. Rosa m'a envoyé une photo du canevas d'origine." },
+  { work: "a25", artist: "rosa", author: "Inès R.", date: "2026-09-18", rating: 4, text: "Superbe blazer, les perles sont bien cousues. Taille un peu grand." },
+  { work: "a19", artist: "zia", author: "Camille R.", date: "2026-10-06", rating: 5, text: "Le sac est solide et léger, la couleur camel est magnifique." },
+  { work: "a28", artist: "leonie", author: "Chloé V.", date: "2026-10-01", rating: 5, text: "Le collier est encore plus beau porté. Fermoir solide." },
+  { work: "a4", artist: "ines", author: "Paul G.", date: "2026-09-25", rating: 5, text: "Le tirage est d'une qualité folle et le cadre en noyer est superbe." },
+];
+
+/* Délai d'expédition indicatif par catégorie (en jours ouvrés). */
+const LEAD_TIME = { Peinture: "3 à 5 jours", Photographie: "5 à 7 jours (tirage à la commande)", Céramique: "2 à 4 jours", Mode: "2 à 4 jours", Crochet: "Fait à la commande : 2 à 3 semaines", Bijoux: "1 à 3 jours", "Maison & déco": "2 à 4 jours" };
+
+/* Témoignages d'artistes pour la page « Vendre sur ATYPIIK ». */
+const ARTIST_QUOTES = [
+  { artist: "margaux", text: "J'ai vendu mes premiers vases en ligne sans avoir à créer de site. Et les acheteurs savent qui je suis." },
+  { artist: "rosa", text: "Ici, mes vestes ne sont pas noyées au milieu de produits industriels. C'est ce qui m'a convaincue." },
+  { artist: "zia", text: "Les commandes sur mesure représentent maintenant la moitié de mes ventes." },
+];
+
+/* Questions fréquentes (page « Comment ça marche »). */
+const FAQ = [
+  ["Qui sont les artistes d'ATYPIIK ?", "Des créateurs et créatrices indépendants, sélectionnés un par un par notre équipe. Nous vérifions que chaque pièce est bien conçue et fabriquée par la personne qui la vend."],
+  ["Combien de temps pour recevoir ma commande ?", "Chaque fiche indique le délai d'expédition de l'artiste. Les pièces en stock partent en général sous 2 à 5 jours ; les pièces faites à la commande prennent plus de temps. La livraison est suivie."],
+  ["Combien coûte la livraison ?", "Les frais de port dépendent de la taille et du poids du colis. Ils sont affichés avant le paiement et reversés à l'artiste."],
+  ["Puis-je retourner une œuvre ?", "Oui, vous disposez de 14 jours après réception pour changer d'avis, sauf pour les commandes sur mesure. Les frais de retour sont à votre charge."],
+  ["Et si mon colis arrive abîmé ?", "Signalez-le depuis votre commande avec des photos, dans les 48 h. L'artiste et notre équipe vous répondent dans le dossier, et vous êtes remboursé·e si le problème est confirmé."],
+  ["Le paiement est-il sécurisé ?", "Oui. Le paiement passe par Stripe : vos données bancaires ne transitent jamais par nos serveurs. L'artiste est payé une fois la commande livrée."],
+  ["Puis-je demander une pièce sur mesure ?", "Oui, depuis la page d'un artiste. Vous décrivez votre projet, l'artiste vous envoie un devis, et rien n'est payé avant que vous l'acceptiez."],
+];
