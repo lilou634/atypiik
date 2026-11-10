@@ -9,7 +9,7 @@
 Bonjour Monsieur Cailhol,
 
 Voici le lien de mon projet pour l'épreuve IA :
-https://NOM-DU-PROJET.vercel.app
+https://atypiik-inseec.vercel.app
 
 Nom et prénom : CAPANNI Lilou
 Classe : [ma classe]

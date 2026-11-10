@@ -35,7 +35,7 @@ Le site est statique : aucune commande de build n'est nécessaire.
 2. « Add New… » → « Project » → importer le dépôt `atypiik`.
 3. Framework Preset : « Other ». Laisser Build Command et Output Directory vides. Deploy.
 4. Dans Settings → Git, choisir la branche de production (celle qui contient ce travail), ou fusionner cette branche dans `main`.
-5. Envoyer l'adresse de production `nom-du-projet.vercel.app` (pas l'adresse longue d'un déploiement).
+5. Envoyer l'adresse de production (pas l'adresse longue d'un déploiement) : https://atypiik-inseec.vercel.app
 
 ## Lancer en local
 
