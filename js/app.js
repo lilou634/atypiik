@@ -689,7 +689,7 @@ function viewSell() {
         <span class="ref">Vendre sur ATYPIIK</span>
         <h1>Votre <span class="fun">boutique</span>, sans créer de site.</h1>
         <p>ATYPIIK est fait pour les artistes et les créatifs qui n'ont ni site, ni marque, ni budget pour se lancer. Vous créez, on s'occupe de la vitrine, du paiement et de la mise en avant.</p>
-        <div class="card-actions"><a class="btn" href="#/profil/artiste">Candidater</a><a class="btn btn-outline" href="#/aide">Lire la FAQ</a></div>
+        <div class="card-actions"><a class="btn" href="#/devenir-artiste">Candidater</a><a class="btn btn-outline" href="#/aide">Lire la FAQ</a></div>
       </div>
       <div class="sell-mosaic">${["a6", "a22", "a28", "a19"].map(byId).filter(Boolean).map((w) => `<div>${visual(w)}</div>`).join("")}</div>
     </section>
@@ -726,7 +726,7 @@ function viewSell() {
     <section class="section sell-cta">
       <h2>Envie de <span class="fun">vous lancer</span> ?</h2>
       <p>La candidature prend cinq minutes. On vous répond sous une semaine.</p>
-      <a class="btn" href="#/profil/artiste">Candidater maintenant</a>
+      <a class="btn" href="#/devenir-artiste">Candidater maintenant</a>
     </section>`;
 }
 
@@ -1295,6 +1295,14 @@ function viewProfile() {
     }
     return `${head(esc(u.name), "Compte artiste")}${emptyBox("En cours de validation", p?.status === "refusé" ? "Votre demande n'a pas été retenue. Contactez-nous pour en savoir plus." : "Notre équipe vérifie votre profil. Vous pourrez publier vos œuvres dès sa validation.", '<a class="btn btn-outline" href="#/messages/support">Contacter l\'équipe</a>')}`;
   }
+  if (u.role === "acheteur" && u.applied) {
+    const p = state.pending.find((x) => x.id === u.applied);
+    if (p?.status === "validé") {
+      state.user = { ...u, role: "vendeur", artistId: p.artistId, applied: null };
+      save();
+      return viewProfile();
+    }
+  }
   if (u.role === "vendeur") return head(esc(u.name), "Espace artiste") + sellerSpace();
   if (u.role === "admin") return head("Administration", "Back-office ATYPIIK") + adminSpace();
   return head(esc(u.name), "Espace acheteur") + buyerSpace();
@@ -1354,6 +1362,7 @@ function buyerSpace() {
   }
   if (tab === "compte") body = accountPanel();
   return (
+    becomeArtistBox() +
     tabs(
       "profile",
       [
@@ -1526,6 +1535,12 @@ function sellerSpace() {
         }</div>
       </div>`;
   }
+  // Un artiste est aussi un acheteur : il retrouve ici ses propres achats.
+  const bought = state.orders.filter((o) => o.buyer === state.user.name);
+  if (tab === "achats")
+    body = bought.length
+      ? bought.map((o) => orderCard(o)).join("")
+      : emptyBox("Aucun achat", "Vous pouvez acheter les œuvres des autres artistes avec ce même compte : elles apparaîtront ici.", '<a class="btn" href="#/galerie">Explorer la galerie</a>');
   return (
     tabs(
       "seller",
@@ -1538,6 +1553,7 @@ function sellerSpace() {
         ["surmesure", "Sur mesure", state.requests.filter((r) => r.artist === id && r.status === "nouvelle").length],
         ["profil", "Profil & médias"],
         ["messages", "Messages"],
+        ["achats", "Mes achats", bought.filter((o) => o.status < 3).length],
       ],
       tab,
     ) + body
@@ -1896,6 +1912,10 @@ function requireUser(msg) {
 function addToCart(id) {
   if (!requireUser("Connectez-vous pour ajouter des œuvres au panier.")) return false;
   const w = byId(id);
+  if (state.user.artistId && w.artist === state.user.artistId) {
+    toast("C'est l'une de vos œuvres : vous ne pouvez pas l'acheter.");
+    return false;
+  }
   const max = w.variants[currentVariant].stock;
   const line = state.cart.find((l) => l.id === id && l.variant === currentVariant);
   if (line) line.qty = Math.min(max, line.qty + 1);

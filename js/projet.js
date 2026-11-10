@@ -514,3 +514,83 @@ const PROJECT_VIEWS = {
   strategie: [viewStrategy],
   communication: [viewCom],
 };
+
+/* ---------- Devenir artiste depuis un compte acheteur ---------- */
+function becomeArtistBox() {
+  const u = state.user;
+  const p = u.applied && state.pending.find((x) => x.id === u.applied);
+  if (p && p.status === "en attente")
+    return `<div class="become panel"><div><span class="label muted">Votre candidature artiste</span><h2>En cours de validation</h2>
+      <p>L'équipe vérifie votre portfolio, en général sous 48 h. Vous pouvez continuer à acheter normalement.</p></div>
+      <div class="become-cta"><button class="btn btn-outline" data-act="demo-validate" data-id="${p.id}">Simuler la validation (démo)</button></div></div>`;
+  if (p && p.status === "refusé")
+    return `<div class="become panel"><div><span class="label muted">Votre candidature artiste</span><h2>Non retenue pour le moment</h2><p>Vous pourrez candidater de nouveau avec de nouvelles pièces.</p></div></div>`;
+  return `<div class="become panel"><div><span class="label muted">Vous créez aussi ?</span><h2>Ouvrez votre atelier</h2>
+    <p>Gardez votre compte, vos commandes et vos favoris : ajoutez simplement un espace artiste. Gratuit, 10 % de commission sur vos ventes.</p></div>
+    <div class="become-cta"><a class="btn" href="#/devenir-artiste">Devenir artiste</a></div></div>`;
+}
+function viewBecomeArtist() {
+  if (!state.user) {
+    afterLogin = "#/devenir-artiste";
+    return `<div class="page-head"><h1>Devenir artiste</h1><p>Créez un compte artiste, ou connectez-vous à votre compte acheteur pour y ajouter un espace artiste.</p></div>${loginForms()}`;
+  }
+  const u = state.user;
+  if (u.role === "vendeur") return emptyBox("Vous êtes déjà artiste", "Votre espace artiste est dans votre profil.", '<a class="btn" href="#/profil">Mon espace artiste</a>');
+  if (u.role !== "acheteur" || u.applied) return viewProfile();
+  return `
+    <div class="page-head"><span class="label muted">Compte de ${esc(u.name)}</span><h1>Devenir artiste</h1><p>Trois informations suffisent. Votre compte acheteur reste le même : vos commandes et vos favoris sont conservés.</p></div>
+    <div class="cart">
+      <form class="panel" id="become-form">
+        <h2>Votre atelier</h2>
+        <div class="field"><label for="ba-name">Nom d'artiste</label><input id="ba-name" required value="${esc(u.name)}" /></div>
+        <div class="field-row">
+          <div class="field"><label for="ba-city">Ville</label><input id="ba-city" required /></div>
+          <div class="field"><label for="ba-disc">Discipline</label><input id="ba-disc" required placeholder="Céramique, peinture, crochet…" /></div>
+        </div>
+        <div class="field"><label for="ba-link">Lien vers votre travail (Instagram, portfolio)</label><input id="ba-link" placeholder="instagram.com/votre-atelier" /></div>
+        <div class="field"><label>Formule</label>
+          ${PLANS.map((p, i) => `<label class="check"><input type="radio" name="ba-plan" value="${p.id}" ${i === 0 ? "checked" : ""} /> <b>${esc(p.name)}</b> · ${p.price ? ht(p.price) + " / mois, " : "gratuit, "}${p.commission} % de commission</label>`).join("")}
+        </div>
+        <button class="btn btn-block">Envoyer ma candidature</button>
+      </form>
+      <aside class="summary"><h3>Comment ça se passe</h3>
+        <ol class="facts"><li>Vous envoyez votre candidature.</li><li>L'équipe regarde votre travail, sous 48 h.</li><li>Une fois validé, votre espace artiste s'ouvre dans votre profil et vous publiez vos œuvres.</li></ol>
+        <p class="hint">Vous gardez 90 % du prix de chaque vente (93 % avec Atelier Pro).</p></aside>
+    </div>`;
+}
+function bindBecomeArtist() {
+  const f = $("#become-form");
+  if (!f) return bindLogin();
+  f.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const u = state.user;
+    const plan = $('input[name="ba-plan"]:checked').value;
+    const p = { id: "p" + Date.now(), name: $("#ba-name").value.trim(), email: u.email, city: $("#ba-city").value.trim(), discipline: $("#ba-disc").value.trim(), status: "en attente", plan };
+    state.pending.push(p);
+    state.user = { ...u, applied: p.id };
+    state.crm.unshift({
+      id: "c" + Date.now(), name: p.name, type: "artiste", company: p.discipline, city: p.city, source: "Site ATYPIIK", stage: "nouveau", plan,
+      value: plan === "pro" ? Math.round(PLANS[1].price * 12 * 100) / 100 : 0, email: u.email, phone: "Non renseigné", fresh: true,
+      history: [[today(), "Acheteur inscrit qui candidate pour devenir artiste" + ($("#ba-link").value.trim() ? ` (${$("#ba-link").value.trim()})` : "")]],
+      next: [today(), "Regarder son portfolio et valider ou refuser"],
+    });
+    save();
+    toast("Candidature envoyée : l'équipe la valide sous 48 h.");
+    nav("#/profil");
+  });
+}
+PROJECT_VIEWS["devenir-artiste"] = [viewBecomeArtist, bindBecomeArtist];
+PROJECT_ACTIONS["demo-validate"] = (el) => {
+  const p = state.pending.find((x) => x.id === el.dataset.id);
+  if (!p) return;
+  actions["seller-ok"]({ dataset: { id: p.id } });
+  const c = state.crm.find((x) => x.email === p.email && x.type === "artiste");
+  if (c) {
+    c.stage = "gagne";
+    c.history.push([today(), "Candidature validée, atelier ouvert"]);
+  }
+  state.user = { ...state.user, role: "vendeur", artistId: p.artistId, applied: null };
+  save();
+  toast("Candidature validée : votre espace artiste est ouvert.");
+  render();
+};

@@ -4332,3 +4332,25 @@ div.art::after {
     grid-template-columns: 7em minmax(0, 1fr) auto;
   }
 }
+
+/* Devenir artiste depuis un compte acheteur */
+.become {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 24px;
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.become h2 {
+  margin: 4px 0 6px;
+}
+.become p {
+  margin: 0;
+}
+@media (max-width: 640px) {
+  .become {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

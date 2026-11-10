@@ -433,6 +433,7 @@ const FAQ = [
   ["Combien coûte la livraison ?", "Les frais de port dépendent de la taille et du poids du colis. Ils sont affichés avant le paiement et reversés à l'artiste."],
   ["Puis-je retourner une œuvre ?", "Oui, vous disposez de 14 jours après réception pour changer d'avis, sauf pour les commandes sur mesure. Les frais de retour sont à votre charge."],
   ["Et si mon colis arrive abîmé ?", "Signalez-le depuis votre commande avec des photos, dans les 48 h. L'artiste et notre équipe vous répondent dans le dossier, et le remboursement est effectué si le problème est confirmé."],
+  ["Puis-je être à la fois acheteur et artiste ?", "Oui, avec un seul compte. Depuis votre espace acheteur, cliquez sur « Devenir artiste » : vous gardez vos commandes et vos favoris, et votre espace artiste s'ouvre dès que l'équipe a validé votre travail. Un artiste peut aussi acheter les œuvres des autres artistes ; ses achats sont dans l'onglet « Mes achats »."],
   ["Le paiement est-il sécurisé ?", "Oui. Le paiement passe par un prestataire de paiement agréé : vos données bancaires ne transitent jamais par nos serveurs. L'artiste est payé une fois la commande livrée. Dans cette démo, aucun paiement n'est réellement effectué."],
   ["Puis-je demander une pièce sur mesure ?", "Oui, depuis la page d'un artiste. Vous décrivez votre projet, l'artiste vous envoie un devis, et rien n'est payé avant que vous l'acceptiez."],
 ];
