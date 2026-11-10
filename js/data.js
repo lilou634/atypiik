@@ -271,7 +271,7 @@ const COLORS = {
 
 /* Données de démo pour l'espace administrateur. */
 const SEED_PENDING_SELLERS = [
-  { id: "p1", name: "Léa Moreau", email: "lea.moreau@exemple.fr", city: "Nantes", discipline: "Céramique", status: "en attente" },
+  { id: "p1", name: "Léa Moreau", email: "lea.moreau@example.com", city: "Nantes", discipline: "Céramique", status: "en attente" },
   { id: "p2", name: "Studio Ghost", email: "hello@studioghost.fr", city: "Toulouse", discipline: "Sérigraphie", status: "en attente" },
 ];
 
@@ -380,14 +380,14 @@ const STORY = {
 /* Mise en avant éditoriale : l'artiste de la semaine et le prochain drop (édition limitée). */
 const FEATURED = {
   artist: "rosa",
-  week: "Semaine du 19 octobre",
+  week: "Semaine du 9 novembre",
   quote: "Je chine des canevas et des tapisseries oubliés, et je leur donne une deuxième vie sur des vestes qu'on a envie de porter tous les jours.",
   works: ["a22", "a23", "a25"],
 };
 const DROP = {
   title: "Céramiques d'hiver",
   artist: "margaux",
-  date: "2026-11-07T18:00:00+01:00",
+  date: "2026-12-04T18:00:00+01:00",
   pieces: 24,
   text: "24 pièces uniques — vases, bougeoirs et tasses — mises en ligne en même temps. Quand c'est parti, c'est parti.",
   works: ["a6", "a14", "a7"],
@@ -433,6 +433,6 @@ const FAQ = [
   ["Combien coûte la livraison ?", "Les frais de port dépendent de la taille et du poids du colis. Ils sont affichés avant le paiement et reversés à l'artiste."],
   ["Puis-je retourner une œuvre ?", "Oui, vous disposez de 14 jours après réception pour changer d'avis, sauf pour les commandes sur mesure. Les frais de retour sont à votre charge."],
   ["Et si mon colis arrive abîmé ?", "Signalez-le depuis votre commande avec des photos, dans les 48 h. L'artiste et notre équipe vous répondent dans le dossier, et le remboursement est effectué si le problème est confirmé."],
-  ["Le paiement est-il sécurisé ?", "Oui. Le paiement passe par Stripe : vos données bancaires ne transitent jamais par nos serveurs. L'artiste est payé une fois la commande livrée."],
+  ["Le paiement est-il sécurisé ?", "Oui. Le paiement passe par un prestataire de paiement agréé : vos données bancaires ne transitent jamais par nos serveurs. L'artiste est payé une fois la commande livrée. Dans cette démo, aucun paiement n'est réellement effectué."],
   ["Puis-je demander une pièce sur mesure ?", "Oui, depuis la page d'un artiste. Vous décrivez votre projet, l'artiste vous envoie un devis, et rien n'est payé avant que vous l'acceptiez."],
 ];

@@ -16,7 +16,7 @@ const clone = (o) => JSON.parse(JSON.stringify(o));
 const initials = (name) => name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
 
 /* ---------- Persistance ---------- */
-const DATA_VERSION = 8;
+const DATA_VERSION = 9;
 const store = {
   get(key, fallback) {
     try {
@@ -46,7 +46,7 @@ if (store.get("version", 0) !== DATA_VERSION) {
 
 const PERSISTED = [
   "user", "favs", "cart", "views", "follows", "orders", "threads", "notifs", "works", "artists",
-  "pending", "disputes", "sales", "cookies", "prefs", "media", "posts", "requests", "dropAlert", "reviews",
+  "pending", "disputes", "sales", "cookies", "prefs", "media", "posts", "requests", "dropAlert", "reviews", "crm", "subDone",
 ];
 const state = {
   user: store.get("user", null),
@@ -84,6 +84,10 @@ const state = {
   cookies: store.get("cookies", null),
   prefs: store.get("prefs", { orders: true, prices: true, news: true, promos: false, email: true }),
   media: store.get("media", {}),
+  crm: store.get("crm", clone(CRM_SEED)),
+  subDone: store.get("subDone", null),
+  sub: null,
+  crmFilter: null,
   gallery: { type: [], color: [], size: [], artist: "", max: 2000, view: "grid", q: "", sort: "new" },
   tab: {},
   checkout: { step: 1, address: null },
@@ -258,7 +262,7 @@ function reviewList(list, showWork = false) {
   return list
     .map(
       (r) => `<article class="review">
-        <div class="review-top">${stars(r.rating, false)}<span class="mono muted">${esc(r.author)} · ${frDate(r.date)} · achat vérifié</span></div>
+        <div class="review-top">${stars(r.rating, false)}<span class="mono muted">${esc(r.author)} · ${frDate(r.date)} · avis fictif (démo)</span></div>
         ${showWork && byId(r.work) ? `<a class="review-work" href="#/oeuvre/${r.work}">${esc(byId(r.work).title)}</a>` : ""}
         <p>${esc(r.text)}</p>
       </article>`,
@@ -352,7 +356,7 @@ function viewHome() {
 
     <section class="section trust">
       <div><b>Artistes sélectionnés</b><span>Chaque créateur est vérifié avant de vendre.</span></div>
-      <div><b>Paiement sécurisé</b><span>Par Stripe. L'artiste est payé après la livraison.</span></div>
+      <div><b>Paiement sécurisé</b><span>Paiement simulé dans cette démo. L'artiste est payé après la livraison.</span></div>
       <div><b>Retours sous 14 jours</b><span>Et un vrai suivi si le colis arrive abîmé.</span></div>
       <a class="text-link" href="#/aide">Comment ça marche</a>
     </section>
@@ -677,7 +681,7 @@ function viewSell() {
     ["Candidatez", "Présentez votre travail en quelques minutes : vos œuvres, votre discipline, votre ville."],
     ["On regarde votre travail", "Notre équipe étudie chaque candidature à la main et vous répond sous une semaine."],
     ["Ouvrez votre boutique", "Votre page artiste, vos œuvres et vos déclinaisons, vos coulisses : tout est prêt en une soirée."],
-    ["Vendez, on s'occupe du reste", "Vous expédiez la pièce. Une fois qu'elle est livrée, vous recevez 90 % du prix de vente et la totalité des frais de port, versés par Stripe."],
+    ["Vendez, on s'occupe du reste", "Vous expédiez la pièce. Une fois qu'elle est livrée, vous recevez 90 % du prix de vente et la totalité des frais de port."],
   ];
   return `
     <section class="sell-hero">
@@ -730,7 +734,7 @@ function viewSell() {
 function viewHelp() {
   const steps = [
     ["Découvrez", "Parcourez la galerie, suivez vos artistes préférés, ou demandez une pièce sur mesure."],
-    ["Commandez", "Paiement sécurisé par Stripe. Les frais de port sont affichés avant de payer."],
+    ["Commandez", "Paiement sécurisé (simulé dans cette démo). Les frais de port sont affichés avant de payer."],
     ["Recevez", "L'artiste prépare et expédie votre pièce. Vous suivez chaque étape depuis votre compte."],
     ["Profitez", "14 jours pour changer d'avis, et un dossier de suivi si quelque chose ne va pas."],
   ];
@@ -991,7 +995,7 @@ function summaryBox(lines, cta = "", split = false) {
           : ""
       }
       ${cta}
-      <p class="secure">🔒 Paiement sécurisé Stripe Connect · PCI-DSS</p>
+      <p class="secure">🔒 Paiement simulé : aucune carte n'est débitée</p>
     </aside>`;
 }
 
@@ -1030,7 +1034,7 @@ function viewCheckout() {
             <div class="field"><label for="cc-exp">Expiration</label><input id="cc-exp" required placeholder="MM/AA" autocomplete="cc-exp" /></div>
             <div class="field"><label for="cc-cvc">CVC</label><input id="cc-cvc" required inputmode="numeric" placeholder="123" autocomplete="cc-csc" /></div>
           </div>
-          <p class="hint">Démo : aucun paiement réel n'est effectué. En production, la saisie de la carte est gérée par Stripe.</p>
+          <p class="hint">Démo : aucun paiement réel n'est effectué, n'entrez pas une vraie carte. Utilisez par exemple 4242 4242 4242 4242.</p>
           <button class="btn btn-block">Payer ${euro(total)} + frais de port</button>
         </form>`;
   return `
@@ -1080,6 +1084,7 @@ function placeOrder() {
     address: `${a.street}, ${a.zip} ${a.city}`,
     lines: lines.map((l) => ({ id: l.id, variant: l.variant, qty: l.qty, price: l.w.price })), total,
   });
+  crmFromOrder(state.orders[0]);
   state.cart = [];
   state.checkout = { step: 1, address: a };
   if (state.prefs.orders) notify(`Commande ${id} confirmée — ${euro(total)}. L'artiste prépare votre colis.`, "#/profil");
@@ -1192,7 +1197,7 @@ function loginForms() {
     <div class="two-col">
       <form class="panel" id="login-form">
         <h2>Se connecter</h2>
-        <div class="field"><label for="li-email">E-mail</label><input id="li-email" type="email" required autocomplete="email" placeholder="vous@exemple.fr" /></div>
+        <div class="field"><label for="li-email">E-mail</label><input id="li-email" type="email" required autocomplete="email" placeholder="vous@example.com" /></div>
         <div class="field"><label for="li-pass">Mot de passe</label><input id="li-pass" type="password" required autocomplete="current-password" /></div>
         <button class="btn btn-block">Se connecter</button>
         <div class="demo-box">
@@ -1217,7 +1222,7 @@ function loginForms() {
           </div>
           <div class="seller-terms">
             <strong>Comment se passe le paiement</strong>
-            <p>Vous fixez votre prix. Sur chaque vente, ATYPIIK prélève une commission de <b>10 %</b> et vous recevez <b>90 %</b>, versés par Stripe après la livraison. Les frais de port, qui dépendent de la taille du colis, sont payés par l'acheteur et vous sont reversés.</p>
+            <p>Vous fixez votre prix. Sur chaque vente, ATYPIIK prélève une commission de <b>10 %</b> et vous recevez <b>90 %</b>, versés après la livraison. Les frais de port, qui dépendent de la taille du colis, sont payés par l'acheteur et vous sont reversés.</p>
           </div>
         </div>
         <div class="field"><label for="su-pass">Mot de passe</label><input id="su-pass" type="password" required minlength="8" autocomplete="new-password" /></div>
@@ -1258,8 +1263,8 @@ function bindLogin() {
   });
 }
 const DEMO_USERS = {
-  acheteur: { name: "Camille Roux", email: "camille@exemple.fr", role: "acheteur" },
-  vendeur: { name: "Nova Lune", email: "nova@exemple.fr", role: "vendeur", artistId: "nova" },
+  acheteur: { name: "Camille Roux", email: "camille@example.com", role: "acheteur" },
+  vendeur: { name: "Nova Lune", email: "nova@example.com", role: "vendeur", artistId: "nova" },
   admin: { name: "Équipe ATYPIIK", email: "admin@atypiik.fr", role: "admin" },
 };
 function login(user) {
@@ -1847,7 +1852,7 @@ function bindReport() {
 function viewLegal(key) {
   const pages = {
     mentions: ["Mentions légales", "<p>Éditeur : ATYPIIK SAS (à compléter : capital, RCS, siège social, directeur de la publication).</p><p>Hébergement : à compléter (nom, adresse et téléphone de l'hébergeur).</p><p>Contact : via la messagerie ou l'adresse e-mail de la société.</p>"],
-    cgu: ["CGU / CGV", "<p>Les présentes conditions encadrent l'utilisation de la marketplace ATYPIIK par les acheteurs et les artistes vendeurs.</p><p><strong>Commission :</strong> ATYPIIK prélève 10 % du prix de vente TTC de chaque transaction. L'artiste perçoit 90 %, versés via Stripe Connect après la livraison.</p><p><strong>Livraison :</strong> les frais de port dépendent de la taille et du poids du colis. Ils sont payés par l'acheteur et reversés à l'artiste ; ils n'entrent pas dans le calcul de la commission.</p><p><strong>Rétractation :</strong> 14 jours à compter de la réception, hors œuvres réalisées sur commande personnalisée.</p>"],
+    cgu: ["CGU / CGV", "<p>Les présentes conditions encadrent l'utilisation de la marketplace ATYPIIK par les acheteurs et les artistes vendeurs.</p><p><strong>Commission :</strong> ATYPIIK prélève 10 % du prix de vente TTC de chaque transaction (7 % avec l'offre Atelier Pro). L'artiste perçoit 90 % (93 % avec l'offre Atelier Pro), versés après la livraison.</p><p><strong>Livraison :</strong> les frais de port dépendent de la taille et du poids du colis. Ils sont payés par l'acheteur et reversés à l'artiste ; ils n'entrent pas dans le calcul de la commission.</p><p><strong>Rétractation :</strong> 14 jours à compter de la réception, hors œuvres réalisées sur commande personnalisée.</p>"],
   };
   if (key === "rgpd")
     return `
@@ -2255,8 +2260,8 @@ document.addEventListener("submit", async (e) => {
     const part = Math.min(d.amount, Math.max(0, +$("#dec-amount").value || 0));
     if (dec === "partial" && !part) return toast("Indiquez le montant du remboursement partiel.");
     const outcome = {
-      full: ["remboursé", `Remboursement intégral de ${euro(d.amount)} via Stripe`],
-      partial: ["remboursement partiel", `Remboursement partiel de ${euro(part)} via Stripe`],
+      full: ["remboursé", `Remboursement intégral de ${euro(d.amount)}`],
+      partial: ["remboursement partiel", `Remboursement partiel de ${euro(part)}`],
       info: ["en attente d'infos", "Précisions demandées par ATYPIIK"],
       reject: ["refusé", "Litige refusé par ATYPIIK"],
     }[dec];
@@ -2383,7 +2388,7 @@ function render(keepScroll = false, restoring = false) {
     profil: [viewProfile, () => (bindLogin(), bindSeller(), presetSignup(param))],
     legal: [() => viewLegal(param)],
   };
-  const [view, bind] = views[route] || [viewNotFound];
+  const [view, bind] = views[route] || PROJECT_VIEWS[route] || [viewNotFound];
   const y = window.scrollY;
   const back = route ? `<div class="backbar"><button type="button" class="back-link" data-act="go-back">← Retour</button></div>` : "";
   app.innerHTML = `<div class="view"${keepScroll ? ' style="animation:none"' : ""}>${back}${view()}</div>`;
@@ -2437,6 +2442,7 @@ actions["search-all"] = () => {
   if (currentRoute === "galerie") render(true);
   else nav("#/galerie");
 };
+Object.assign(actions, PROJECT_ACTIONS);
 try {
   const h = location.hash;
   if (/^#\/[\w/-]*$/.test(h)) currentHash = h;

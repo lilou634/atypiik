@@ -11,11 +11,11 @@ root = pathlib.Path(__file__).resolve().parent.parent
 html = (root / "index.html").read_text(encoding="utf-8")
 
 css = "".join((root / "css" / f).read_text(encoding="utf-8") for f in ("theme.css", "style.css"))
-js = "".join((root / "js" / f).read_text(encoding="utf-8") for f in ("data.js", "photos.js", "app.js"))
+js = "".join((root / "js" / f).read_text(encoding="utf-8") for f in ("data.js", "photos.js", "projet-data.js", "projet.js", "app.js"))
 
 html = re.sub(r'\s*<link rel="stylesheet" href="css/theme.css" />\s*<link rel="stylesheet" href="css/style.css" />',
               lambda _: f"\n    <style>\n{css}\n    </style>", html)
-html = re.sub(r'\s*<script src="js/data.js"></script>\s*<script src="js/photos.js"></script>\s*<script src="js/app.js"></script>',
+html = re.sub(r'\s*<script src="js/data.js"></script>\s*<script src="js/photos.js"></script>\s*<script src="js/projet-data.js"></script>\s*<script src="js/projet.js"></script>\s*<script src="js/app.js"></script>',
               lambda _: f"\n    <script>\n{js}\n    </script>", html)
 
 # Les photos référencées dans le code (assets/photos/…) sont intégrées en base64
@@ -28,6 +28,7 @@ def inline_photo(m):
     return '"data:%s;base64,%s"' % (mime, base64.b64encode(path.read_bytes()).decode())
 
 html = re.sub(r'"(assets/photos/[^"]+\.(?:jpe?g|png))"', inline_photo, html)
+html = re.sub(r'"(assets/logo/[^"]+\.svg)"', lambda m: '"data:image/svg+xml;base64,%s"' % base64.b64encode((root / m.group(1)).read_bytes()).decode(), html)
 
 out = root / "dist" / "ATYPIIK.html"
 out.parent.mkdir(exist_ok=True)

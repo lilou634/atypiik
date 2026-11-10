@@ -7,6 +7,36 @@ bordeaux, beige, blanc, noir et le chrome en détail.
 **Le plus simple :** ouvrez `dist/ATYPIIK.html` d'un double-clic (tout le site en un seul fichier).
 Après une modification des sources, régénérez-le avec `python3 tools/build.py`.
 
+## Projet INSEEC (épreuve IA)
+
+Le site sert de livrable pour l'épreuve « créer et lancer un produit ». Il réunit les quatre
+espaces demandés, accessibles depuis la barre noire en haut de chaque page :
+
+| Espace | Adresse | Contenu |
+| --- | --- | --- |
+| Projet | `#/projet` | Page d'entrée de la présentation |
+| 1. Vente | `#/offre`, `#/galerie` | Promesse, offres et prix HT/TTC, achat d'une œuvre et abonnement Atelier Pro simulés jusqu'à la confirmation, FAQ (`#/aide`) et contact |
+| 2. CRM | `#/crm` | 22 contacts fictifs, recherche et filtres, fiche contact, pipeline, tableau de bord. Les commandes et abonnements passés sur le site y arrivent |
+| 3. Stratégie | `#/strategie` | Problème, personas, marché sourcé, concurrents, prix, modèle économique |
+| 4. Communication | `#/communication` | Plateforme de marque, canaux, 9 posts, calendrier, partenariats, 10 premiers clients, indicateurs |
+
+Le bandeau « Projet étudiant INSEEC, démo sans vente réelle » est affiché en haut de chaque page.
+Aucun vrai paiement, aucune donnée personnelle réelle (adresses en `example.com`, téléphones fictifs),
+aucune clé d'API. Les données du projet sont dans `js/projet-data.js`, les vues dans `js/projet.js`.
+
+**Avant le rendu : ouvrir chaque lien de source** de la page Stratégie (liste en bas de page) et
+vérifier que le chiffre y figure bien.
+
+### Mettre en ligne sur Vercel
+
+Le site est statique : aucune commande de build n'est nécessaire.
+
+1. Se connecter sur vercel.com avec son compte GitHub.
+2. « Add New… » → « Project » → importer le dépôt `atypiik`.
+3. Framework Preset : « Other ». Laisser Build Command et Output Directory vides. Deploy.
+4. Dans Settings → Git, choisir la branche de production (celle qui contient ce travail), ou fusionner cette branche dans `main`.
+5. Envoyer l'adresse de production `nom-du-projet.vercel.app` (pas l'adresse longue d'un déploiement).
+
 ## Lancer en local
 
 Aucune dépendance ni build. Il faut juste un petit serveur, au choix :
@@ -53,6 +83,8 @@ index.html       squelette : header, menu mobile, barre basse, footer, bandeau c
 css/theme.css    variables de couleurs / typo
 css/style.css    composants
 js/data.js       œuvres, artistes et données de démo (à remplacer par l'API)
+js/projet-data.js  offre, CRM fictif, dossier stratégique et plan de communication
+js/projet.js     vues du projet : offre, abonnement, CRM, stratégie, communication
 js/photos.js     photos associées aux œuvres
 assets/photos/   fichiers photo
 js/app.js        routage, vues, espaces acheteur / artiste / admin

@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>ATYPIIK</title>
+    <link rel="icon" href="assets/logo/atypiik.svg" type="image/svg+xml" />
     <meta name="description" content="ATYPIIK, la boutique des artistes émergents, sélectionnés un par un : peinture, céramique, mode, crochet, bijoux." />
     <meta name="theme-color" content="#ffffff" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -16,9 +17,17 @@
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
-    <div class="announce"><span class="long">Artistes sélectionnés un par un — Livraison suivie — Paiement sécurisé</span><span class="short">Artistes sélectionnés un par un</span></div>
-
     <header class="header">
+      <div class="demo-bar">
+        <p class="demo-banner" role="note">Projet étudiant INSEEC, démo sans vente réelle</p>
+        <nav class="spaces-nav" aria-label="Espaces du projet">
+          <a href="#/projet" data-route="projet">Projet</a>
+          <a href="#/offre" data-route="offre">1. Vente</a>
+          <a href="#/crm" data-route="crm">2. CRM</a>
+          <a href="#/strategie" data-route="strategie">3. Stratégie</a>
+          <a href="#/communication" data-route="communication">4. Communication</a>
+        </nav>
+      </div>
       <div class="container header-inner">
         <nav class="nav" aria-label="Navigation principale">
           <a href="#/galerie" data-route="galerie">Galerie</a>
@@ -31,7 +40,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h18M3 12h18M3 17h18" /></svg>
         </button>
 
-        <a href="#/" class="logo" aria-label="ATYPIIK, accueil">ATYPIIK</a>
+        <a href="#/" class="logo" aria-label="ATYPIIK, accueil"><img src="assets/logo/atypiik.svg" alt="ATYPIIK" width="150" height="58" /></a>
 
         <div class="header-tools">
           <span id="user-pill"></span>
@@ -74,6 +83,10 @@
       <a href="#/histoire">Notre histoire</a>
       <a href="#/aide">Comment ça marche</a>
       <a href="#/vendre">Vendre sur ATYPIIK</a>
+      <a href="#/offre">Offres et prix</a>
+      <a href="#/crm">CRM (démo)</a>
+      <a href="#/strategie">Stratégie</a>
+      <a href="#/communication">Communication</a>
       <a href="#/favoris">Favoris</a>
       <a href="#/panier">Panier</a>
       <a href="#/notifications">Notifications</a>
@@ -87,7 +100,7 @@
       <div class="container">
         <div class="footer-grid">
           <div>
-            <a href="#/" class="logo">ATYPIIK</a>
+            <a href="#/" class="logo"><img src="assets/logo/atypiik.svg" alt="ATYPIIK" width="130" height="50" /></a>
             <p>La marketplace de l'art dans sa globalité. Des pièces uniques ou déclinées, en direct des artistes indépendants.</p>
             <form class="newsletter" id="newsletter">
               <input type="email" required placeholder="Votre e-mail" aria-label="Votre e-mail" id="newsletter-email" />
@@ -113,6 +126,15 @@
             </nav>
           </div>
           <div>
+            <h4>Projet INSEEC</h4>
+            <nav>
+              <a href="#/offre">Offres et prix</a>
+              <a href="#/crm">CRM</a>
+              <a href="#/strategie">Dossier stratégique</a>
+              <a href="#/communication">Plan de communication</a>
+            </nav>
+          </div>
+          <div>
             <h4>Légal</h4>
             <nav>
               <a href="#/aide">Comment ça marche · FAQ</a>
@@ -125,7 +147,7 @@
         </div>
         <div class="footer-bottom">
           <span>© <span id="year"></span> ATYPIIK</span>
-          <span>Paiement sécurisé · Stripe Connect · HTTPS</span>
+          <span>Projet étudiant INSEEC · démo sans vente réelle · données fictives</span>
         </div>
       </div>
     </footer>
@@ -163,6 +185,8 @@
 
     <script src="js/data.js"></script>
     <script src="js/photos.js"></script>
+    <script src="js/projet-data.js"></script>
+    <script src="js/projet.js"></script>
     <script src="js/app.js"></script>
   </body>
 </html>

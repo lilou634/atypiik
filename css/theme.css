@@ -12,14 +12,12 @@
    Tant qu'ils sont absents, des polices proches de Google Fonts prennent le relais. */
 @font-face {
   font-family: "Cubao";
-  src: local("Cubao"), local("Cubao Free"), url("../assets/fonts/Cubao.woff2") format("woff2"),
-    url("../assets/fonts/Cubao.otf") format("opentype"), url("../assets/fonts/Cubao.ttf") format("truetype");
+  src: local("Cubao"), local("Cubao Free");
   font-display: swap;
 }
 @font-face {
   font-family: "Le Petit Cochon";
-  src: local("Le Petit Cochon"), local("LePetitCochon"), url("../assets/fonts/LePetitCochon.woff2") format("woff2"),
-    url("../assets/fonts/LePetitCochon.otf") format("opentype"), url("../assets/fonts/LePetitCochon.ttf") format("truetype");
+  src: local("Le Petit Cochon"), local("LePetitCochon");
   font-display: swap;
 }
 
