@@ -495,10 +495,11 @@ function viewProduct(id) {
   return `
     <div class="product">
       <div>
-        <div class="zoom" id="zoom">${visual(w)}</div>
+        <div class="zoom" id="zoom">${visual(w)}${viewer3d(w)}</div>
         <div class="thumbs">${[0, 1, 2]
           .map((i) => `<button class="${i ? "" : "on"}" data-act="thumb" data-i="${i}" aria-label="Vue ${i + 1}">${visual(w, ["", "transform:scale(1.9);transform-origin:50% 45%", "transform:scale(1.9);transform-origin:25% 75%"][i])}</button>`)
-          .join("")}</div>
+          .join("")}${VIEW3D[w.id] ? `<button class="thumb-3d" data-act="view3d" aria-label="Voir l'œuvre en 3D">3D</button>` : ""}</div>
+        ${VIEW3D[w.id] ? `<p class="hint">Vue 3D (${esc(VIEW3D[w.id].kind.toLowerCase())}) reconstituée à partir de la photo : faites tourner l'œuvre pour voir sa tranche et son dos.</p>` : ""}
       </div>
       <div class="product-info">
         <div class="badges inline">${badgesFor(w)}</div>
@@ -2033,7 +2034,8 @@ const actions = {
     refreshAvailability(byId(currentParam));
   },
   thumb(el) {
-    $$('[data-act="thumb"]').forEach((x) => x.classList.toggle("on", x === el));
+    $$('[data-act="thumb"], [data-act="view3d"]').forEach((x) => x.classList.toggle("on", x === el));
+    $("#zoom").classList.remove("is-3d");
     $("#zoom .art").style.cssText = el.firstElementChild.style.cssText;
   },
   "add-cart"(el) {

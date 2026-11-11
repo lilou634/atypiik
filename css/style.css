@@ -4387,3 +4387,170 @@ div.art::after {
 .drop .demo-note {
   color: #ffd8de;
 }
+
+/* Vue 3D des œuvres plates */
+.v3d {
+  position: absolute;
+  inset: 0;
+  display: none;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  background: radial-gradient(ellipse at 50% 40%, #f6f2ec 0%, var(--wall) 70%);
+}
+.v3d:active {
+  cursor: grabbing;
+}
+.zoom.is-3d {
+  cursor: default;
+}
+.zoom.is-3d > .art {
+  visibility: hidden;
+}
+.zoom.is-3d .v3d {
+  display: block;
+}
+.v3d-stage {
+  position: absolute;
+  inset: 0 0 64px;
+  perspective: 1100px;
+}
+.v3d-box {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+}
+.v3d-box.smooth {
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.v3d .f {
+  position: absolute;
+  backface-visibility: hidden;
+}
+.v3d .f-front,
+.v3d .f-sheen,
+.v3d .f-back {
+  width: var(--w);
+  height: var(--h);
+  left: calc(var(--w) / -2);
+  top: calc(var(--h) / -2);
+}
+.v3d .f-front {
+  background-position: center;
+  background-size: cover;
+  transform: translateZ(calc(var(--d) / 2));
+}
+.v3d .f-sheen {
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, var(--sheen, 0.1)) 50%, rgba(255, 255, 255, 0) 70%);
+  transform: translateZ(calc(var(--d) / 2 + 0.5px));
+  pointer-events: none;
+}
+.v3d .f-back {
+  background:
+    linear-gradient(var(--edge), var(--edge)) 0 0 / 100% 7% no-repeat,
+    linear-gradient(var(--edge), var(--edge)) 0 100% / 100% 7% no-repeat,
+    linear-gradient(90deg, var(--edge), var(--edge)) 0 0 / 7% 100% no-repeat,
+    linear-gradient(90deg, var(--edge), var(--edge)) 100% 0 / 7% 100% no-repeat,
+    #c9a477;
+  transform: rotateY(180deg) translateZ(calc(var(--d) / 2));
+}
+.v3d .f-back::after {
+  content: "atypiik · œuvre originale";
+  position: absolute;
+  right: 14%;
+  bottom: 14%;
+  padding: 6px 10px;
+  background: #fff;
+  font-family: var(--font-fun);
+  font-size: 0.75rem;
+  color: var(--accent);
+}
+.v3d .f-left,
+.v3d .f-right {
+  width: var(--d);
+  height: var(--h);
+  left: calc(var(--d) / -2);
+  top: calc(var(--h) / -2);
+  background: var(--edge);
+}
+.v3d .f-left {
+  transform: rotateY(-90deg) translateZ(calc(var(--w) / 2));
+  filter: brightness(0.82);
+}
+.v3d .f-right {
+  transform: rotateY(90deg) translateZ(calc(var(--w) / 2));
+  filter: brightness(0.7);
+}
+.v3d .f-top,
+.v3d .f-bottom {
+  width: var(--w);
+  height: var(--d);
+  left: calc(var(--w) / -2);
+  top: calc(var(--d) / -2);
+  background: var(--edge);
+}
+.v3d .f-top {
+  transform: rotateX(90deg) translateZ(calc(var(--h) / 2));
+  filter: brightness(1.05);
+}
+.v3d .f-bottom {
+  transform: rotateX(-90deg) translateZ(calc(var(--h) / 2));
+  filter: brightness(0.6);
+}
+.v3d-shadow {
+  position: absolute;
+  left: 50%;
+  bottom: 8%;
+  width: 46%;
+  height: 22px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse, rgba(17, 16, 16, 0.28), transparent 70%);
+}
+.v3d-ui {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 14px;
+}
+.v3d-hint {
+  font-size: 0.72rem;
+  color: var(--ink-2);
+}
+.v3d-btns {
+  display: flex;
+  gap: 4px;
+}
+.v3d-btns button {
+  padding: 6px 10px;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.v3d-btns button:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+.thumb-3d {
+  border: 1px solid var(--rule);
+  background: var(--accent);
+  color: var(--paper);
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+.thumb-3d.on {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}

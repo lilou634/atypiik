@@ -324,3 +324,14 @@ const MODEL = {
   ],
   hypotheses: "Hypothèses (estimations) : panier moyen de 90 €, au milieu du budget de notre persona acheteuse (40 à 150 € par achat), à confirmer avec les premières ventes ; 400 artistes inscrits dont 30 % en Pro (120) ; un artiste vend en moyenne 0,55 pièce par mois (220 commandes).",
 };
+
+/* ---------- Vue 3D des œuvres plates ----------
+   Texture = la photo redressée et recadrée sur l'œuvre (assets/3d/).
+   ratio = largeur ÷ hauteur, depth = épaisseur ÷ grand côté, edge = couleur de la tranche. */
+const VIEW3D = {
+  a1: { tex: "assets/3d/a1.jpg", ratio: 680 / 900, depth: 0.05, edge: "#b89466", kind: "Toile en caisse américaine" },
+  a2: { tex: "assets/3d/a2.jpg", ratio: 900 / 675, depth: 0.045, edge: "#9fb0d4", kind: "Toile sur châssis" },
+  a3: { tex: "assets/3d/a3.jpg", ratio: 900 / 853, depth: 0.07, edge: "#ead9a6", kind: "Mini-toile" },
+  a4: { tex: "assets/3d/a4.jpg", ratio: 678 / 900, depth: 0.045, edge: "#4a2b1c", kind: "Tirage encadré noyer" },
+  a5: { tex: "assets/3d/a5.jpg", ratio: 900 / 652, depth: 0.05, edge: "#f1f0ec", kind: "Tirage en caisse blanche" },
+};

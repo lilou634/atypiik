@@ -27,7 +27,7 @@ def inline_photo(m):
     mime = "image/png" if path.suffix.lower() == ".png" else "image/jpeg"
     return '"data:%s;base64,%s"' % (mime, base64.b64encode(path.read_bytes()).decode())
 
-html = re.sub(r'"(assets/(?:photos|com)/[^"]+\.(?:jpe?g|png))"', inline_photo, html)
+html = re.sub(r'"(assets/(?:photos|com|3d)/[^"]+\.(?:jpe?g|png))"', inline_photo, html)
 html = re.sub(r'"(assets/logo/[^"]+\.svg)"', lambda m: '"data:image/svg+xml;base64,%s"' % base64.b64encode((root / m.group(1)).read_bytes()).decode(), html)
 
 out = root / "dist" / "ATYPIIK.html"

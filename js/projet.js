@@ -607,3 +607,94 @@ PROJECT_ACTIONS["demo-validate"] = (el) => {
   toast("Candidature validée : votre espace artiste est ouvert.");
   render();
 };
+
+/* ---------- Vue 3D des œuvres plates (CSS 3D, sans bibliothèque) ---------- */
+function viewer3d(w) {
+  const c = VIEW3D[w.id];
+  if (!c) return "";
+  const face = (cls) => `<div class="f ${cls}"></div>`;
+  // L'image est posée en style en ligne : une url() dans une variable CSS serait résolue depuis le dossier css/.
+  return `<div class="v3d" id="v3d" data-id="${w.id}" aria-label="Vue 3D de ${esc(w.title)}">
+      <div class="v3d-stage"><div class="v3d-box" style="--edge:${c.edge}">
+        <div class="f f-front" style="background-image:url('${c.tex}')"></div>${face("f-sheen")}${face("f-back")}${face("f-left")}${face("f-right")}${face("f-top")}${face("f-bottom")}
+      </div><div class="v3d-shadow"></div></div>
+      <div class="v3d-ui">
+        <span class="v3d-hint">Faites glisser pour tourner l'œuvre</span>
+        <div class="v3d-btns"><button data-act="v3d-view" data-v="face">Face</button><button data-act="v3d-view" data-v="tranche">Tranche</button><button data-act="v3d-view" data-v="dos">Dos</button><button data-act="v3d-view" data-v="auto">↻ Auto</button></div>
+      </div>
+    </div>`;
+}
+let v3d = null;
+function layout3d() {
+  const el = $("#v3d");
+  if (!el) return;
+  const c = VIEW3D[el.dataset.id];
+  const r = el.getBoundingClientRect();
+  const L = Math.min(r.width, r.height) * 0.6;
+  const W = c.ratio >= 1 ? L : L * c.ratio;
+  const H = c.ratio >= 1 ? L / c.ratio : L;
+  const box = $(".v3d-box", el);
+  box.style.setProperty("--w", W + "px");
+  box.style.setProperty("--h", H + "px");
+  box.style.setProperty("--d", L * c.depth + "px");
+}
+function render3d() {
+  const box = $("#v3d .v3d-box");
+  if (!box || !v3d) return;
+  box.style.transform = `rotateX(${v3d.rx}deg) rotateY(${v3d.ry}deg)`;
+  const a = ((v3d.ry % 360) + 360) % 360;
+  box.style.setProperty("--sheen", (0.06 + 0.3 * Math.abs(Math.sin((a * Math.PI) / 180))).toFixed(2));
+}
+function init3d() {
+  const el = $("#v3d");
+  if (!el) return;
+  if (v3d && v3d.raf) cancelAnimationFrame(v3d.raf);
+  v3d = { rx: -8, ry: -28, auto: true, t0: performance.now(), drag: null };
+  layout3d();
+  render3d();
+  const tick = (t) => {
+    if (!v3d || !document.body.contains(el)) return;
+    if (v3d.auto) {
+      v3d.ry = -28 + 32 * Math.sin((t - v3d.t0) / 1400);
+      render3d();
+    }
+    v3d.raf = requestAnimationFrame(tick);
+  };
+  v3d.raf = requestAnimationFrame(tick);
+  el.addEventListener("pointerdown", (e) => {
+    if (e.target.closest("button")) return;
+    v3d.auto = false;
+    $(".v3d-box", el).classList.remove("smooth");
+    v3d.drag = { x: e.clientX, y: e.clientY, rx: v3d.rx, ry: v3d.ry };
+    el.setPointerCapture(e.pointerId);
+  });
+  el.addEventListener("pointermove", (e) => {
+    if (!v3d.drag) return;
+    v3d.ry = v3d.drag.ry + (e.clientX - v3d.drag.x) * 0.5;
+    v3d.rx = Math.max(-60, Math.min(60, v3d.drag.rx - (e.clientY - v3d.drag.y) * 0.4));
+    render3d();
+  });
+  const end = () => (v3d.drag = null);
+  el.addEventListener("pointerup", end);
+  el.addEventListener("pointercancel", end);
+  window.addEventListener("resize", layout3d);
+}
+PROJECT_ACTIONS["view3d"] = (el) => {
+  $$('[data-act="thumb"], [data-act="view3d"]').forEach((x) => x.classList.toggle("on", x === el));
+  $("#zoom").classList.add("is-3d");
+  if (!v3d || !document.body.contains($("#v3d"))) init3d();
+  else layout3d();
+};
+PROJECT_ACTIONS["v3d-view"] = (el) => {
+  const box = $("#v3d .v3d-box");
+  box.classList.add("smooth");
+  const v = el.dataset.v;
+  if (v === "auto") {
+    v3d.auto = true;
+    v3d.t0 = performance.now();
+    return;
+  }
+  v3d.auto = false;
+  [v3d.rx, v3d.ry] = { face: [0, 0], tranche: [-6, -72], dos: [0, 180] }[v];
+  render3d();
+};
