@@ -22,7 +22,13 @@ const PLANS = [
       "Messagerie avec les acheteurs",
       "Médiation en cas de litige",
     ],
-    excluded: ["Mise en avant dans la Sélection et les drops", "Statistiques détaillées", "Shooting photo"],
+    excluded: [
+      "Candidature prioritaire aux drops et à la Sélection",
+      "Statistiques détaillées",
+      "Conseil personnalisé",
+      "Shooting photo (proposé à part)",
+      "Frais de livraison, payés par l'acheteur",
+    ],
   },
   {
     id: "pro",
