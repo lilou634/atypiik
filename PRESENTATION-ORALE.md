@@ -51,7 +51,7 @@ Règle de l'épreuve : on présente **depuis le site, sans diaporama**, comme si
 > « Pour l'acheteur, c'est gratuit : il paie l'œuvre TTC et la livraison selon la taille du colis.
 > Pour l'artiste, deux formules. **Atelier** : 0 € par mois, 10 % de commission. **Atelier Pro** : 12,90 € HT par mois, soit 15,48 € TTC, et 7 % de commission. »
 
-> « Pourquoi ces prix ? Trois raisons. Les concurrents : on est le moins cher des acteurs qui sélectionnent leurs artistes. Nos coûts : le paiement par carte coûte environ 1,5 % + 0,25 €, donc sur un panier de 90 € il nous reste 7,40 € de marge brute. La valeur : l'offre Pro devient rentable pour l'artiste dès **430 € de ventes par mois**. »
+> « Pourquoi ces prix ? Trois raisons. Les concurrents : on est le moins cher des acteurs qui sélectionnent leurs artistes. Nos coûts : le paiement par carte coûte environ 1,5 % + 0,25 €, donc sur un panier moyen estimé à 90 €, il nous reste 7,40 € de marge brute. La valeur : l'offre Pro devient rentable pour l'artiste dès **430 € de ventes par mois**. »
 
 ### 2:45 → 3:45 · La démo : acheter puis suivre le client (**Panier** → **CRM**)
 
