@@ -7,73 +7,65 @@ Règle de l'épreuve : on présente **depuis le site, sans diaporama**, comme si
 
 ## Le déroulé (5:00)
 
-### 0:00 → 0:30 · L'accroche et la promesse (page **Projet**)
+### 0:00 → 0:30 · Accroche (page **Projet**)
 
-> « Aujourd'hui, un artiste qui débute a deux choix pour vendre en ligne : une galerie en ligne qui garde 40 à 50 % du prix, ou Etsy, où il se retrouve noyé parmi presque 6 millions de vendeurs.
-> J'ai créé **ATYPIIK** pour lui offrir une troisième voie.
-> Ma promesse : ATYPIIK aide les artistes émergents à vendre leurs créations en ligne sans y laisser leurs marges, et permet à chacun d'acheter une pièce unique choisie à la main, à prix accessible.
-> Je vais vous montrer le produit, l'outil qui suit les clients, pourquoi le marché existe, et comment on le lance. »
+> « Aujourd'hui, un artiste qui débute a deux choix pour vendre en ligne : une galerie en ligne qui garde 40 à 50 % du prix, ou Etsy, où il se retrouve noyé parmi presque 6 millions de vendeurs. J'ai créé ATYPIIK pour lui offrir une troisième voie.
+> Ma promesse : ATYPIIK aide les artistes émergents à vendre leurs créations en ligne sans y laisser leurs marges, et permet à chacun d'acheter une pièce unique choisie à la main, à prix accessible. »
 
-*Montrer du doigt la barre noire du haut : « Tout le site est organisé en quatre espaces. »*
+*Montrer la barre noire du haut :* « Le site est organisé en quatre espaces : la vente, le CRM, la stratégie et la communication. »
 
-### 0:30 → 1:15 · Le problème et la cible (**3. Stratégie**, parties 1 et 2)
+### 0:30 → 1:15 · Le problème et la cible (**3. Stratégie**)
 
-> « Le problème est concret. En France, près de **350 000 artistes-auteurs**, et **67 %** d'entre eux ont besoin d'un autre revenu : vivre de son art est rare.
-> Sur une œuvre vendue 200 €, l'artiste perd 80 € chez Saatchi Art et 100 € chez Singulart. Chez nous, il perd 20 €. »
+> « Le problème est concret. En France, il y a près de 350 000 artistes-auteurs, et 67 % d'entre eux ont besoin d'un autre revenu. Sur une œuvre vendue 200 €, l'artiste perd 80 € chez Saatchi Art et 100 € chez Singulart. Chez nous, il perd 20 €. »
 
-*Descendre jusqu'aux personas.*
+*Descendre aux personas.*
 
-> « Je vise deux personnes. **Clara**, 27 ans, chargée de com à Lyon : elle dépense 40 à 150 € par achat de déco ou de cadeau et découvre tout sur Instagram et Pinterest. **Hugo**, 31 ans, illustrateur et céramiste à Marseille : il vend en direct sur Instagram, sans outil, et refuse de laisser la moitié du prix à une galerie. »
+> « Je vise deux personnes. Clara, 27 ans, chargée de communication à Lyon : elle dépense 40 à 150 € par achat de déco ou de cadeau, et découvre tout sur Instagram et Pinterest. Hugo, 31 ans, illustrateur et céramiste à Marseille : il vend en direct sur Instagram, sans outil, et refuse de laisser la moitié du prix à une galerie. »
 
-### 1:15 → 2:00 · Le marché et la concurrence (**Stratégie**, parties 3 et 4)
+### 1:15 → 2:00 · Le marché et la concurrence (**Stratégie**, suite)
 
-> « Le marché de l'art pèse **59,6 milliards de dollars** en 2025, dont **9,2 milliards en ligne**, soit 15 %. Deux tendances jouent pour nous : l'achat direct à l'artiste représente déjà **19 %** des dépenses des collectionneurs, et la génération Z passe davantage par des places de marché en ligne.
-> Chaque chiffre a son lien vers la source, ici. »
+> « Le marché de l'art pèse 59,6 milliards de dollars en 2025, en hausse de 4 %, dont 9,2 milliards en ligne. Et l'achat direct à l'artiste représente déjà 19 % des dépenses des collectionneurs. Chaque chiffre a son lien vers la source. »
 
-*Cliquer sur un lien « source » pour montrer qu'il s'ouvre, puis descendre au tableau.*
+*Cliquer sur un lien « source », puis descendre au tableau.*
 
-> « Face à nous, quatre acteurs réels. Les galeries en ligne prennent **40 à 50 %**. Etsy coûte environ **11 %**, mais sans aucune sélection. ATYPIIK se place au milieu : **sélection à la main comme une galerie, prix proche d'Etsy**. »
+> « Face à nous, quatre acteurs réels. Les galeries en ligne prennent 40 à 50 %. Etsy coûte environ 11 %, mais sans aucune sélection. ATYPIIK, c'est la sélection d'une galerie à un prix proche d'Etsy. »
 
 ### 2:00 → 2:45 · L'offre et le prix (**1. Vente**)
 
-> « Pour l'acheteur, c'est gratuit : il paie l'œuvre TTC et la livraison selon la taille du colis.
-> Pour l'artiste, deux formules. **Atelier** : 0 € par mois, 10 % de commission. **Atelier Pro** : 12,90 € HT par mois, soit 15,48 € TTC, et 7 % de commission. »
+> « Pour l'acheteur, c'est gratuit : il paie l'œuvre, au prix fixé par l'artiste, et la livraison selon la taille du colis.
+> Pour l'artiste, il y a deux formules. Atelier : gratuit, avec 10 % de commission. Atelier Pro : 12,90 € HT par mois, soit 15,48 € TTC, avec 7 % de commission et des avantages : priorité sur les drops, statistiques et un conseil personnalisé.
+> Pourquoi ces prix ? On est le moins cher des acteurs qui sélectionnent leurs artistes. Sur un panier moyen estimé à 90 €, notre commission fait 7,50 € HT et, après les frais de paiement, il nous reste 5,90 € de marge. Et l'offre Pro devient rentable pour l'artiste dès 430 € de ventes par mois. »
 
-> « Pourquoi ces prix ? Trois raisons. Les concurrents : on est le moins cher des acteurs qui sélectionnent leurs artistes. Nos coûts : le paiement par carte coûte environ 1,5 % + 0,25 €, donc sur un panier moyen estimé à 90 €, notre commission de 7,50 € HT laisse 5,90 € de marge brute. La valeur : l'offre Pro devient rentable pour l'artiste dès **430 € de ventes par mois**. »
+### 2:45 → 3:45 · La démo (**Galerie** → **CRM**)
 
-### 2:45 → 3:45 · La démo : acheter puis suivre le client (**Galerie** → **CRM**)
+*Galerie : ouvrir « Sac Nuage », cliquer sur « Ajouter au panier », choisir « Acheteur », cliquer de nouveau sur « Ajouter au panier », aller au panier et payer avec 4242 4242 4242 4242, date 12/28, CVC 123.*
 
-*Galerie : ouvrir « Sac Nuage », cliquer sur « Ajouter au panier », choisir « Acheteur » dans la connexion de démo, cliquer de nouveau sur « Ajouter au panier », puis aller au panier et payer avec 4242 4242 4242 4242, date 12/28, CVC 123.*
+> « Je passe une commande de démo. Aucun paiement réel n'est fait, c'est indiqué en haut de chaque page. »
 
-> « Je passe une vraie commande de démo. Aucun paiement réel, c'est indiqué en haut de chaque page. »
+*Page « Commande confirmée », puis 2. CRM et Contacts.*
 
-*Page « Commande confirmée ». Ouvrir **2. CRM** puis **Contacts**.*
+> « Côté entreprise, la commande arrive automatiquement dans le CRM, ici en haut, marquée "Nouveau sur le site". Les autres contacts viennent de notre phase pilote, fictive bien sûr. »
 
-> « Et côté entreprise, la commande arrive automatiquement dans le CRM, ici en haut, marquée "Nouveau sur le site". »
+*Pipeline : cliquer sur la flèche d'un contact « Nouveau ».*
 
-*Ouvrir **Pipeline**, cliquer sur la flèche → d'un contact « Nouveau ».*
+> « Chaque prospect avance d'étape en étape, de "nouveau" à "gagné", avec sa source, l'historique des échanges et la prochaine action. »
 
-> « Chaque prospect avance d'étape en étape, de nouveau à gagné. Chaque fiche contient la source, l'historique et la prochaine action. »
+*Tableau de bord.*
 
-*Ouvrir **Tableau de bord**.*
-
-> « Et le tableau de bord donne le chiffre d'affaires, le nombre de clients et le taux de conversion. On voit aussi qu'Instagram est notre meilleure source de clients : c'est ce qui guide le plan de communication. »
+> « Le tableau de bord donne le chiffre d'affaires, le nombre de clients et le taux de conversion. Instagram est notre meilleure source de clients : c'est ce qui guide la communication. »
 
 ### 3:45 → 4:35 · La communication (**4. Communication**)
 
-> « Le nom : ATYPIIK, "atypique" avec deux i, parce qu'on met en avant des artistes qui sortent du rang. Trois messages : l'artiste garde 90 %, chaque artiste est choisi à la main, on achète directement à ceux qui créent. »
+> « ATYPIIK, c'est "atypique" avec deux i, pour des artistes qui sortent du rang. Trois messages : l'artiste garde 90 %, chaque artiste est choisi à la main, et on achète directement à ceux qui créent.
+> Neuf posts sont prêts à publier sur Instagram, TikTok et Pinterest, dont cinq vidéos, avec le texte, le format, la date et l'objectif. »
 
-*Descendre jusqu'aux posts.*
+*Défiler : calendrier, partenariats, 10 premiers clients.*
 
-> « Neuf posts sont prêts à publier sur Instagram, TikTok et Pinterest, avec le texte, le visuel, le format, la date et l'objectif. On peut copier le texte et publier demain matin. »
+> « Le calendrier couvre quatre semaines, de l'ouverture au public le 16 novembre jusqu'au drop de Noël du 4 décembre. Il y a cinq partenaires à démarcher, avec ce que chacun y gagne. Et un plan concret pour les dix premiers clients : 50 artistes contactés un par un sur Instagram, et 15 entreprises démarchées pour leurs cadeaux de fin d'année. »
 
-*Défiler rapidement : calendrier, partenariats, 10 premiers clients.*
+### 4:35 → 5:00 · Conclusion (**Stratégie**, modèle économique)
 
-> « Le calendrier couvre quatre semaines, jusqu'au drop de Noël du 4 décembre. Il y a cinq partenaires à démarcher, avec ce que chacun y gagne. Et un plan concret pour les dix premiers clients : 50 artistes contactés un par un sur Instagram, et 15 entreprises pour les cadeaux de fin d'année. »
-
-### 4:35 → 5:00 · Le modèle économique et la conclusion (**Stratégie**, partie 6)
-
-> « ATYPIIK gagne de l'argent de deux façons : la commission et l'abonnement Pro. Objectif à 12 mois : **3 000 € HT de chiffre d'affaires par mois**. Cela demande 120 artistes en Pro et 220 commandes par mois à 90 € de panier moyen.
+> « ATYPIIK gagne de l'argent avec la commission et l'abonnement Pro. Objectif à 12 mois : 3 000 € HT de chiffre d'affaires par mois, avec 120 artistes en Pro et 220 commandes par mois.
 > ATYPIIK, c'est la sélection d'une galerie au prix d'Etsy, et l'artiste garde 90 %. Merci, j'attends vos questions. »
 
 ---
