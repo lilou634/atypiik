@@ -39,7 +39,7 @@ Règle de l'épreuve : on présente **depuis le site, sans diaporama**, comme si
 > « Pour l'acheteur, c'est gratuit : il paie l'œuvre TTC et la livraison selon la taille du colis.
 > Pour l'artiste, deux formules. **Atelier** : 0 € par mois, 10 % de commission. **Atelier Pro** : 12,90 € HT par mois, soit 15,48 € TTC, et 7 % de commission. »
 
-> « Pourquoi ces prix ? Trois raisons. Les concurrents : on est le moins cher des acteurs qui sélectionnent leurs artistes. Nos coûts : le paiement par carte coûte environ 1,5 % + 0,25 €, donc sur un panier moyen estimé à 90 €, il nous reste 7,40 € de marge brute. La valeur : l'offre Pro devient rentable pour l'artiste dès **430 € de ventes par mois**. »
+> « Pourquoi ces prix ? Trois raisons. Les concurrents : on est le moins cher des acteurs qui sélectionnent leurs artistes. Nos coûts : le paiement par carte coûte environ 1,5 % + 0,25 €, donc sur un panier moyen estimé à 90 €, notre commission de 7,50 € HT laisse 5,90 € de marge brute. La valeur : l'offre Pro devient rentable pour l'artiste dès **430 € de ventes par mois**. »
 
 ### 2:45 → 3:45 · La démo : acheter puis suivre le client (**Galerie** → **CRM**)
 
@@ -73,7 +73,7 @@ Règle de l'épreuve : on présente **depuis le site, sans diaporama**, comme si
 
 ### 4:35 → 5:00 · Le modèle économique et la conclusion (**Stratégie**, partie 6)
 
-> « ATYPIIK gagne de l'argent de deux façons : la commission et l'abonnement Pro. Objectif à 12 mois : **3 000 € HT de chiffre d'affaires par mois**. Cela demande 120 artistes en Pro et 200 commandes par mois à 90 € de panier moyen.
+> « ATYPIIK gagne de l'argent de deux façons : la commission et l'abonnement Pro. Objectif à 12 mois : **3 000 € HT de chiffre d'affaires par mois**. Cela demande 120 artistes en Pro et 220 commandes par mois à 90 € de panier moyen.
 > ATYPIIK, c'est la sélection d'une galerie au prix d'Etsy, et l'artiste garde 90 %. Merci, j'attends vos questions. »
 
 ---
@@ -81,7 +81,7 @@ Règle de l'épreuve : on présente **depuis le site, sans diaporama**, comme si
 ## Les questions probables et quoi répondre
 
 **« Pourquoi 10 % et pas 15 ou 20 % ? »**
-Parce que c'est notre argument face aux galeries (40-50 %) et que ça reste au niveau d'Etsy (environ 11 %). La marge suffit : sur 90 €, la commission est de 9 €, le paiement coûte environ 1,60 €, il reste 7,40 €. Et l'abonnement Pro complète les revenus.
+Parce que c'est notre argument face aux galeries (40-50 %) et que ça reste au niveau d'Etsy (environ 11 %). La marge suffit : sur 90 €, la commission est de 9 € TTC, soit 7,50 € HT ; le paiement coûte environ 1,60 €, il reste 5,90 €. Et l'abonnement Pro complète les revenus.
 
 **« Pourquoi un abonnement Pro à 12,90 € ? »**
 Il est rentable pour l'artiste à partir de 430 € de ventes par mois, puisque 3 % d'économie sur 430 € font environ 12,90 €. Il vise donc les artistes qui vendent régulièrement, et il nous donne un revenu stable même les mois creux.
@@ -90,7 +90,7 @@ Il est rentable pour l'artiste à partir de 430 € de ventes par mois, puisque 
 La sélection à l'entrée : pas de revente ni de production de masse. On ajoute la mise en avant (artiste de la semaine, drops en quantité limitée, commandes sur mesure) et un catalogue 100 % artistes indépendants.
 
 **« Votre objectif de 3 000 € par mois est-il réaliste ? »**
-C'est une estimation, avec des hypothèses écrites sur la page : 400 artistes inscrits dont 30 % en Pro, et 0,5 vente par artiste et par mois. Les prix sont fixés par les artistes, donc le panier moyen de 90 € est une estimation : c'est le milieu du budget de Clara (40 à 150 € par achat), et on l'ajustera avec les premières ventes. Si les ventes sont plus faibles, l'abonnement Pro assure à lui seul la moitié du chiffre d'affaires.
+C'est une estimation, avec des hypothèses écrites sur la page : 400 artistes inscrits dont 30 % en Pro, et 0,55 vente par artiste et par mois. Les prix sont fixés par les artistes, donc le panier moyen de 90 € est une estimation : c'est le milieu du budget de Clara (40 à 150 € par achat), et on l'ajustera avec les premières ventes. Si les ventes sont plus faibles, l'abonnement Pro assure à lui seul la moitié du chiffre d'affaires.
 
 **« D'où viennent vos chiffres ? »**
 Du rapport Art Basel & UBS 2026, du ministère de la Culture (DEPS), de la lettre aux actionnaires d'Etsy et des pages officielles des concurrents. Chaque chiffre a son lien sur la page Stratégie, et je les ai tous ouverts pour vérifier. *(Le faire vraiment avant l'oral !)*
@@ -127,7 +127,7 @@ L'argent est versé à l'artiste après la livraison. En cas de problème, l'ach
 | 19 % | Part des dépenses achetée directement aux artistes |
 | 350 000 / 67 % | Artistes-auteurs en France / part ayant un autre revenu |
 | 90 € | Panier moyen visé |
-| 3 000 € HT / mois | Objectif à 12 mois |
+| 3 000 € HT / mois | Objectif à 12 mois (120 Pro + 220 commandes) |
 | 430 € / mois | Seuil où l'offre Pro devient rentable pour l'artiste |
 
 ## Conseils pour le jour J

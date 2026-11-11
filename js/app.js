@@ -16,7 +16,7 @@ const clone = (o) => JSON.parse(JSON.stringify(o));
 const initials = (name) => name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
 
 /* ---------- Persistance ---------- */
-const DATA_VERSION = 9;
+const DATA_VERSION = 10;
 const store = {
   get(key, fallback) {
     try {
@@ -670,7 +670,7 @@ function viewArtist(id) {
         ${selectedBadge()}
         <p>${esc(a.bio)}</p>
         <p class="demo-note">Profil d'artiste fictif (démo) : nom, biographie, œuvres et posts sont inventés, les photos servent d'illustration.</p>
-        <div class="artist-stats">${reviewsOf((r) => r.artist === id).length ? `<span>${stars(ratingOf(reviewsOf((r) => r.artist === id)))} ${plural(reviewsOf((r) => r.artist === id).length, "avis")}</span>` : ""}<span><b>${a.followers + (state.follows.includes(id) ? 1 : 0)}</b> abonnés</span><span><b>${works.length}</b> œuvres</span><span><b>${posts.length}</b> posts</span></div>
+        <div class="artist-stats">${reviewsOf((r) => r.artist === id).length ? `<span>${stars(ratingOf(reviewsOf((r) => r.artist === id)))} ${plural(reviewsOf((r) => r.artist === id).length, "avis")}</span>` : ""}<span><b>${(a.followers + (state.follows.includes(id) ? 1 : 0)).toLocaleString("fr-FR")}</b> abonnés</span><span><b>${works.length}</b> œuvres</span><span><b>${posts.length}</b> posts</span></div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">${followBtn(id)}<a class="btn btn-outline" href="#/commande-perso/${id}">Commande personnalisée</a><a class="btn btn-outline" href="#/messages/${id}">Contacter</a></div>
     </div>
@@ -684,7 +684,7 @@ function viewSell() {
     ["Candidatez", "Présentez votre travail en quelques minutes : vos œuvres, votre discipline, votre ville."],
     ["On regarde votre travail", "Notre équipe étudie chaque candidature à la main et vous répond sous une semaine."],
     ["Ouvrez votre boutique", "Votre page artiste, vos œuvres et vos déclinaisons, vos coulisses : tout est prêt en une soirée."],
-    ["Vendez, on s'occupe du reste", "Vous expédiez la pièce. Une fois qu'elle est livrée, vous recevez 90 % du prix de vente et la totalité des frais de port."],
+    ["Vendez, on s'occupe du reste", "Vous expédiez la pièce. Sous 7 jours après la livraison, vous recevez 90 % du prix de vente (93 % avec Atelier Pro) et la totalité des frais de port."],
   ];
   return `
     <section class="sell-hero">
@@ -698,7 +698,7 @@ function viewSell() {
     </section>
 
     <section class="section sell-numbers">
-      <div><b>10 %</b><span>de commission, tout compris. Pas d'abonnement, pas de frais d'annonce.</span></div>
+      <div><b>10 %</b><span>de commission, tout compris, sans abonnement ni frais d'annonce avec l'offre Atelier. Ou 7 % avec Atelier Pro (12,90 € HT par mois).</span></div>
       <div><b>90 %</b><span>du prix pour vous, plus l'intégralité des frais de port.</span></div>
       <div><b>0 €</b><span>pour ouvrir votre boutique. Vous ne payez que si vous vendez.</span></div>
     </section>
@@ -778,7 +778,7 @@ function featuredSection() {
 function dropSection() {
   const a = artistById(DROP.artist);
   const at = new Date(DROP.date);
-  const when = at.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" }) + " à " + at.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+  const when = at.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", timeZone: "Europe/Paris" }) + " à " + at.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Paris" });
   return `
     <section class="section drop">
       <div class="drop-visuals">${DROP.works.map(byId).filter(Boolean).map((w) => `<div class="drop-item">${visual(w)}</div>`).join("")}</div>
@@ -1229,7 +1229,7 @@ function loginForms() {
           </div>
           <div class="seller-terms">
             <strong>Comment se passe le paiement</strong>
-            <p>Vous fixez votre prix. Sur chaque vente, ATYPIIK prélève une commission de <b>10 %</b> et vous recevez <b>90 %</b>, versés après la livraison. Les frais de port, qui dépendent de la taille du colis, sont payés par l'acheteur et vous sont reversés.</p>
+            <p>Vous fixez votre prix. Sur chaque vente, ATYPIIK prélève une commission de <b>10 %</b> (7 % avec Atelier Pro) et vous recevez <b>90 %</b> (93 %), versés sous 7 jours après la livraison. Les frais de port, qui dépendent de la taille du colis, sont payés par l'acheteur et vous sont reversés.</p>
           </div>
         </div>
         <div class="field"><label for="su-pass">Mot de passe</label><input id="su-pass" type="password" required minlength="8" autocomplete="new-password" /></div>
@@ -1448,7 +1448,7 @@ function sellerSpace() {
         <div><b>${euro(gross * 0.9)}</b><span>Revenus nets (90 %)</span></div>
         <div><b>${sales.length}</b><span>Ventes</span></div>
         <div><b class="${toShip ? "pink" : ""}">${toShip}</b><span>À expédier</span></div>
-        <div><b>${a.followers}</b><span>Abonnés</span></div>
+        <div><b>${a.followers.toLocaleString("fr-FR")}</b><span>Abonnés</span></div>
       </div>
       <div class="two-col">
         <div class="panel"><h3>À faire</h3>
@@ -1715,7 +1715,7 @@ function adminSpace() {
   return `
     <div class="kpis">
       <div><b>${euro(gmv)}</b><span>Volume de ventes</span></div>
-      <div><b class="pink">${euro(gmv * 0.1)}</b><span>Commissions (10 %)</span></div>
+      <div><b class="pink">${euro(gmv * 0.1)}</b><span>Commissions (taux Atelier 10 %)</span></div>
       <div><b>${state.artists.length}</b><span>Artistes actifs</span></div>
       <div><b class="${openDisputes.length ? "pink" : "green"}">${openDisputes.length}</b><span>Litiges ouverts</span></div>
     </div>
@@ -1875,7 +1875,7 @@ function bindReport() {
 function viewLegal(key) {
   const pages = {
     mentions: ["Mentions légales", "<p>Éditeur : projet étudiant réalisé par Lilou Capanni dans le cadre d'une épreuve de l'INSEEC Grande École. ATYPIIK n'est pas une société immatriculée et ne vend rien : ce site est une démonstration.</p><p>Directrice de la publication : Lilou Capanni.</p><p>Hébergement : Vercel Inc. (États-Unis).</p><p>Contact : via la page Contact du site.</p>"],
-    cgu: ["CGU / CGV", "<p>Les présentes conditions encadrent l'utilisation de la marketplace ATYPIIK par les acheteurs et les artistes vendeurs.</p><p><strong>Commission :</strong> ATYPIIK prélève 10 % du prix de vente TTC de chaque transaction (7 % avec l'offre Atelier Pro). L'artiste perçoit 90 % (93 % avec l'offre Atelier Pro), versés après la livraison.</p><p><strong>Livraison :</strong> les frais de port dépendent de la taille et du poids du colis. Ils sont payés par l'acheteur et reversés à l'artiste ; ils n'entrent pas dans le calcul de la commission.</p><p><strong>Rétractation :</strong> 14 jours à compter de la réception, hors œuvres réalisées sur commande personnalisée.</p>"],
+    cgu: ["CGU / CGV", "<p>Les présentes conditions encadrent l'utilisation de la marketplace ATYPIIK par les acheteurs et les artistes vendeurs.</p><p><strong>Commission :</strong> ATYPIIK prélève 10 % du prix de vente TTC de chaque transaction (7 % avec l'offre Atelier Pro). L'artiste perçoit 90 % (93 % avec l'offre Atelier Pro), versés sous 7 jours après la livraison.</p><p><strong>Livraison :</strong> les frais de port dépendent de la taille et du poids du colis. Ils sont payés par l'acheteur et reversés à l'artiste ; ils n'entrent pas dans le calcul de la commission.</p><p><strong>Rétractation :</strong> 14 jours à compter de la réception, hors œuvres réalisées sur commande personnalisée.</p>"],
   };
   if (key === "rgpd")
     return `

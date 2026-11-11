@@ -58,14 +58,14 @@ const ARTWORKS = [
     technique: "Huile sur toile, caisse américaine en chêne", dims: "80 × 100 cm",
     description: "Deux silhouettes flottent dans une eau profonde peinte à grands coups de couteau.",
     img: "assets/photos/a1.jpg", art: "#768b74",
-    variants: [{ label: "Original", stock: 1 }], isNew: true,
+    variants: [{ label: "Original", stock: 0 }], sold: true, isNew: true,
   },
   {
     id: "a2", title: "Promenade", artist: "nova", type: "Peinture", color: "bleu", size: "L", price: 1800,
     technique: "Huile sur toile", dims: "100 × 140 cm",
     description: "Un pas pressé, deux dalmatiens, un fond bleu ciel : une scène de rue figée en plein mouvement.",
     img: "assets/photos/a2.jpg", art: "#9b9693",
-    variants: [{ label: "Original", stock: 1 }],
+    variants: [{ label: "Original", stock: 0 }], sold: true,
   },
   {
     id: "a3", title: "Fenêtre aux rosiers", artist: "nova", type: "Peinture", color: "jaune", size: "S", price: 95,
@@ -205,7 +205,7 @@ const ARTWORKS = [
     technique: "Denim brut et canevas brodé ancien", dims: "Taille M",
     description: "Une veste en denim brut, avec un canevas de voilier chiné au dos.",
     img: "assets/photos/a22.jpg", art: "#747069",
-    variants: [{ label: "Pièce unique — M", stock: 1 }], isNew: true,
+    variants: [{ label: "Pièce unique — M", stock: 0 }], sold: true, isNew: true,
   },
   {
     id: "a23", title: "Veste Pastorale", artist: "rosa", type: "Mode", color: "multicolore", size: "M", price: 290,
@@ -272,7 +272,7 @@ const COLORS = {
 /* Données de démo pour l'espace administrateur. */
 const SEED_PENDING_SELLERS = [
   { id: "p1", name: "Léa Moreau", email: "lea.moreau@example.com", city: "Nantes", discipline: "Céramique", status: "en attente" },
-  { id: "p2", name: "Studio Ghost", email: "hello@studioghost.fr", city: "Toulouse", discipline: "Sérigraphie", status: "en attente" },
+  { id: "p2", name: "Studio Ghost", email: "studio.ghost@example.com", city: "Toulouse", discipline: "Sérigraphie", status: "en attente" },
 ];
 
 /* Litiges (démo). Les photos de démonstration réutilisent le visuel de l'œuvre concernée ;
@@ -346,7 +346,7 @@ const SEED_POSTS = [
 /* Ventes passées (démo) pour l'espace artiste et les commissions. */
 const SEED_SALES = [
   { order: "CMD-2026-0912", date: "2026-09-28", buyer: "Hugo L.", work: "a2", qty: 1, price: 1800, status: 3 },
-  { order: "CMD-2026-0944", date: "2026-10-03", buyer: "Sarah B.", work: "a1", qty: 1, price: 1450, status: 2 },
+  { order: "CMD-2026-0947", date: "2026-10-03", buyer: "Sarah B.", work: "a1", qty: 1, price: 1450, status: 2 },
   { order: "CMD-2026-0961", date: "2026-10-06", buyer: "Marc D.", work: "a3", qty: 1, price: 95, status: 1 },
   { order: "CMD-2026-0975", date: "2026-10-09", buyer: "Jade P.", work: "a4", qty: 1, price: 320, status: 1 },
   { order: "CMD-2026-0980", date: "2026-10-10", buyer: "Yanis K.", work: "a6", qty: 2, price: 85, status: 3 },

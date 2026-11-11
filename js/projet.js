@@ -28,7 +28,7 @@ function viewProject() {
     <div class="spaces">${spaces
       .map(([h, t, s, d]) => `<a class="space" href="${h}"><span class="label muted">${s}</span><h2>${t}</h2><p>${d}</p><span class="text-link">Ouvrir →</span></a>`)
       .join("")}</div>
-    <p class="hint">Site de démonstration : aucun paiement réel, aucun compte réel, toutes les personnes du CRM sont fictives.</p>`;
+    <p class="hint">Site de démonstration : aucun paiement réel, aucun compte réel, toutes les personnes du CRM sont fictives. Scénario : une phase pilote fictive avec les premiers artistes depuis septembre 2026, puis l'ouverture au public le 16 novembre 2026, qui lance le plan de communication.</p>`;
 }
 
 /* ---------- 1. Offre ---------- */
@@ -165,13 +165,13 @@ function crmStats() {
   const sales = won.filter((c) => c.type === "acheteur").reduce((s, c) => s + c.value, 0);
   const subs = won.filter((c) => c.type === "artiste").reduce((s, c) => s + c.value, 0);
   const open = state.crm.filter((c) => !["gagne", "perdu"].includes(c.stage));
-  return { won, lost, sales, subs, ca: subs + sales * COMMISSION, open, pipe: open.reduce((s, c) => s + c.value, 0), rate: state.crm.length ? won.length / state.crm.length : 0 };
+  return { won, lost, sales, subs, ca: subs + (sales * COMMISSION) / (1 + VAT), open, pipe: open.reduce((s, c) => s + c.value, 0), rate: state.crm.length ? won.length / state.crm.length : 0 };
 }
 function viewCRM(param) {
   if (param && !["tableau", "contacts", "pipeline"].includes(param)) return viewContact(param);
   const tab = ["contacts", "pipeline"].includes(param) ? param : "tableau";
   const st = crmStats();
-  const head = `<div class="page-head"><span class="label muted">Outil interne · accès démo sans identifiant</span><h1>CRM ATYPIIK</h1><p>Suivi des artistes et des acheteurs, de la prise de contact à la vente. Toutes les données sont fictives et restent dans votre navigateur.</p></div>
+  const head = `<div class="page-head"><span class="label muted">Outil interne · accès démo sans identifiant</span><h1>CRM ATYPIIK</h1><p>Suivi des artistes et des acheteurs, de la prise de contact à la vente. Données fictives de la phase pilote (septembre à novembre 2026), conservées dans votre navigateur.</p></div>
     <nav class="tabs crm-tabs">${[["tableau", "Tableau de bord"], ["contacts", "Contacts"], ["pipeline", "Pipeline"]].map(([id, l]) => `<a class="${id === tab ? "on" : ""}" href="#/crm/${id}">${l}</a>`).join("")}</nav>`;
   if (tab === "contacts") return head + crmContacts();
   if (tab === "pipeline") return head + crmPipeline();
@@ -187,7 +187,7 @@ function viewCRM(param) {
       <div><b>${Math.round(st.rate * 100)} %</b><span>Taux de conversion</span></div>
       <div><b>${euro(st.pipe)}</b><span>En négociation</span></div>
     </div>
-    <p class="hint">Chiffre d'affaires = abonnements Atelier Pro signés sur 12 mois (${ht(st.subs)}) + 10 % des commandes des acheteurs (${euro(st.sales)} de ventes TTC). Taux de conversion = contacts gagnés ÷ ensemble des contacts (${st.won.length} ÷ ${state.crm.length}).</p>
+    <p class="hint">Chiffre d'affaires = abonnements Atelier Pro signés sur 12 mois (${ht(st.subs)}) + 10 % des commandes des acheteurs suivis, hors TVA (${euro(st.sales)} de ventes TTC). Taux de conversion = contacts gagnés ÷ ensemble des contacts (${st.won.length} ÷ ${state.crm.length}).</p>
     <div class="crm-dash">
       <section class="panel"><h2>Contacts par étape</h2>${byStage.map(([l, n]) => `<div class="bar"><span>${l}</span><i style="--w:${(n / max) * 100}%"></i><b>${n}</b></div>`).join("")}</section>
       <section class="panel"><h2>Contacts par source</h2>${bySource.map(([l, n, w]) => `<div class="bar"><span>${l}</span><i style="--w:${(n / maxS) * 100}%"></i><b>${n}<small> · ${w} gagné${w > 1 ? "s" : ""}</small></b></div>`).join("")}</section>
@@ -407,7 +407,7 @@ function viewStrategy() {
       <div class="personas">${PERSONAS.map(
         (p) => `<article class="persona"><div class="persona-img">${visual(byId(p.photo))}</div><div>
           <span class="label muted">${p.side} · persona fictif</span><h3>${p.name}, ${p.age} ans</h3><p><b>${esc(p.job)}</b></p>
-          <dl class="dl"><dt>Budget</dt><dd>${esc(p.budget)}</dd><dt>S'informe sur</dt><dd>${esc(p.info)}</dd><dt>Ce qu'il ou elle veut</dt><dd>${esc(p.need)}</dd><dt>Ce qui bloque</dt><dd>${esc(p.pain)}</dd></dl></div></article>`,
+          <dl class="dl"><dt>Budget</dt><dd>${esc(p.budget)}</dd><dt>S'informe sur</dt><dd>${esc(p.info)}</dd><dt>${p.side === "Acheteuse" ? "Ce qu'elle veut" : "Ce qu'il veut"}</dt><dd>${esc(p.need)}</dd><dt>Ce qui bloque</dt><dd>${esc(p.pain)}</dd></dl></div></article>`,
       ).join("")}</div>
     </section>
 
