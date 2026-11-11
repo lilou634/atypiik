@@ -4626,75 +4626,6 @@ div.art::after {
   outline-offset: 2px;
 }
 
-/* Aperçu en relief des objets */
-.rel {
-  position: absolute;
-  inset: 0;
-  display: none;
-  touch-action: none;
-  user-select: none;
-  background: radial-gradient(ellipse at 50% 40%, #f6f2ec 0%, var(--wall) 70%);
-}
-.zoom.is-relief {
-  cursor: default;
-}
-.zoom.is-relief > .art {
-  visibility: hidden;
-}
-.zoom.is-relief .rel {
-  display: block;
-}
-.rel-stage {
-  position: absolute;
-  inset: 0 0 64px;
-  perspective: 900px;
-  display: grid;
-  place-items: center;
-}
-.rel-card {
-  position: relative;
-  width: 64%;
-  aspect-ratio: 4 / 5;
-  overflow: hidden;
-  transform-style: preserve-3d;
-  box-shadow: 0 2px 6px rgba(17, 16, 16, 0.18);
-}
-.rel-img {
-  position: absolute;
-  inset: -6%;
-  background-size: cover;
-  background-position: center;
-  transform: translate(var(--px, 0), var(--py, 0));
-}
-.rel-sheen {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at var(--sx, 50%) 30%, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 55%);
-  pointer-events: none;
-}
-.rel-shadow {
-  position: absolute;
-  left: 50%;
-  bottom: 9%;
-  width: 52%;
-  height: 26px;
-  transform: translateX(-50%);
-  background: radial-gradient(ellipse, rgba(17, 16, 16, 0.3), transparent 70%);
-}
-.thumb-relief {
-  border: 1px solid var(--rule);
-  background: var(--paper);
-  color: var(--accent);
-  font-size: 0.62rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-.thumb-relief.on {
-  background: var(--accent);
-  color: var(--paper);
-}
-
     </style>
   </head>
   <body>
@@ -6348,65 +6279,6 @@ PROJECT_ACTIONS["v3d-view"] = (el) => {
   [v3d.rx, v3d.ry] = { face: [0, 0], tranche: [-6, -72], dos: [0, 180] }[v];
   render3d();
 };
-
-/* ---------- Aperçu en relief des objets (pas une 3D : la photo s'incline) ---------- */
-function relief(w) {
-  if (VIEW3D[w.id]) return "";
-  const src = (typeof PHOTOS !== "undefined" && PHOTOS[w.id]) || w.img;
-  if (!src) return "";
-  return `<div class="rel" id="rel" aria-label="Aperçu en relief de ${esc(w.title)}">
-      <div class="rel-stage"><div class="rel-card"><div class="rel-img" style="background-image:url('${src}')"></div><div class="rel-sheen"></div></div><div class="rel-shadow"></div></div>
-      <div class="v3d-ui"><span class="v3d-hint">Bougez la souris ou glissez le doigt. Aperçu en relief à partir de la photo, ce n'est pas une vue 3D.</span></div>
-    </div>`;
-}
-let rel = null;
-function renderRelief() {
-  const card = $("#rel .rel-card");
-  if (!card || !rel) return;
-  card.style.transform = `rotateX(${rel.rx}deg) rotateY(${rel.ry}deg)`;
-  card.style.setProperty("--px", (-rel.ry * 0.9).toFixed(1) + "px");
-  card.style.setProperty("--py", (rel.rx * 0.9).toFixed(1) + "px");
-  card.style.setProperty("--sx", (50 + rel.ry * 2.2).toFixed(0) + "%");
-  const sh = $("#rel .rel-shadow");
-  sh.style.transform = `translateX(calc(-50% + ${(-rel.ry * 1.4).toFixed(1)}px))`;
-}
-function initRelief() {
-  const el = $("#rel");
-  if (!el) return;
-  if (rel && rel.raf) cancelAnimationFrame(rel.raf);
-  rel = { rx: 0, ry: 0, auto: true, t0: performance.now() };
-  const tick = (t) => {
-    if (!rel || !document.body.contains(el)) return;
-    if (rel.auto) {
-      const s = (t - rel.t0) / 1300;
-      rel.ry = 9 * Math.sin(s);
-      rel.rx = 4 * Math.sin(s * 0.7);
-      renderRelief();
-    }
-    rel.raf = requestAnimationFrame(tick);
-  };
-  rel.raf = requestAnimationFrame(tick);
-  const move = (e) => {
-    const r = el.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width - 0.5;
-    const y = (e.clientY - r.top) / r.height - 0.5;
-    rel.auto = false;
-    rel.ry = Math.max(-16, Math.min(16, x * 32));
-    rel.rx = Math.max(-12, Math.min(12, -y * 24));
-    renderRelief();
-  };
-  el.addEventListener("pointermove", move);
-  el.addEventListener("pointerdown", move);
-  el.addEventListener("pointerleave", () => {
-    rel.auto = true;
-    rel.t0 = performance.now();
-  });
-}
-PROJECT_ACTIONS["relief"] = (el) => {
-  $$('[data-act="thumb"], [data-act="relief"]').forEach((x) => x.classList.toggle("on", x === el));
-  $("#zoom").classList.add("is-relief");
-  if (!rel || !document.body.contains($("#rel"))) initRelief();
-};
 /* =========================================================
    ATYPIIK — application front (vanilla JS)
    Toutes les données sont simulées et stockées dans le
@@ -6904,10 +6776,10 @@ function viewProduct(id) {
   return `
     <div class="product">
       <div>
-        <div class="zoom" id="zoom">${visual(w)}${viewer3d(w)}${relief(w)}</div>
+        <div class="zoom" id="zoom">${visual(w)}${viewer3d(w)}</div>
         <div class="thumbs">${[0, 1, 2]
           .map((i) => `<button class="${i ? "" : "on"}" data-act="thumb" data-i="${i}" aria-label="Vue ${i + 1}">${visual(w, ["", "transform:scale(1.9);transform-origin:50% 45%", "transform:scale(1.9);transform-origin:25% 75%"][i])}</button>`)
-          .join("")}${VIEW3D[w.id] ? `<button class="thumb-3d" data-act="view3d" aria-label="Voir l'œuvre en 3D">3D</button>` : `<button class="thumb-relief" data-act="relief" aria-label="Aperçu en relief">Relief</button>`}</div>
+          .join("")}${VIEW3D[w.id] ? `<button class="thumb-3d" data-act="view3d" aria-label="Voir l'œuvre en 3D">3D</button>` : ""}</div>
         ${VIEW3D[w.id] ? `<p class="hint">Vue 3D (${esc(VIEW3D[w.id].kind.toLowerCase())}) reconstituée à partir de la photo : faites tourner l'œuvre pour voir sa tranche et son dos.</p>` : ""}
       </div>
       <div class="product-info">
@@ -8443,8 +8315,8 @@ const actions = {
     refreshAvailability(byId(currentParam));
   },
   thumb(el) {
-    $$('[data-act="thumb"], [data-act="view3d"], [data-act="relief"]').forEach((x) => x.classList.toggle("on", x === el));
-    $("#zoom").classList.remove("is-3d", "is-relief");
+    $$('[data-act="thumb"], [data-act="view3d"]').forEach((x) => x.classList.toggle("on", x === el));
+    $("#zoom").classList.remove("is-3d");
     $("#zoom .art").style.cssText = el.firstElementChild.style.cssText;
   },
   "add-cart"(el) {
