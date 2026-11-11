@@ -4576,7 +4576,7 @@ div.art::after {
         </div>
         <div class="footer-bottom">
           <span>© <span id="year"></span> ATYPIIK</span>
-          <span>Projet étudiant INSEEC · démo sans vente réelle · données fictives</span>
+          <span>Projet étudiant INSEEC · démo sans vente réelle · artistes, avis et données fictifs · photos d’illustration</span>
         </div>
       </div>
     </footer>
@@ -6699,6 +6699,7 @@ function viewSell() {
         const a = artistById(q.artist);
         return a ? `<figure>${avatar(a, true)}<blockquote>« ${esc(q.text)} »</blockquote><figcaption><a href="#/artiste/${a.id}">${esc(a.name)}</a> · ${esc(disciplineOf(a.id))}</figcaption></figure>` : "";
       }).join("")}</div>
+      <p class="hint">Artistes et témoignages fictifs (démo).</p>
     </section>
 
     <section class="section sell-cta">
@@ -6742,6 +6743,7 @@ function featuredSection() {
         <h2>L'artiste de la <span class="fun">semaine</span></h2>
         <div class="featured-id">${avatar(a)}<div><h3><a href="#/artiste/${a.id}">${esc(a.name)}</a></h3>${selectedBadge(true)}<span class="mono muted">${esc(disciplineOf(a.id))} · ${esc(a.city)}</span></div></div>
         <blockquote>« ${esc(FEATURED.quote)} »</blockquote>
+        <p class="hint">Artiste et témoignage fictifs (démo).</p>
         <div class="card-actions"><a class="btn" href="#/artiste/${a.id}">Découvrir son univers</a>${followBtn(a.id)}</div>
       </div>
       <div class="featured-works">${works.map((w) => `<a href="#/oeuvre/${w.id}" class="featured-item">${visual(w)}<span>${esc(w.title)} · ${euro(w.price)}</span></a>`).join("")}</div>
