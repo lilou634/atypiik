@@ -4554,3 +4554,72 @@ div.art::after {
   outline: 2px solid var(--ink);
   outline-offset: 2px;
 }
+
+/* Aperçu en relief des objets */
+.rel {
+  position: absolute;
+  inset: 0;
+  display: none;
+  touch-action: none;
+  user-select: none;
+  background: radial-gradient(ellipse at 50% 40%, #f6f2ec 0%, var(--wall) 70%);
+}
+.zoom.is-relief {
+  cursor: default;
+}
+.zoom.is-relief > .art {
+  visibility: hidden;
+}
+.zoom.is-relief .rel {
+  display: block;
+}
+.rel-stage {
+  position: absolute;
+  inset: 0 0 64px;
+  perspective: 900px;
+  display: grid;
+  place-items: center;
+}
+.rel-card {
+  position: relative;
+  width: 64%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  box-shadow: 0 2px 6px rgba(17, 16, 16, 0.18);
+}
+.rel-img {
+  position: absolute;
+  inset: -6%;
+  background-size: cover;
+  background-position: center;
+  transform: translate(var(--px, 0), var(--py, 0));
+}
+.rel-sheen {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--sx, 50%) 30%, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 55%);
+  pointer-events: none;
+}
+.rel-shadow {
+  position: absolute;
+  left: 50%;
+  bottom: 9%;
+  width: 52%;
+  height: 26px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse, rgba(17, 16, 16, 0.3), transparent 70%);
+}
+.thumb-relief {
+  border: 1px solid var(--rule);
+  background: var(--paper);
+  color: var(--accent);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.thumb-relief.on {
+  background: var(--accent);
+  color: var(--paper);
+}

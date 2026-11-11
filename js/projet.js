@@ -698,3 +698,62 @@ PROJECT_ACTIONS["v3d-view"] = (el) => {
   [v3d.rx, v3d.ry] = { face: [0, 0], tranche: [-6, -72], dos: [0, 180] }[v];
   render3d();
 };
+
+/* ---------- Aperçu en relief des objets (pas une 3D : la photo s'incline) ---------- */
+function relief(w) {
+  if (VIEW3D[w.id]) return "";
+  const src = (typeof PHOTOS !== "undefined" && PHOTOS[w.id]) || w.img;
+  if (!src) return "";
+  return `<div class="rel" id="rel" aria-label="Aperçu en relief de ${esc(w.title)}">
+      <div class="rel-stage"><div class="rel-card"><div class="rel-img" style="background-image:url('${src}')"></div><div class="rel-sheen"></div></div><div class="rel-shadow"></div></div>
+      <div class="v3d-ui"><span class="v3d-hint">Bougez la souris ou glissez le doigt. Aperçu en relief à partir de la photo, ce n'est pas une vue 3D.</span></div>
+    </div>`;
+}
+let rel = null;
+function renderRelief() {
+  const card = $("#rel .rel-card");
+  if (!card || !rel) return;
+  card.style.transform = `rotateX(${rel.rx}deg) rotateY(${rel.ry}deg)`;
+  card.style.setProperty("--px", (-rel.ry * 0.9).toFixed(1) + "px");
+  card.style.setProperty("--py", (rel.rx * 0.9).toFixed(1) + "px");
+  card.style.setProperty("--sx", (50 + rel.ry * 2.2).toFixed(0) + "%");
+  const sh = $("#rel .rel-shadow");
+  sh.style.transform = `translateX(calc(-50% + ${(-rel.ry * 1.4).toFixed(1)}px))`;
+}
+function initRelief() {
+  const el = $("#rel");
+  if (!el) return;
+  if (rel && rel.raf) cancelAnimationFrame(rel.raf);
+  rel = { rx: 0, ry: 0, auto: true, t0: performance.now() };
+  const tick = (t) => {
+    if (!rel || !document.body.contains(el)) return;
+    if (rel.auto) {
+      const s = (t - rel.t0) / 1300;
+      rel.ry = 9 * Math.sin(s);
+      rel.rx = 4 * Math.sin(s * 0.7);
+      renderRelief();
+    }
+    rel.raf = requestAnimationFrame(tick);
+  };
+  rel.raf = requestAnimationFrame(tick);
+  const move = (e) => {
+    const r = el.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5;
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    rel.auto = false;
+    rel.ry = Math.max(-16, Math.min(16, x * 32));
+    rel.rx = Math.max(-12, Math.min(12, -y * 24));
+    renderRelief();
+  };
+  el.addEventListener("pointermove", move);
+  el.addEventListener("pointerdown", move);
+  el.addEventListener("pointerleave", () => {
+    rel.auto = true;
+    rel.t0 = performance.now();
+  });
+}
+PROJECT_ACTIONS["relief"] = (el) => {
+  $$('[data-act="thumb"], [data-act="relief"]').forEach((x) => x.classList.toggle("on", x === el));
+  $("#zoom").classList.add("is-relief");
+  if (!rel || !document.body.contains($("#rel"))) initRelief();
+};
