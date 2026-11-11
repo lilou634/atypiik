@@ -165,7 +165,7 @@ function crmStats() {
   const sales = won.filter((c) => c.type === "acheteur").reduce((s, c) => s + c.value, 0);
   const subs = won.filter((c) => c.type === "artiste").reduce((s, c) => s + c.value, 0);
   const open = state.crm.filter((c) => !["gagne", "perdu"].includes(c.stage));
-  return { won, lost, sales, subs, ca: subs + (sales * COMMISSION) / (1 + VAT), open, pipe: open.reduce((s, c) => s + c.value, 0), rate: state.crm.length ? won.length / state.crm.length : 0 };
+  return { won, lost, sales, subs, ca: subs + (sales * COMMISSION) / (1 + VAT), open, pipe: open.reduce((s, c) => s + c.value, 0), pipeSales: open.filter((c) => c.type === "acheteur").reduce((s, c) => s + c.value, 0), pipeSubs: open.filter((c) => c.type === "artiste").reduce((s, c) => s + c.value, 0), rate: state.crm.length ? won.length / state.crm.length : 0 };
 }
 function viewCRM(param) {
   if (param && !["tableau", "contacts", "pipeline"].includes(param)) return viewContact(param);
@@ -185,7 +185,7 @@ function viewCRM(param) {
       <div><b class="pink">${ht(st.ca)}</b><span>Chiffre d'affaires ATYPIIK</span></div>
       <div><b>${st.won.length}</b><span>Clients (contacts gagnés)</span></div>
       <div><b>${Math.round(st.rate * 100)} %</b><span>Taux de conversion</span></div>
-      <div><b>${euro(st.pipe)}</b><span>En négociation</span></div>
+      <div><b>${euro(st.pipeSales)} TTC</b><span>En négociation (commandes) + ${ht(st.pipeSubs)} d'abonnements</span></div>
     </div>
     <p class="hint">Chiffre d'affaires = abonnements Atelier Pro signés sur 12 mois (${ht(st.subs)}) + 10 % des commandes des acheteurs suivis, hors TVA (${euro(st.sales)} de ventes TTC). Taux de conversion = contacts gagnés ÷ ensemble des contacts (${st.won.length} ÷ ${state.crm.length}).</p>
     <div class="crm-dash">
@@ -193,6 +193,15 @@ function viewCRM(param) {
       <section class="panel"><h2>Contacts par source</h2>${bySource.map(([l, n, w]) => `<div class="bar"><span>${l}</span><i style="--w:${(n / maxS) * 100}%"></i><b>${n}<small> · ${w} gagné${w > 1 ? "s" : ""}</small></b></div>`).join("")}</section>
       <section class="panel crm-todo"><h2>Prochaines actions</h2>${todo.map((c) => `<a href="#/crm/${c.id}" class="todo"><span class="mono">${frDate(c.next[0])}</span><span><b>${esc(c.name)}</b> · ${esc(c.next[1])}</span></a>`).join("")}</section>
     </div>`;
+}
+/* Montant d'un contact : abonnement Pro sur 12 mois (HT) pour un artiste, commandes (TTC) pour un acheteur. */
+const crmAmount = (c) => (!c.value ? "—" : c.type === "artiste" ? ht(c.value) : euro(c.value) + " TTC");
+const AMOUNT_LEGEND = "Montant : pour un artiste, l'abonnement Atelier Pro sur 12 mois, HT (« — » en offre Atelier gratuite) ; pour un acheteur, le total de ses commandes, TTC. Pour un contact pas encore gagné, c'est le montant espéré.";
+function pipeTotals(list) {
+  const subs = list.filter((c) => c.type === "artiste").reduce((s, c) => s + c.value, 0);
+  const sales = list.filter((c) => c.type === "acheteur").reduce((s, c) => s + c.value, 0);
+  const parts = [sales ? euro(sales) + " TTC" : "", subs ? ht(subs) : ""].filter(Boolean);
+  return parts.length ? parts.join(" + ") : "—";
 }
 function crmFilters() {
   return state.crmFilter || (state.crmFilter = { q: "", type: "", stage: "", source: "" });
@@ -214,7 +223,7 @@ function crmTable() {
       (c) => `<tr><td><a href="#/crm/${c.id}"><strong>${esc(c.name)}</strong></a>${c.fresh ? ' <span class="tag pink">Nouveau sur le site</span>' : ""}<br /><span class="muted">${esc(c.company || c.email)}</span></td>
       <td>${c.type === "artiste" ? "Artiste" : "Acheteur"}</td><td>${esc(c.city)}</td><td>${esc(c.source)}</td>
       <td><span class="tag ${c.stage === "gagne" ? "green" : c.stage === "perdu" ? "grey" : "pink"}">${stageLabel(c.stage)}</span></td>
-      <td class="num">${c.value ? euro(c.value) : "—"}</td><td><span class="mono">${frDate(c.next[0])}</span> ${esc(c.next[1])}</td></tr>`,
+      <td class="num">${crmAmount(c)}</td><td><span class="mono">${frDate(c.next[0])}</span> ${esc(c.next[1])}</td></tr>`,
     )
     .join("")}</tbody></table></div>`;
 }
@@ -230,7 +239,8 @@ function crmContacts() {
       <button class="btn btn-small" data-act="crm-new">+ Nouveau contact</button>
     </div>
     <p class="hint" id="crm-count">${crmRows().length} contact(s) sur ${state.crm.length}</p>
-    <div id="crm-table">${crmTable()}</div>`;
+    <div id="crm-table">${crmTable()}</div>
+    <p class="hint">${AMOUNT_LEGEND}</p>`;
 }
 function bindCRM() {
   const q = $("#crm-q");
@@ -284,15 +294,15 @@ function bindCRM() {
     });
 }
 function crmPipeline() {
-  return `<p class="hint">Faites avancer un contact avec la flèche, ou ouvrez sa fiche pour choisir l'étape.</p>
+  return `<p class="hint">Faites avancer un contact avec la flèche, ou ouvrez sa fiche pour choisir l'étape. ${AMOUNT_LEGEND}</p>
     <div class="pipe">${CRM_STAGES.map(([id, l]) => {
       const list = state.crm.filter((c) => c.stage === id);
       return `<section class="pipe-col pipe-${id}"><h3><span>${l}</span><b>${list.length}</b></h3>
-        <p class="mono muted">${euro(list.reduce((s, c) => s + c.value, 0))}</p>
+        <p class="mono muted">${pipeTotals(list)}</p>
         ${list
           .map(
             (c) => `<article class="pipe-card"><a href="#/crm/${c.id}"><b>${esc(c.name)}</b><span class="muted">${c.type === "artiste" ? "Artiste" : "Acheteur"} · ${esc(c.source)}</span></a>
-            <div class="pipe-foot"><span class="mono">${c.value ? euro(c.value) : "—"}</span>
+            <div class="pipe-foot"><span class="mono">${crmAmount(c)}</span>
             ${id === "gagne" || id === "perdu" ? "" : `<span><button class="icon-btn" data-act="crm-lose" data-id="${c.id}" title="Marquer perdu" aria-label="Marquer perdu">✕</button><button class="icon-btn" data-act="crm-next" data-id="${c.id}" title="Étape suivante" aria-label="Étape suivante">→</button></span>`}</div></article>`,
           )
           .join("")}</section>`;
@@ -340,7 +350,7 @@ function viewNewContact() {
       <div class="field-row"><div class="field"><label for="nc-email">E-mail (fictif)</label><input id="nc-email" type="email" required placeholder="nom@example.com" /></div>
       <div class="field"><label for="nc-phone">Téléphone (fictif)</label><input id="nc-phone" placeholder="06 00 00 00 00" /></div></div>
       <div class="field-row"><div class="field"><label for="nc-source">Source</label><select id="nc-source">${CRM_SOURCES.map((s) => `<option>${s}</option>`).join("")}</select></div>
-      <div class="field"><label for="nc-value">Montant estimé (€)</label><input id="nc-value" type="number" min="0" step="0.01" value="0" /></div></div>
+      <div class="field"><label for="nc-value">Montant estimé (€ HT pour un abonnement, € TTC pour des commandes)</label><input id="nc-value" type="number" min="0" step="0.01" value="0" /></div></div>
       <button class="btn">Créer le contact</button>
     </form>`;
 }
