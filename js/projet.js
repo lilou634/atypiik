@@ -447,6 +447,8 @@ function viewStrategy() {
 const NET_ICON = { Instagram: "IG", TikTok: "TT", Pinterest: "PI" };
 function postVisual(p) {
   const w = byId(p.work);
+  if (p.video)
+    return `<div class="post-visual post-video"><video src="${p.video}" poster="${p.poster}" muted loop playsinline autoplay preload="metadata" aria-label="Vidéo du post ${p.n}"></video></div>`;
   return `<div class="post-visual net-${p.network.toLowerCase()}">${visual(w)}<span class="post-logo">atypiik</span><div class="post-over"><b>${esc(p.overlay)}</b></div></div>`;
 }
 function viewCom() {
@@ -476,10 +478,10 @@ function viewCom() {
             <div class="post-meta"><span class="tag">${p.network}</span><span class="mono">${frDate(p.date)}</span></div>
             <p class="post-format"><b>Format</b> ${esc(p.format)}<br /><b>Objectif</b> ${esc(p.goal)}</p>
             <p class="post-text">${esc(p.text).replace(/\n/g, "<br />")}</p>
-            <button class="btn btn-small btn-outline" data-act="post-copy" data-id="${p.n}">Copier le texte</button>
+            <div class="post-actions"><button class="btn btn-small btn-outline" data-act="post-copy" data-id="${p.n}">Copier le texte</button>${p.video ? `<a class="btn btn-small btn-outline" href="${p.video}" download>Télécharger la vidéo</a>` : ""}</div>
           </div></article>`,
       ).join("")}</div>
-      <p class="hint">Visuels réalisés avec les photos des œuvres du catalogue de démo.</p>
+      <p class="hint">Visuels et vidéos réalisés avec les photos des œuvres du catalogue de démo. Les vidéos sont au format vertical 9:16, prêtes à publier.</p>
     </section>
 
     <section class="strat" id="calendrier"><h2 class="strat-h">4. Le calendrier éditorial</h2>
