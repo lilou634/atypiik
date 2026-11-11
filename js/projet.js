@@ -481,7 +481,7 @@ function viewCom() {
             <div class="post-actions"><button class="btn btn-small btn-outline" data-act="post-copy" data-id="${p.n}">Copier le texte</button>${p.video ? `<a class="btn btn-small btn-outline" href="${p.video}" download>Télécharger la vidéo</a>` : ""}</div>
           </div></article>`,
       ).join("")}</div>
-      <p class="hint">Visuels et vidéos réalisés avec les photos des œuvres du catalogue de démo. Les vidéos sont au format vertical 9:16, prêtes à publier.</p>
+      <p class="hint">Visuels et vidéos réalisés avec les photos des œuvres du catalogue de démo. Les vidéos sont au format vertical 9:16, prêtes à publier.</p><p class="demo-note">Les artistes cités dans les posts (Margaux Pech, Rosa Mendes…), leurs œuvres et le drop sont fictifs (démo) ; les photos servent d'illustration.</p>
     </section>
 
     <section class="strat" id="calendrier"><h2 class="strat-h">4. Le calendrier éditorial</h2>

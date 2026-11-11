@@ -4371,3 +4371,19 @@ div.art::after {
   flex-wrap: wrap;
   gap: 6px;
 }
+
+/* Mentions « fictif (démo) » */
+.demo-note {
+  margin: 8px 0;
+  font-size: 0.78rem;
+  font-style: italic;
+  color: var(--accent);
+}
+.demo-note::before {
+  content: "● ";
+  font-style: normal;
+}
+.tone-ink .demo-note,
+.drop .demo-note {
+  color: #ffd8de;
+}

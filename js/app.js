@@ -409,7 +409,7 @@ function viewGallery() {
   const chip = (group, v, label = v) =>
     `<button class="chip ${g[group].includes(v) ? "on" : ""}" data-act="filter" data-group="${group}" data-value="${v}">${label}</button>`;
   return `
-    <div class="page-head"><h1>La <span class="fun">galerie</span></h1><p>${g.q ? `Résultats pour « ${esc(g.q)} »` : "Toutes les œuvres disponibles, filtrées en direct."}</p></div>
+    <div class="page-head"><h1>La <span class="fun">galerie</span></h1><p>${g.q ? `Résultats pour « ${esc(g.q)} »` : "Toutes les œuvres disponibles, filtrées en direct."}</p><p class="demo-note">Œuvres, artistes et prix fictifs (démo) : les photos servent d'illustration.</p></div>
     <div class="gallery-layout">
       <aside class="filters" aria-label="Filtres">
         <details open><summary>Type d'art</summary><div class="opts">${types.map((t) => chip("type", t)).join("")}</div></details>
@@ -506,6 +506,7 @@ function viewProduct(id) {
         <div class="by">par <a href="#/artiste/${a.id}">${esc(a.name)}</a> ${selectedBadge(true)} · ${esc(a.city)}</div>
         ${workReviews.length ? `<a class="rating-link" href="#avis" data-act="to-reviews">${stars(ratingOf(workReviews))} <span class="muted">(${plural(workReviews.length, "avis")})</span></a>` : ""}
         <div class="product-price">${euro(w.price)} <small>TTC</small></div>
+        <p class="demo-note">Œuvre, artiste et prix fictifs (démo) : la photo sert d'illustration.</p>
         <ul class="facts">
           <li><b>${esc(editionOf(w))}</b></li>
           <li>Expédié sous ${esc(LEAD_TIME[w.type] || "3 à 5 jours")} · livraison suivie</li>
@@ -537,6 +538,7 @@ function viewProduct(id) {
 
     <section class="section reviews" id="avis">
       <div class="section-head"><div><h2>Les <span class="fun">avis</span></h2></div>${artistReviews.length ? `<span>${stars(ratingOf(artistReviews))} <span class="muted">${plural(artistReviews.length, "avis")} sur ${esc(a.name)}</span></span>` : ""}</div>
+      <p class="demo-note">Avis fictifs, rédigés pour la démo : aucun client réel.</p>
       ${shown.length ? `${workReviews.length ? "" : `<p class="hint">Pas encore d'avis sur cette pièce. Voici ce que disent les clients de ${esc(a.name)} :</p>`}<div class="review-grid">${reviewList(shown, !workReviews.length)}</div>` : '<p class="hint">Pas encore d\'avis.</p>'}
       ${
         canReview
@@ -621,7 +623,7 @@ function artistFeature({ a, reason }) {
 function viewArtists() {
   const sugg = suggestedArtists().slice(0, 3);
   return `
-    <div class="page-head"><h1>Les <span class="fun">artistes</span></h1><p>Découvrez les créateurs et créatrices d'ATYPIIK, leurs œuvres et leurs coulisses. Suivez vos préférés pour ne manquer aucune nouveauté.</p></div>
+    <div class="page-head"><h1>Les <span class="fun">artistes</span></h1><p>Découvrez les créateurs et créatrices d'ATYPIIK, leurs œuvres et leurs coulisses. Suivez vos préférés pour ne manquer aucune nouveauté.</p><p class="demo-note">Tous les artistes présentés sont fictifs (démo) : leurs profils sont inventés et leurs photos servent d'illustration.</p></div>
     ${sugg.length ? `<section><div class="section-head"><div><h2>Suggestions <span class="fun">d'artistes</span></h2></div></div><div class="features">${sugg.map(artistFeature).join("")}</div></section>` : ""}
     <section class="section"><div class="section-head"><div><h2>Tous les <span class="fun">artistes</span></h2></div><span class="mono muted">${plural(state.artists.length, "artiste")}</span></div>
       <div class="grid">${state.artists.map(artistCard).join("")}</div></section>`;
@@ -649,7 +651,7 @@ function viewArtist(id) {
   }
   if (tab === "avis") {
     const list = reviewsOf((r) => r.artist === id);
-    body = list.length ? `<div class="review-grid">${reviewList(list, true)}</div>` : emptyBox("Pas encore d'avis", "Les avis des clients apparaîtront ici après leurs commandes.");
+    body = list.length ? `<p class="demo-note">Avis fictifs, rédigés pour la démo : aucun client réel.</p><div class="review-grid">${reviewList(list, true)}</div>` : emptyBox("Pas encore d'avis", "Les avis des clients apparaîtront ici après leurs commandes.");
   }
   if (tab === "oeuvres") body = works.length ? `<div class="grid">${works.map((w) => card(w)).join("")}</div>` : emptyBox("Bientôt", "Cet artiste n'a pas encore publié d'œuvre.");
   if (tab === "posts") body = posts.length ? `<div class="posts">${posts.map((p) => postCard(p)).join("")}</div>` : emptyBox("Pas encore de post", "Les nouvelles de l'atelier apparaîtront ici.");
@@ -667,6 +669,7 @@ function viewArtist(id) {
         <h1>${esc(a.name)}</h1>
         ${selectedBadge()}
         <p>${esc(a.bio)}</p>
+        <p class="demo-note">Profil d'artiste fictif (démo) : nom, biographie, œuvres et posts sont inventés, les photos servent d'illustration.</p>
         <div class="artist-stats">${reviewsOf((r) => r.artist === id).length ? `<span>${stars(ratingOf(reviewsOf((r) => r.artist === id)))} ${plural(reviewsOf((r) => r.artist === id).length, "avis")}</span>` : ""}<span><b>${a.followers + (state.follows.includes(id) ? 1 : 0)}</b> abonnés</span><span><b>${works.length}</b> œuvres</span><span><b>${posts.length}</b> posts</span></div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">${followBtn(id)}<a class="btn btn-outline" href="#/commande-perso/${id}">Commande personnalisée</a><a class="btn btn-outline" href="#/messages/${id}">Contacter</a></div>
@@ -721,7 +724,7 @@ function viewSell() {
         const a = artistById(q.artist);
         return a ? `<figure>${avatar(a, true)}<blockquote>« ${esc(q.text)} »</blockquote><figcaption><a href="#/artiste/${a.id}">${esc(a.name)}</a> · ${esc(disciplineOf(a.id))}</figcaption></figure>` : "";
       }).join("")}</div>
-      <p class="hint">Artistes et témoignages fictifs (démo).</p>
+      <p class="demo-note">Artistes et témoignages fictifs (démo).</p>
     </section>
 
     <section class="section sell-cta">
@@ -765,7 +768,7 @@ function featuredSection() {
         <h2>L'artiste de la <span class="fun">semaine</span></h2>
         <div class="featured-id">${avatar(a)}<div><h3><a href="#/artiste/${a.id}">${esc(a.name)}</a></h3>${selectedBadge(true)}<span class="mono muted">${esc(disciplineOf(a.id))} · ${esc(a.city)}</span></div></div>
         <blockquote>« ${esc(FEATURED.quote)} »</blockquote>
-        <p class="hint">Artiste et témoignage fictifs (démo).</p>
+        <p class="demo-note">Artiste et témoignage fictifs (démo).</p>
         <div class="card-actions"><a class="btn" href="#/artiste/${a.id}">Découvrir son univers</a>${followBtn(a.id)}</div>
       </div>
       <div class="featured-works">${works.map((w) => `<a href="#/oeuvre/${w.id}" class="featured-item">${visual(w)}<span>${esc(w.title)} · ${euro(w.price)}</span></a>`).join("")}</div>
@@ -785,6 +788,7 @@ function dropSection() {
         <p class="mono">${esc(a?.name || "")} · ${DROP.pieces} pièces · ${esc(when)}</p>
         <div class="countdown" data-countdown="${DROP.date}" aria-live="polite">${countdownHtml(DROP.date)}</div>
         <p>${esc(DROP.text)}</p>
+        <p class="demo-note">Drop fictif (démo) : aucune vente n'aura lieu.</p>
         <button class="btn ${state.dropAlert ? "btn-outline" : "btn-light"}" data-act="drop-alert">${state.dropAlert ? "✓ Rappel activé" : "Me prévenir au lancement"}</button>
       </div>
     </section>`;
@@ -866,6 +870,7 @@ function viewPost(id) {
       <a class="post-author" href="#/artiste/${a.id}">${avatar(a, true)}<span><strong>${esc(a.name)}</strong><span class="mono muted">${esc(disciplineOf(a.id))} · ${esc(a.city)}</span></span></a>
       <div class="post-hero">${postMedia(p)}</div>
       <span class="ref">${frDate(p.date)}${p.media?.video ? " · Vidéo coulisses" : ""}</span>
+      <p class="demo-note">Post fictif (démo), publié par un artiste fictif.</p>
       <h1>${esc(p.title)}</h1>
       <p class="post-text">${esc(p.text)}</p>
       <div class="card-actions">${followBtn(a.id)}<a class="btn btn-outline" href="#/artiste/${a.id}">Voir le profil</a></div>
