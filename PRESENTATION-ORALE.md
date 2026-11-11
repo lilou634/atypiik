@@ -102,7 +102,7 @@ Il est rentable pour l'artiste à partir de 430 € de ventes par mois, puisque 
 La sélection à l'entrée : pas de revente ni de production de masse. On ajoute la mise en avant (artiste de la semaine, drops en quantité limitée, commandes sur mesure) et un catalogue 100 % artistes indépendants.
 
 **« Votre objectif de 3 000 € par mois est-il réaliste ? »**
-C'est une estimation, avec des hypothèses écrites sur la page : 400 artistes inscrits dont 30 % en Pro, et 0,5 vente par artiste et par mois. Le panier moyen de 90 € vient du prix médian de notre catalogue (environ 95 €). Si les ventes sont plus faibles, l'abonnement Pro assure à lui seul la moitié du chiffre d'affaires.
+C'est une estimation, avec des hypothèses écrites sur la page : 400 artistes inscrits dont 30 % en Pro, et 0,5 vente par artiste et par mois. Les prix sont fixés par les artistes, donc le panier moyen de 90 € est une estimation : c'est le milieu du budget de Clara (40 à 150 € par achat), et on l'ajustera avec les premières ventes. Si les ventes sont plus faibles, l'abonnement Pro assure à lui seul la moitié du chiffre d'affaires.
 
 **« D'où viennent vos chiffres ? »**
 Du rapport Art Basel & UBS 2026, du ministère de la Culture (DEPS), de la lettre aux actionnaires d'Etsy et des pages officielles des concurrents. Chaque chiffre a son lien sur la page Stratégie, et je les ai tous ouverts pour vérifier. *(Le faire vraiment avant l'oral !)*

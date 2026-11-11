@@ -48,7 +48,7 @@ function viewOffer() {
     <section class="offer-buyer panel">
       <div><span class="label muted">Pour les acheteurs</span><h2>Acheter une œuvre</h2>
         <p>Inscription gratuite, aucun frais de service. Vous payez le prix de l'œuvre fixé par l'artiste, <b>TTC</b>, et la livraison, calculée selon la taille du colis.</p>
-        <ul class="incl"><li>Pièces uniques et petites séries, dès 28 € TTC</li><li>Paiement sécurisé, argent versé à l'artiste après la livraison</li><li>Retour possible sous 14 jours</li><li>Commandes sur mesure auprès des artistes</li></ul>
+        <ul class="incl"><li>Pièces uniques et petites séries, au prix fixé par chaque artiste</li><li>Paiement sécurisé, argent versé à l'artiste après la livraison</li><li>Retour possible sous 14 jours</li><li>Commandes sur mesure auprès des artistes</li></ul>
         <ul class="excl"><li>Frais de livraison, à la charge de l'acheteur</li></ul>
       </div>
       <div class="offer-cta"><a class="btn" href="#/galerie">Voir la galerie</a><span class="hint">Parcours de démo : choisissez une œuvre, ajoutez-la au panier puis payez avec une carte fictive.</span></div>

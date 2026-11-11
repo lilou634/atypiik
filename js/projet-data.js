@@ -141,7 +141,7 @@ const BRAND = {
   messages: [
     ["L'artiste garde 90 %", "Sur chaque vente, 90 % du prix revient à l'artiste (93 % avec Atelier Pro). On le dit et on le montre."],
     ["Chaque artiste est choisi à la main", "Pas de revente ni de production de masse : chaque boutique est validée par l'équipe avant d'ouvrir."],
-    ["De l'art qui rentre dans ta vie", "Des pièces uniques dès quelques dizaines d'euros, pour offrir ou pour ta maison."],
+    ["De l'art qui rentre dans ta vie", "Des pièces uniques pour offrir ou pour ta maison, achetées directement à ceux qui les créent, sans passer par une galerie."],
   ],
 };
 
@@ -157,13 +157,13 @@ const CHANNELS = [
 const POSTS = [
   { n: 1, network: "Instagram", format: "Carrousel 5 images (1080 × 1350)", date: "2026-11-16", goal: "Notoriété : présenter le concept",
     work: "a4", overlay: "L'art qui sort du rang",
-    text: "On lance ATYPIIK 🎨\nUne boutique en ligne où chaque artiste est choisi à la main, et où 90 % du prix va directement à l'artiste.\n\nPeinture, céramique, bijoux, crochet, photo : des pièces uniques dès 28 €.\n\nSwipe pour rencontrer nos 8 premiers artistes 👉\n\n#art #artisteemergent #faitmain #artfrancais #decointerieure" },
+    text: "On lance ATYPIIK 🎨\nUne boutique en ligne où chaque artiste est choisi à la main, et où 90 % du prix va directement à l'artiste.\n\nPeinture, céramique, bijoux, crochet, photo : des pièces uniques, au prix fixé par chaque artiste.\n\nSwipe pour rencontrer nos 8 premiers artistes 👉\n\n#art #artisteemergent #faitmain #artfrancais #decointerieure" },
   { n: 2, network: "TikTok", format: "Vidéo verticale 30 s (9:16)", date: "2026-11-17", goal: "Notoriété : faire connaître un artiste",
     work: "a6", overlay: "Dans l'atelier de Margaux",
     text: "POV : tu entres dans l'atelier d'une céramiste à Nantes ✨\nDe la boule de faïence au vase rayé peint à la main, en 30 secondes.\nSes pièces sont sur ATYPIIK, lien en bio.\n\n#ceramique #pottery #artisan #atelier #tiktokart" },
   { n: 3, network: "Pinterest", format: "Épingle verticale (1000 × 1500)", date: "2026-11-18", goal: "Trafic vers la galerie",
-    work: "a3", overlay: "Idées déco murale à moins de 100 €",
-    text: "Idées déco murale à moins de 100 € : tirages signés, sérigraphies et petites toiles d'artistes émergents. Pièces uniques ou en édition limitée, livrées chez vous.\nLien : la galerie ATYPIIK, filtre « moins de 100 € »." },
+    work: "a3", overlay: "Idées déco murale faites main",
+    text: "Idées déco murale faites main : tirages signés, sérigraphies et toiles d'artistes émergents. Pièces uniques ou en édition limitée, livrées chez vous.\nLien : la galerie ATYPIIK." },
   { n: 4, network: "Instagram", format: "Reel 20 s (9:16)", date: "2026-11-23", goal: "Recruter des artistes",
     work: "a1", overlay: "Artiste ? Garde 90 %",
     text: "Tu crées et tu veux vendre sans laisser la moitié du prix en commission ?\nSur ATYPIIK, tu gardes 90 % de chaque vente. Pas d'abonnement obligatoire.\n\nOn sélectionne nos artistes à la main : envoie ton portfolio via le lien en bio.\n\n#artistefrancais #vendresonart #illustration #creatrice" },
@@ -172,7 +172,7 @@ const POSTS = [
     text: "On reçoit des dizaines de candidatures, voilà comment on choisit 👇\n1. Des pièces faites main, pas revendues\n2. Une vraie patte, qu'on reconnaît\n3. Des photos honnêtes\nEt toi, tu postulerais ?\n\n#artiste #selection #faitmain #petitecreatrice" },
   { n: 6, network: "Pinterest", format: "Épingle idée (5 pages)", date: "2026-11-27", goal: "Trafic : cadeaux de Noël",
     work: "a29", overlay: "10 cadeaux faits main pour Noël",
-    text: "10 idées de cadeaux faits main pour Noël, de 25 à 150 € : bijoux, crochet, céramique, tirages. Chaque pièce est faite par un artiste indépendant en France." },
+    text: "10 idées de cadeaux faits main pour Noël : bijoux, crochet, céramique, tirages. Chaque pièce est faite par un artiste indépendant en France." },
   { n: 7, network: "Instagram", format: "Story + compte à rebours", date: "2026-12-01", goal: "Conversion : annoncer le drop",
     work: "a14", overlay: "Drop céramique · 18 h",
     text: "DROP ce vendredi 18 h ⏰\nLes céramiques d'hiver de Margaux : 24 pièces, pas une de plus.\nActive le rappel pour être prévenu à l'ouverture 🔔" },
@@ -294,7 +294,7 @@ const COMPETITORS = [
   { name: "Saatchi Art", type: "Galerie en ligne internationale", fee: "40 % du prix de vente des originaux", buyer: "Œuvres souvent au-delà de 500 €", diff: "Commission quatre fois plus élevée, catalogue international, peu de petits prix.", src: ["saatchi"] },
   { name: "Singulart", type: "Galerie en ligne d'artistes sélectionnés", fee: "50 % HT du prix de vente", buyer: "Œuvres de plusieurs centaines à plusieurs milliers d'euros", diff: "Commission cinq fois plus élevée, ciblée sur les collectionneurs aisés.", src: ["singulart"] },
   { name: "Artmajeur", type: "Galerie en ligne ouverte à tous", fee: "Inscription gratuite, abonnements payants ; la commission varie selon la formule", buyer: "Très large choix, qualité inégale", diff: "Pas de sélection à l'entrée ; nous choisissons chaque artiste et mettons en avant des drops.", src: ["artmajeur"] },
-  { name: "ATYPIIK", type: "Boutique d'artistes émergents sélectionnés", fee: "10 % (Atelier, sans abonnement) ou 7 % + 12,90 € HT / mois (Atelier Pro), frais de paiement inclus", buyer: "Pièces uniques dès 28 €, médiane du catalogue autour de 95 €", diff: "Sélection à la main, artiste qui garde 90 à 93 %, drops et commandes sur mesure.", src: [], us: true },
+  { name: "ATYPIIK", type: "Boutique d'artistes émergents sélectionnés", fee: "10 % (Atelier, sans abonnement) ou 7 % + 12,90 € HT / mois (Atelier Pro), frais de paiement inclus", buyer: "Prix fixé librement par chaque artiste, sans frais de service pour l'acheteur", diff: "Sélection à la main, artiste qui garde 90 à 93 %, drops et commandes sur mesure.", src: [], us: true },
 ];
 
 const PRICING = [
@@ -315,5 +315,5 @@ const MODEL = {
     ["Volume de ventes mensuel", "200 commandes × 90 € de panier moyen = 18 000 €", null],
     ["Commissions", "18 000 € × 8,5 % de commission moyenne (moitié Atelier, moitié Pro)", 1530],
   ],
-  hypotheses: "Hypothèses (estimations) : panier moyen de 90 €, proche du prix médian du catalogue actuel (environ 95 €) ; 400 artistes inscrits dont 30 % en Pro ; un artiste vend en moyenne 0,5 pièce par mois.",
+  hypotheses: "Hypothèses (estimations) : panier moyen de 90 €, au milieu du budget de notre persona acheteuse (40 à 150 € par achat), à confirmer avec les premières ventes ; 400 artistes inscrits dont 30 % en Pro ; un artiste vend en moyenne 0,5 pièce par mois.",
 };
