@@ -738,7 +738,7 @@ function viewSell() {
 function viewHelp() {
   const steps = [
     ["Découvrez", "Parcourez la galerie, suivez vos artistes préférés, ou demandez une pièce sur mesure."],
-    ["Commandez", "Paiement sécurisé (simulé dans cette démo). Les frais de port sont affichés avant de payer."],
+    ["Commandez", "Paiement sécurisé (simulé dans cette démo). Les frais de port, calculés selon la taille du colis, sont à la charge de l'acheteur."],
     ["Recevez", "L'artiste prépare et expédie votre pièce. Vous suivez chaque étape depuis votre compte."],
     ["Profitez", "14 jours pour changer d'avis, et un dossier de suivi si quelque chose ne va pas."],
   ];

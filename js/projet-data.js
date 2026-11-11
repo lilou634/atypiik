@@ -27,7 +27,7 @@ const PLANS = [
       "Candidature prioritaire aux drops et à la Sélection",
       "Statistiques détaillées",
       "Conseil personnalisé",
-      "Shooting photo (proposé à part)",
+      "Shooting photo (option prévue plus tard)",
       "Frais de livraison, payés par l'acheteur",
     ],
   },
@@ -44,7 +44,7 @@ const PLANS = [
       "Statistiques de visites, favoris et ventes",
       "Un conseil personnalisé par trimestre (visio 30 min)",
     ],
-    excluded: ["Shooting photo (proposé à part)", "Frais de livraison, payés par l'acheteur"],
+    excluded: ["Shooting photo (option prévue plus tard)", "Frais de livraison, payés par l'acheteur"],
   },
 ];
 const VAT = 0.2;
@@ -170,7 +170,7 @@ const POSTS = [
     text: "POV : tu entres dans l'atelier d'une céramiste à Nantes ✨\nDe la boule de faïence au vase rayé peint à la main, en 14 secondes.\nSes pièces sont sur ATYPIIK, lien en bio.\n\n#ceramique #pottery #artisan #atelier #tiktokart" },
   { n: 3, network: "Pinterest", format: "Épingle verticale (1000 × 1500)", date: "2026-11-18", goal: "Trafic vers la galerie",
     work: "a3", overlay: "Idées déco murale faites main",
-    text: "Idées déco murale faites main : tirages photo signés, toiles et céramiques d'artistes émergents. Pièces uniques ou en édition limitée, livrées chez vous.\nLien : la galerie ATYPIIK." },
+    text: "Idées déco murale faites main : tirages photo signés, toiles et céramiques d'artistes émergents. Pièces uniques ou en édition limitée, livrées chez toi.\nLien : la galerie ATYPIIK." },
   { n: 4, network: "Instagram", format: "Reel 15 s (9:16)", video: "assets/com/post-4.mp4", poster: "assets/com/post-4.jpg", date: "2026-11-23", goal: "Recruter des artistes",
     work: "a1", overlay: "Artiste ? Garde 90 %",
     text: "Tu crées et tu veux vendre sans laisser la moitié du prix en commission ?\nSur ATYPIIK, tu gardes 90 % de chaque vente. Pas d'abonnement obligatoire.\n\nOn sélectionne nos artistes à la main : envoie ton portfolio via le lien en bio.\n\n#artistefrancais #vendresonart #illustration #creatrice" },
@@ -187,13 +187,13 @@ const POSTS = [
     work: "a18", overlay: "Unboxing d'une pièce unique",
     text: "Unboxing d'une pièce unique 📦\nEmballée à la main par l'artiste, avec un petit mot.\nC'est ça, acheter à un artiste plutôt qu'à une usine.\n\n#unboxing #faitmain #cadeaudenoel #art" },
   { n: 9, network: "Instagram", format: "Post image (1080 × 1350)", date: "2026-12-07", goal: "Fidélisation : artiste de la semaine",
-    work: "a22", overlay: "Artiste de la semaine",
-    text: "Artiste de la semaine : Rosa Mendes 🧵\nÀ Montpellier, elle chine des canevas et des tapisseries oubliés et en fait des vestes uniques.\n« Je leur donne une deuxième vie sur des vestes qu'on a envie de porter tous les jours. »\n\nSa boutique est sur ATYPIIK, lien en bio.\n\n#upcycling #faitmain #modeethique #artistedelasemaine" },
+    work: "a20", overlay: "Artiste de la semaine",
+    text: "Artiste de la semaine : Zia Okafor 🧶\nÀ Lille, elle crochète chaque pièce à la main, une par une : pulls, sacs, housses de coussin.\nSon record ? Un pull en 40 heures.\n\nSa boutique est sur ATYPIIK, lien en bio.\n\n#crochet #faitmain #tricot #artistedelasemaine" },
 ];
 
 const CALENDAR = [
   ["Semaine 1 · 16-22 nov.", "Ouverture au public", ["Lun. 16 : post 1, carrousel d'ouverture (Instagram)", "Mar. 17 : post 2, dans l'atelier (TikTok)", "Mer. 18 : post 3, déco murale (Pinterest)", "Jeu. 19 : newsletter n° 1, « ATYPIIK ouvre au public »", "Sam. 21 : stand au marché de créateurs local"]],
-  ["Semaine 2 · 23-29 nov.", "Recrutement d'artistes", ["Lun. 23 : post 4, artiste garde 90 % (Instagram)", "Mer. 25 : post 5, notre sélection (TikTok)", "Mer. 25 : visite d'une école d'art partenaire", "Jeu. 26 : newsletter n° 2, coups de cœur", "Ven. 27 : post 6, cadeaux de Noël (Pinterest)"]],
+  ["Semaine 2 · 23-29 nov.", "Recrutement d'artistes", ["Lun. 23 : post 4, artiste garde 90 % (Instagram)", "Mer. 25 : post 5, notre sélection (TikTok)", "Mer. 25 : visite d'une école d'art (piste de partenariat)", "Jeu. 26 : newsletter n° 2, coups de cœur", "Ven. 27 : post 6, cadeaux de Noël (Pinterest)"]],
   ["Semaine 3 · 30 nov.-6 déc.", "Drop de Noël", ["Mar. 1er : post 7, story du drop (Instagram)", "Jeu. 3 : newsletter n° 3, rappel du drop", "Ven. 4 : post 8, unboxing (TikTok)", "Ven. 4 à 18 h : ouverture du drop céramique", "Sam. 5 : live Instagram avec l'artiste du drop"]],
   ["Semaine 4 · 7-13 déc.", "Derniers cadeaux", ["Lun. 7 : post 9, artiste de la semaine (Instagram)", "Mer. 9 : rappel « commande avant le 15 pour Noël » (stories)", "Jeu. 10 : newsletter n° 4, idées cadeaux de dernière minute", "Ven. 11 : bilan des indicateurs et choix des posts à reconduire"]],
 ];
@@ -237,7 +237,7 @@ const KPIS = [
   ["Clics vers le site", "clics depuis les réseaux et Pinterest (liens suivis)", "500 / mois"],
   ["Inscriptions newsletter", "nouveaux inscrits par semaine", "50 / semaine"],
   ["Taux de conversion du site", "commandes ÷ visites", "1,5 %"],
-  ["Coût d'acquisition client", "dépenses marketing ÷ nouveaux clients", "moins de 15 €"],
+  ["Coût d'acquisition client", "dépenses marketing ÷ nouveaux clients", "moins de 15 € (rentabilisé dès la 3e commande, ou par un abonnement Pro)"],
   ["Artistes recrutés", "boutiques ouvertes et passages en Atelier Pro", "10 boutiques au 1er mois, 5 passages en Pro au 4e mois (fin des 3 mois offerts)"],
 ];
 

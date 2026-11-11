@@ -55,7 +55,7 @@ function viewOffer() {
     </section>
     <div class="section-head"><h2>Pour les artistes : deux formules</h2></div>
     <div class="plans">${PLANS.map(plan).join("")}</div>
-    <p class="hint">Prix en euros. TVA de 20 % appliquée aux abonnements. La commission est prélevée sur le prix de vente, l'artiste reçoit le reste sous 7 jours après la livraison.</p>`;
+    <p class="hint">Prix en euros. TVA de 20 % incluse dans la commission et ajoutée aux abonnements. La commission est prélevée sur le prix de vente, l'artiste reçoit le reste sous 7 jours après la livraison.</p>`;
 }
 
 /* ---------- Abonnement simulé ---------- */
@@ -398,7 +398,7 @@ function viewStrategy() {
     <nav class="toc">${[["probleme", "Problème"], ["cible", "Cible"], ["marche", "Marché"], ["concurrence", "Concurrence"], ["prix", "Prix"], ["modele", "Modèle économique"], ["sources", "Sources"]].map(([id, l]) => `<a href="#/strategie" data-act="scroll-to" data-id="${id}">${l}</a>`).join("")}</nav>
 
     <section class="strat" id="probleme"><h2 class="strat-h">1. Le problème</h2>
-      <p class="lead">${esc(PROBLEM.who)}</p>
+      <h3 class="label">Qui est concerné</h3><p class="lead">${esc(PROBLEM.who)}</p>
       <ul class="facts">${PROBLEM.facts.map(([t, ...k]) => `<li>${esc(t)} ${src(...k)}</li>`).join("")}</ul>
       <div class="two-col"><div class="panel"><h3>À quelle fréquence</h3><p>${esc(PROBLEM.frequency)}</p></div><div class="panel"><h3>Ce que ça coûte aujourd'hui</h3><p>${esc(PROBLEM.cost)}</p></div></div>
     </section>
@@ -486,6 +486,7 @@ function viewCom() {
 
     <section class="strat" id="calendrier"><h2 class="strat-h">4. Le calendrier éditorial</h2>
       <div class="calendar">${CALENDAR.map(([w, theme, items]) => `<div class="panel"><span class="label muted">${w}</span><h3>${theme}</h3><ul class="facts">${items.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>`).join("")}</div>
+    <p class="hint">Le calendrier liste les publications phares ; le reste du rythme annoncé par canal (reposts d'œuvres, stories, épingles) se fait au fil de la semaine.</p>
     </section>
 
     <section class="strat" id="partenariats"><h2 class="strat-h">5. Les partenariats</h2>
@@ -498,7 +499,7 @@ function viewCom() {
     </section>
 
     <section class="strat" id="indicateurs"><h2 class="strat-h">7. Les indicateurs</h2>
-      <div class="table-wrap"><table><thead><tr><th>Indicateur</th><th>Calcul</th><th>Objectif du premier mois</th></tr></thead><tbody>${KPIS.map(([a, b, c]) => `<tr><td><strong>${a}</strong></td><td>${esc(b)}</td><td>${esc(c)}</td></tr>`).join("")}</tbody></table></div>
+      <div class="table-wrap"><table><thead><tr><th>Indicateur</th><th>Calcul</th><th>Objectif</th></tr></thead><tbody>${KPIS.map(([a, b, c]) => `<tr><td><strong>${a}</strong></td><td>${esc(b)}</td><td>${esc(c)}</td></tr>`).join("")}</tbody></table></div>
     </section>`;
 }
 PROJECT_ACTIONS["scroll-to"] = (el, e) => {

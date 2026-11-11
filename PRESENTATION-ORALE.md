@@ -61,7 +61,7 @@ Règle de l'épreuve : on présente **depuis le site, sans diaporama**, comme si
 
 ### 3:45 → 4:35 · La communication (**4. Communication**)
 
-> « Le nom : ATYPIIK, "atypique" avec deux i, parce qu'on met en avant des artistes qui sortent du rang. Trois messages : l'artiste garde 90 %, chaque artiste est choisi à la main, de l'art qui rentre dans ta vie. »
+> « Le nom : ATYPIIK, "atypique" avec deux i, parce qu'on met en avant des artistes qui sortent du rang. Trois messages : l'artiste garde 90 %, chaque artiste est choisi à la main, on achète directement à ceux qui créent. »
 
 *Descendre jusqu'aux posts.*
 
