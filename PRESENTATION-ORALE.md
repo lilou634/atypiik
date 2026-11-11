@@ -5,18 +5,6 @@ Règle de l'épreuve : on présente **depuis le site, sans diaporama**, comme si
 
 ---
 
-## Avant d'entrer dans la salle (5 min de préparation)
-
-1. Ouvrir le site sur ton ordinateur, en plein écran (touche F11 ou Ctrl + Cmd + F).
-2. Accepter ou refuser le bandeau cookies tout de suite, pour qu'il ne gêne pas pendant l'oral.
-3. **Préparer l'achat pour gagner du temps** :
-   - Ouvrir « Sac Nuage » (Galerie, catégorie Crochet), cliquer sur « Ajouter au panier » puis sur « Acheteur » dans la connexion de démo.
-   - Revenir sur l'œuvre et l'ajouter au panier. **Ne pas payer** : on le fera devant le jury.
-4. Ouvrir 4 onglets dans cet ordre : **Projet** · **Panier** · **CRM** · **Stratégie**. La Communication s'ouvre depuis la barre du haut.
-5. Avoir la carte de démo en tête : **4242 4242 4242 4242**, date **12/28**, CVC **123**.
-
----
-
 ## Le déroulé (5:00)
 
 ### 0:00 → 0:30 · L'accroche et la promesse (page **Projet**)
@@ -53,9 +41,9 @@ Règle de l'épreuve : on présente **depuis le site, sans diaporama**, comme si
 
 > « Pourquoi ces prix ? Trois raisons. Les concurrents : on est le moins cher des acteurs qui sélectionnent leurs artistes. Nos coûts : le paiement par carte coûte environ 1,5 % + 0,25 €, donc sur un panier moyen estimé à 90 €, il nous reste 7,40 € de marge brute. La valeur : l'offre Pro devient rentable pour l'artiste dès **430 € de ventes par mois**. »
 
-### 2:45 → 3:45 · La démo : acheter puis suivre le client (**Panier** → **CRM**)
+### 2:45 → 3:45 · La démo : acheter puis suivre le client (**Galerie** → **CRM**)
 
-*Onglet Panier : « Passer la commande ». Remplir l'adresse, puis payer avec 4242…*
+*Galerie : ouvrir « Sac Nuage », cliquer sur « Ajouter au panier », choisir « Acheteur » dans la connexion de démo, cliquer de nouveau sur « Ajouter au panier », puis aller au panier et payer avec 4242 4242 4242 4242, date 12/28, CVC 123.*
 
 > « Je passe une vraie commande de démo. Aucun paiement réel, c'est indiqué en haut de chaque page. »
 
