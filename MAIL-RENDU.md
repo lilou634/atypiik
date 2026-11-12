@@ -1,21 +1,23 @@
-# Mail de rendu (à copier dans Gmail)
+# Mail de rendu (à copier dans ta messagerie)
 
 **À :** sebastien.cailhol.pro@gmail.com
-**Pièce jointe :** aucune
 **Objet :** Épreuve IA – CAPANNI Lilou – ATYPIIK
+**Pièce jointe :** aucune
 
 ---
 
-Bonjour Monsieur Cailhol,
+Bonjour Monsieur,
 
-Voici le lien de mon projet pour l'épreuve IA :
+Voici le lien de mon projet réalisé pendant l'épreuve IA :
 https://atypiik-inseec.vercel.app
 
-Nom et prénom : CAPANNI Lilou
-Classe : [ma classe]
-Groupe : [mon groupe]
+ATYPIIK aide les artistes émergents à vendre leurs créations en ligne sans y laisser leurs marges, et permet à chacun d'acheter une pièce unique choisie à la main, à prix accessible.
 
-Promesse du produit : ATYPIIK aide les artistes émergents à vendre leurs créations en ligne sans y laisser leurs marges, et permet à chacun d'acheter une pièce unique choisie à la main, à prix accessible.
+Le site réunit l'espace de vente, le CRM, le dossier stratégique et le plan de communication, accessibles depuis la barre en haut de chaque page.
+
+Lilou CAPANNI
+Classe : [ta classe]
+Groupe : [ton groupe]
 
 Bien cordialement,
 Lilou Capanni
