@@ -7,43 +7,39 @@ Règle de l'épreuve : on présente **depuis le site, sans diaporama**, comme si
 
 ## Le pitch (3:00)
 
-Environ 330 mots à dire, soit 2 min 15 à rythme posé : le reste du temps, ce sont les clics de la démo.
+Tu présentes ce que contient chaque espace, avec seulement deux chiffres à retenir : 90 % pour l'artiste et l'objectif de 3 000 € par mois. Passe d'un espace à l'autre avec le bouton « Suivant » en bas de page.
 
 ### 0:00 → 0:20 · L'accroche (page **Projet**)
 
-> « Un artiste qui débute a deux options pour vendre en ligne : une galerie qui garde la moitié du prix, ou Etsy, où il est noyé parmi 6 millions de vendeurs. ATYPIIK est la troisième voie : une boutique d'artistes émergents choisis à la main, où l'artiste garde 90 % de chaque vente. »
+> « Un artiste qui débute a du mal à vendre en ligne : les galeries prennent une grosse part du prix, et sur les grandes plateformes, il se perd dans la masse. ATYPIIK est une boutique d'artistes émergents choisis à la main, où l'artiste garde 90 % de chaque vente. Le site est organisé en quatre espaces. »
 
-### 0:20 → 0:50 · Le problème et la cible (**3. Stratégie**)
+### 0:20 → 0:50 · **1. Vente**
 
-> « En France, 67 % des 350 000 artistes-auteurs ont besoin d'un autre revenu pour vivre. Sur une œuvre à 200 €, Singulart leur prend 100 € ; nous, 20 €. Je vise deux profils : Hugo, céramiste qui vend seul sur Instagram, et Clara, 27 ans, qui cherche des pièces uniques entre 40 et 150 €. »
+> « D'abord, l'espace de vente, côté client. On y trouve notre promesse, l'offre pour les acheteurs, qui est gratuite, et deux formules pour les artistes : Atelier, sans abonnement, et Atelier Pro, pour ceux qui vendent régulièrement. Le tableau compare les deux, avec les prix HT et TTC. »
 
-### 0:50 → 1:15 · Le marché et la concurrence (**Stratégie**, tableau)
-
-> « Le marché de l'art pèse 59,6 milliards de dollars, dont 9,2 en ligne, et l'achat direct à l'artiste représente déjà 19 % des dépenses. Face aux galeries à 40 ou 50 % et à Etsy sans sélection, ATYPIIK, c'est la sélection d'une galerie au prix d'Etsy. Chaque chiffre est sourcé, ici. »
-
-### 1:15 → 1:40 · L'offre et le prix (**1. Vente**)
-
-> « L'acheteur ne paie que l'œuvre et la livraison. L'artiste a deux formules : Atelier, gratuite, à 10 % de commission, ou Atelier Pro, 12,90 € HT par mois à 7 %, rentable pour lui dès 430 € de ventes par mois. »
-
-### 1:40 → 2:25 · La démo (**Galerie** → **CRM**)
+### 0:50 → 1:35 · La démo, puis **2. CRM**
 
 *Galerie : « Sac Nuage », « Ajouter au panier », « Acheteur », « Ajouter au panier », panier, puis payer avec 4242 4242 4242 4242, 12/28, 123. Parler pendant les clics.*
 
-> « Je passe une commande, avec un paiement simulé : aucune vente réelle, c'est indiqué sur chaque page. »
+> « Je passe une commande en démo, avec un paiement simulé. »
 
 *Commande confirmée, puis 2. CRM : Contacts, Pipeline, Tableau de bord.*
 
-> « Côté entreprise, la commande arrive directement dans notre CRM. On fait avancer chaque contact dans le pipeline, et le tableau de bord donne le chiffre d'affaires, les clients et le taux de conversion. »
+> « La commande arrive directement dans le CRM, côté entreprise. On y retrouve tous les contacts, artistes et acheteurs, avec leur fiche et l'historique des échanges, un pipeline pour les faire avancer étape par étape, et un tableau de bord avec le chiffre d'affaires et le taux de conversion. »
 
-### 2:25 → 2:50 · La communication (**4. Communication**)
+### 1:35 → 2:15 · **3. Stratégie**
 
-> « Pour l'ouverture au public : neuf posts prêts à publier sur Instagram, TikTok et Pinterest, dont cinq vidéos, un calendrier de quatre semaines jusqu'au drop de Noël, cinq partenaires à démarcher et un plan pour nos dix premiers clients. »
+> « Le dossier stratégique explique pourquoi ce produit a sa place : le problème des artistes, nos deux personas, Clara qui achète et Hugo qui vend, le marché avec ses sources, un tableau des concurrents comme Etsy ou Singulart, la justification de nos prix et notre modèle économique. »
 
-### 2:50 → 3:00 · La conclusion
+### 2:15 → 2:45 · **4. Communication**
 
-> « Objectif à 12 mois : 3 000 € HT par mois, avec 120 artistes en Pro et 220 commandes mensuelles. ATYPIIK : la sélection d'une galerie, le prix d'Etsy, et 90 % pour l'artiste. Merci. »
+> « Enfin, le plan de communication : notre plateforme de marque, les réseaux choisis, neuf posts prêts à publier, dont des vidéos, un calendrier sur quatre semaines, des partenaires à démarcher et notre plan pour trouver les premiers clients. »
 
-*Si tu es en retard à la démo, saute la phrase sur le marché (0:50) : la concurrence suffit.*
+### 2:45 → 3:00 · La conclusion
+
+> « Notre objectif : atteindre 3 000 € de chiffre d'affaires par mois d'ici un an. ATYPIIK, c'est la sélection d'une galerie, des prix accessibles, et 90 % pour l'artiste. Merci. »
+
+*Si le jury te demande un chiffre précis, tu les as tous dans « Les chiffres à connaître par cœur », plus bas.*
 
 ---
 
