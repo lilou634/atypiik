@@ -1110,6 +1110,7 @@ function viewOrderDone(id) {
       <h3 style="font-size:3rem;margin-top:12px">Commande confirmée</h3>
       <p>Commande <strong>${o.id}</strong> · ${euro(o.total)}. Un e-mail de confirmation vient de vous être envoyé.<br />Vous suivrez chaque étape depuis votre profil et vos notifications.</p>
       <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><a class="btn" href="#/profil">Suivre ma commande</a><a class="btn btn-outline" href="#/galerie">Continuer mes découvertes</a></div>
+      ${o.crm ? `<p class="hint" style="margin-top:18px">Démo · côté entreprise, cette commande vient d'arriver dans le CRM. <a class="text-link" href="#/crm/${o.crm}">Voir la fiche client dans le CRM →</a></p>` : ""}
     </div>`;
 }
 

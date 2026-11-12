@@ -222,13 +222,32 @@ function crmFromOrder(o) {
     c.value = Math.round((c.value + o.total) * 100) / 100;
     c.stage = "gagne";
     c.fresh = true;
+    // Un client qui recommande remonte en tête de liste : le nouvel achat se voit tout de suite.
+    state.crm = [c, ...state.crm.filter((x) => x !== c)];
   } else {
-    state.crm.unshift({
+    c = {
       id: "c" + Date.now(), name: o.buyer, type: "acheteur", company: "", city: o.address.split(" ").slice(-1)[0], source: "Site ATYPIIK", stage: "gagne",
       value: o.total, email: (state.user && state.user.email) || "acheteur@example.com", phone: "Non renseigné", fresh: true,
       history: [line], next: [today(), "Demander un avis après la livraison"],
-    });
+    };
+    state.crm.unshift(c);
   }
+  c.lastOrder = o.id;
+  o.crm = c.id;
+}
+// Commandes passées sur le site par un contact acheteur.
+const ordersOf = (c) => state.orders.filter((o) => o.crm === c.id);
+function orderLines(o) {
+  return o.lines.map((l) => byId(l.id)).filter(Boolean).map((w) => esc(w.title)).join(", ");
+}
+function ordersTable(list) {
+  return `<div class="table-wrap"><table><thead><tr><th>Commande</th><th>Date</th><th>Client</th><th>Œuvre(s)</th><th class="num">Montant</th></tr></thead><tbody>${list
+    .map((o) => {
+      const c = state.crm.find((x) => x.id === o.crm) || state.crm.find((x) => x.type === "acheteur" && x.name.toLowerCase() === o.buyer.toLowerCase());
+      return `<tr><td><strong>${o.id}</strong>${o.date === today() ? ' <span class="tag pink">Aujourd\'hui</span>' : ""}</td><td>${frDate(o.date)}</td>
+        <td>${c ? `<a class="text-link" href="#/crm/${c.id}">${esc(o.buyer)}</a>` : esc(o.buyer)}</td><td>${orderLines(o)}</td><td class="num">${euro(o.total)} TTC</td></tr>`;
+    })
+    .join("")}</tbody></table></div>`;
 }
 
 /* ---------- 2. CRM ---------- */
@@ -260,6 +279,10 @@ function viewCRM(param) {
       <div><b>${Math.round(st.rate * 100)} %</b><span>Taux de conversion</span><small>${st.won.length} gagnés ÷ ${state.crm.length} contacts</small></div>
       <div><b>${euro(st.pipeSales)} TTC</b><span>En négociation</span><small>Commandes espérées, + ${ht(st.pipeSubs)} d'abonnements</small></div>
     </div>
+    <section class="panel crm-orders"><h2>Commandes passées sur le site</h2>
+      <p class="hint">Chaque achat fait dans la boutique arrive ici et sur la fiche du client, qui passe à l'étape « Gagné ».</p>
+      ${state.orders.length ? ordersTable(state.orders.slice(0, 6)) : emptyBox("Aucune commande", "Passez une commande de démo dans la galerie : elle apparaîtra ici.")}
+    </section>
     <div class="crm-dash">
       <section class="panel"><h2>Contacts par étape</h2>${byStage.map(([l, n]) => `<div class="bar"><span>${l}</span><i style="--w:${(n / max) * 100}%"></i><b>${n}</b></div>`).join("")}</section>
       <section class="panel"><h2>Contacts par source</h2>${bySource.map(([l, n, w]) => `<div class="bar"><span>${l}</span><i style="--w:${(n / maxS) * 100}%"></i><b>${n}<small> · ${w} gagné${w > 1 ? "s" : ""}</small></b></div>`).join("")}</section>
@@ -303,7 +326,10 @@ function crmTable() {
 function crmContacts() {
   const f = crmFilters();
   const opt = (list, cur) => list.map(([v, l]) => `<option value="${v}"${v === cur ? " selected" : ""}>${l}</option>`).join("");
+  const last = state.orders[0];
+  const lastC = last && state.crm.find((x) => x.id === last.crm);
   return `
+    ${last && lastC ? `<a class="crm-last" href="#/crm/${lastC.id}"><span class="label">Dernière commande du site</span><span><b>${last.id}</b> · ${esc(last.buyer)} · ${orderLines(last)} · ${euro(last.total)} TTC · ${frDate(last.date)}</span><span class="text-link">Voir la fiche →</span></a>` : ""}
     <div class="crm-filters">
       <input id="crm-q" type="search" placeholder="Rechercher un nom, une ville…" value="${esc(f.q)}" aria-label="Rechercher un contact" />
       <select data-crm="type" aria-label="Type">${opt([["", "Tous les types"], ["artiste", "Artistes"], ["acheteur", "Acheteurs"]], f.type)}</select>
@@ -407,6 +433,7 @@ function viewContact(id) {
           <button class="btn btn-small btn-outline">Mettre à jour</button>
         </form>
       </section>
+      ${c.type === "acheteur" && ordersOf(c).length ? `<section class="panel contact-history"><h2>Commandes sur le site (${ordersOf(c).length})</h2>${ordersTable(ordersOf(c))}</section>` : ""}
       <section class="panel contact-history"><h2>Historique des échanges</h2>
         <ol class="history">${c.history.slice().reverse().map(([d, t]) => `<li><span class="mono">${frDate(d)}</span>${esc(t)}</li>`).join("")}</ol>
         <form id="note-form" data-id="${c.id}" class="note-form"><input id="note-text" placeholder="Ajouter un échange (appel, message…)" aria-label="Nouvel échange" /><button class="btn btn-small">Ajouter</button></form>

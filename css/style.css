@@ -4907,3 +4907,25 @@ div.art::after {
     font-size: 0.78rem;
   }
 }
+
+/* CRM : commandes du site */
+.crm-orders {
+  margin-bottom: 20px;
+}
+.crm-last {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+  margin-bottom: 14px;
+  padding: 14px 16px;
+  background: var(--accent-soft);
+  border-left: 4px solid var(--accent);
+  font-size: 0.9rem;
+}
+.crm-last .label {
+  color: var(--accent);
+}
+.crm-last .text-link {
+  margin-left: auto;
+}
