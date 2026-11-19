@@ -100,7 +100,7 @@ function viewOffer() {
       <a class="btn btn-block${p.id === "pro" ? "" : " btn-outline"}" href="#/abonnement/${p.id}">Choisir ${esc(p.name)}</a>
     </article>`;
   return `
-    <div class="page-head"><span class="label muted">1. Vente · côté client</span><h1>Ce que l'on vend</h1><p class="lead">${esc(PROMISE)}</p></div>
+    <div class="page-head"><span class="label muted">${isAdmin() ? "1. Vente · côté client" : "Offres et prix"}</span><h1>Ce que l'on vend</h1><p class="lead">${esc(PROMISE)}</p></div>
     <div class="offer-sides">
       <section class="offer-side">
         <span class="label muted">Pour les acheteurs</span><h2>Acheter une œuvre</h2>
@@ -119,7 +119,7 @@ function viewOffer() {
         <tbody>${PLAN_COMPARE.map(([l, a, b]) => `<tr><td>${esc(l)}</td><td>${cell(a)}</td><td class="pro">${cell(b)}</td></tr>`).join("")}</tbody></table></div>
       <p class="hint">Prix en euros. TVA de 20 % incluse dans la commission et ajoutée aux abonnements. L'offre Pro devient rentable pour l'artiste au-delà de 430 € de ventes par mois.</p>
     </section>
-    <section class="proj-demo">
+    ${isAdmin() ? `    <section class="proj-demo">
       <h2>Tester l'achat</h2>
       <ol>
         <li><b>Choisir une œuvre</b><span>Dans la galerie, cliquez sur « Ajouter au panier », puis sur « Acheteur » dans la connexion de démo.</span></li>
@@ -128,7 +128,7 @@ function viewOffer() {
       </ol>
       <a class="btn btn-small" href="#/galerie">Choisir une œuvre</a>
     </section>
-    ${spaceNav(1)}`;
+    ${spaceNav(1)}` : ""}`;
 }
 
 /* ---------- Abonnement simulé ---------- */
@@ -208,8 +208,8 @@ function viewSubDone(id) {
     <div class="empty" style="border-style:solid;border-color:var(--ink)">
       <span class="label muted">Merci ${esc(d.name)}</span>
       <h3 style="font-size:3rem;margin-top:12px">Atelier ouvert</h3>
-      <p>Abonnement <b>${esc(p.name)}</b> confirmé, référence <b>${id}</b>${p.price ? ` · ${ttc(p.price)} par mois` : ""}.<br />Vous apparaissez maintenant dans le CRM d'ATYPIIK, à l'étape « Gagné ».</p>
-      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><a class="btn" href="#/crm/contacts">Voir dans le CRM</a><a class="btn btn-outline" href="#/offre">Retour aux offres</a></div>
+      <p>Abonnement <b>${esc(p.name)}</b> confirmé, référence <b>${id}</b>${p.price ? ` · ${ttc(p.price)} par mois` : ""}.<br />Votre espace artiste vous attend dans votre profil.</p>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><a class="btn" href="#/profil">Mon profil</a><a class="btn btn-outline" href="#/offre">Retour aux offres</a>${isAdmin() ? '<a class="btn btn-outline" href="#/crm/contacts">Voir dans le CRM</a>' : ""}</div>
     </div>`;
 }
 
@@ -640,14 +640,28 @@ PROJECT_ACTIONS["scroll-to"] = (el, e) => {
   if (t) window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 140, behavior: "smooth" });
 };
 
+/* Outils internes de l'administratrice : barre d'administration, menu, garde d'accès. */
+const ADMIN_LINKS = [
+  ["#/profil", "Tableau admin", "profil"],
+  ["#/crm", "CRM", "crm"],
+  ["#/strategie", "Stratégie", "strategie"],
+  ["#/communication", "Communication", "communication"],
+  ["#/projet", "Vue d'ensemble", "projet"],
+];
+function adminOnly([view, bind]) {
+  const locked = () =>
+    `<div class="page-head"><span class="label muted">Administration</span><h1>Espace réservé</h1><p>Cette page est un outil interne d'ATYPIIK. Connectez-vous avec le compte administrateur pour y accéder (en démo : bouton « Administrateur »).</p></div>${loginForms()}`;
+  return [() => (isAdmin() ? view() : locked()), () => (isAdmin() ? bind && bind() : bindLogin())];
+}
+
 const PROJECT_VIEWS = {
-  projet: [viewProject],
+  projet: adminOnly([viewProject]),
   offre: [viewOffer],
   abonnement: [() => viewSubscribe(currentParam), () => bindSubscribe(currentParam)],
   "abonnement-ok": [() => viewSubDone(currentParam)],
-  crm: [() => viewCRM(currentParam), bindCRM],
-  strategie: [viewStrategy],
-  communication: [viewCom],
+  crm: adminOnly([() => viewCRM(currentParam), bindCRM]),
+  strategie: adminOnly([viewStrategy]),
+  communication: adminOnly([viewCom]),
 };
 
 /* ---------- Devenir artiste depuis un compte acheteur ---------- */

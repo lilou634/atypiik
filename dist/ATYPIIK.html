@@ -5001,19 +5001,108 @@ div.art::after {
   margin-left: auto;
 }
 
+/* Barre et menu d'administration (visibles seulement pour l'administratrice) */
+.admin-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px 20px;
+  flex-wrap: wrap;
+  padding: 7px max(16px, (100% - 1360px) / 2);
+  background: var(--accent);
+  color: var(--paper);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.admin-bar[hidden] {
+  display: none;
+}
+.admin-bar nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+}
+.admin-bar a {
+  opacity: 0.8;
+}
+.admin-bar a:hover,
+.admin-bar a.active {
+  opacity: 1;
+  box-shadow: 0 2px 0 var(--paper);
+}
+.admin-bar-title::before {
+  content: "● ";
+}
+.admin-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.admin-tools a {
+  padding: 10px 14px;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.admin-tools a:hover {
+  background: var(--accent);
+  color: var(--paper);
+}
+
+/* Menu latéral : rubriques repliables */
+.drawer .drawer-home {
+  font-size: 2rem;
+}
+.drawer-group {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+.drawer-group summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.drawer-group summary::-webkit-details-marker {
+  display: none;
+}
+.drawer-group summary::after {
+  content: "+";
+  font-family: var(--font-body);
+  font-size: 1.6rem;
+  font-weight: 400;
+}
+.drawer-group[open] summary::after {
+  content: "−";
+}
+.drawer-group a {
+  display: block;
+  padding: 8px 0 8px 14px;
+  font-size: 1.35rem;
+  border-bottom: 0;
+}
+.drawer-group a:last-child {
+  padding-bottom: 16px;
+}
+.drawer-group-admin summary {
+  color: #ffd8de;
+}
+
     </style>
   </head>
   <body>
     <header class="header">
-      <div class="demo-bar">
-        <nav class="spaces-nav" aria-label="Espaces du projet">
-          <a href="#/projet" data-route="projet">Projet</a>
-          <a href="#/offre" data-route="offre">1. Vente</a>
-          <a href="#/crm" data-route="crm">2. CRM</a>
-          <a href="#/strategie" data-route="strategie">3. Stratégie</a>
-          <a href="#/communication" data-route="communication">4. Communication</a>
-        </nav>
-      </div>
+      <div class="admin-bar" id="admin-bar" hidden></div>
       <div class="container header-inner">
         <nav class="nav" aria-label="Navigation principale">
           <a href="#/galerie" data-route="galerie">Galerie</a>
@@ -5062,22 +5151,34 @@ div.art::after {
       <button class="icon-link close" id="drawer-close" aria-label="Fermer le menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18" /></svg>
       </button>
-      <a href="#/">Accueil</a>
-      <a href="#/galerie">Galerie</a>
-      <a href="#/artistes">Artistes</a>
-      <a href="#/selection">Notre sélection</a>
-      <a href="#/histoire">Notre histoire</a>
-      <a href="#/aide">Comment ça marche</a>
-      <a href="#/vendre">Vendre sur ATYPIIK</a>
-      <a href="#/offre">Offres et prix</a>
-      <a href="#/crm">CRM (démo)</a>
-      <a href="#/strategie">Stratégie</a>
-      <a href="#/communication">Communication</a>
-      <a href="#/favoris">Favoris</a>
-      <a href="#/panier">Panier</a>
-      <a href="#/notifications">Notifications</a>
-      <a href="#/profil">Profil</a>
-      <a href="#/messages">Contact / Messagerie</a>
+      <a class="drawer-home" href="#/">Accueil</a>
+      <details class="drawer-group" open>
+        <summary>Découvrir</summary>
+        <a href="#/galerie">Galerie</a>
+        <a href="#/artistes">Artistes</a>
+        <a href="#/selection">Notre sélection</a>
+        <a href="#/histoire">Notre histoire</a>
+      </details>
+      <details class="drawer-group">
+        <summary>Mon compte</summary>
+        <a href="#/profil">Profil</a>
+        <a href="#/favoris">Favoris</a>
+        <a href="#/panier">Panier</a>
+        <a href="#/notifications">Notifications</a>
+        <a href="#/messages">Messagerie</a>
+      </details>
+      <details class="drawer-group">
+        <summary>Artistes</summary>
+        <a href="#/vendre">Vendre sur ATYPIIK</a>
+        <a href="#/offre">Offres et prix</a>
+        <a href="#/devenir-artiste">Devenir artiste</a>
+      </details>
+      <details class="drawer-group">
+        <summary>Aide</summary>
+        <a href="#/aide">Comment ça marche</a>
+        <a href="#/messages/support">Contact</a>
+      </details>
+      <div id="drawer-admin"></div>
     </div>
 
     <main id="app" class="container" tabindex="-1"></main>
@@ -5108,16 +5209,15 @@ div.art::after {
               <a href="#/profil">Profil</a>
               <a href="#/favoris">Favoris</a>
               <a href="#/messages">Messagerie</a>
-              <a href="#/vendre">Vendre sur ATYPIIK</a>
+              <a href="#/panier">Panier</a>
             </nav>
           </div>
           <div>
-            <h4>Coulisses</h4>
+            <h4>Artistes</h4>
             <nav>
+              <a href="#/vendre">Vendre sur ATYPIIK</a>
               <a href="#/offre">Offres et prix</a>
-              <a href="#/crm">CRM</a>
-              <a href="#/strategie">Dossier stratégique</a>
-              <a href="#/communication">Plan de communication</a>
+              <a href="#/devenir-artiste">Devenir artiste</a>
             </nav>
           </div>
           <div>
@@ -6055,7 +6155,7 @@ function viewOffer() {
       <a class="btn btn-block${p.id === "pro" ? "" : " btn-outline"}" href="#/abonnement/${p.id}">Choisir ${esc(p.name)}</a>
     </article>`;
   return `
-    <div class="page-head"><span class="label muted">1. Vente · côté client</span><h1>Ce que l'on vend</h1><p class="lead">${esc(PROMISE)}</p></div>
+    <div class="page-head"><span class="label muted">${isAdmin() ? "1. Vente · côté client" : "Offres et prix"}</span><h1>Ce que l'on vend</h1><p class="lead">${esc(PROMISE)}</p></div>
     <div class="offer-sides">
       <section class="offer-side">
         <span class="label muted">Pour les acheteurs</span><h2>Acheter une œuvre</h2>
@@ -6074,7 +6174,7 @@ function viewOffer() {
         <tbody>${PLAN_COMPARE.map(([l, a, b]) => `<tr><td>${esc(l)}</td><td>${cell(a)}</td><td class="pro">${cell(b)}</td></tr>`).join("")}</tbody></table></div>
       <p class="hint">Prix en euros. TVA de 20 % incluse dans la commission et ajoutée aux abonnements. L'offre Pro devient rentable pour l'artiste au-delà de 430 € de ventes par mois.</p>
     </section>
-    <section class="proj-demo">
+    ${isAdmin() ? `    <section class="proj-demo">
       <h2>Tester l'achat</h2>
       <ol>
         <li><b>Choisir une œuvre</b><span>Dans la galerie, cliquez sur « Ajouter au panier », puis sur « Acheteur » dans la connexion de démo.</span></li>
@@ -6083,7 +6183,7 @@ function viewOffer() {
       </ol>
       <a class="btn btn-small" href="#/galerie">Choisir une œuvre</a>
     </section>
-    ${spaceNav(1)}`;
+    ${spaceNav(1)}` : ""}`;
 }
 
 /* ---------- Abonnement simulé ---------- */
@@ -6163,8 +6263,8 @@ function viewSubDone(id) {
     <div class="empty" style="border-style:solid;border-color:var(--ink)">
       <span class="label muted">Merci ${esc(d.name)}</span>
       <h3 style="font-size:3rem;margin-top:12px">Atelier ouvert</h3>
-      <p>Abonnement <b>${esc(p.name)}</b> confirmé, référence <b>${id}</b>${p.price ? ` · ${ttc(p.price)} par mois` : ""}.<br />Vous apparaissez maintenant dans le CRM d'ATYPIIK, à l'étape « Gagné ».</p>
-      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><a class="btn" href="#/crm/contacts">Voir dans le CRM</a><a class="btn btn-outline" href="#/offre">Retour aux offres</a></div>
+      <p>Abonnement <b>${esc(p.name)}</b> confirmé, référence <b>${id}</b>${p.price ? ` · ${ttc(p.price)} par mois` : ""}.<br />Votre espace artiste vous attend dans votre profil.</p>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><a class="btn" href="#/profil">Mon profil</a><a class="btn btn-outline" href="#/offre">Retour aux offres</a>${isAdmin() ? '<a class="btn btn-outline" href="#/crm/contacts">Voir dans le CRM</a>' : ""}</div>
     </div>`;
 }
 
@@ -6595,14 +6695,28 @@ PROJECT_ACTIONS["scroll-to"] = (el, e) => {
   if (t) window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 140, behavior: "smooth" });
 };
 
+/* Outils internes de l'administratrice : barre d'administration, menu, garde d'accès. */
+const ADMIN_LINKS = [
+  ["#/profil", "Tableau admin", "profil"],
+  ["#/crm", "CRM", "crm"],
+  ["#/strategie", "Stratégie", "strategie"],
+  ["#/communication", "Communication", "communication"],
+  ["#/projet", "Vue d'ensemble", "projet"],
+];
+function adminOnly([view, bind]) {
+  const locked = () =>
+    `<div class="page-head"><span class="label muted">Administration</span><h1>Espace réservé</h1><p>Cette page est un outil interne d'ATYPIIK. Connectez-vous avec le compte administrateur pour y accéder (en démo : bouton « Administrateur »).</p></div>${loginForms()}`;
+  return [() => (isAdmin() ? view() : locked()), () => (isAdmin() ? bind && bind() : bindLogin())];
+}
+
 const PROJECT_VIEWS = {
-  projet: [viewProject],
+  projet: adminOnly([viewProject]),
   offre: [viewOffer],
   abonnement: [() => viewSubscribe(currentParam), () => bindSubscribe(currentParam)],
   "abonnement-ok": [() => viewSubDone(currentParam)],
-  crm: [() => viewCRM(currentParam), bindCRM],
-  strategie: [viewStrategy],
-  communication: [viewCom],
+  crm: adminOnly([() => viewCRM(currentParam), bindCRM]),
+  strategie: adminOnly([viewStrategy]),
+  communication: adminOnly([viewCom]),
 };
 
 /* ---------- Devenir artiste depuis un compte acheteur ---------- */
@@ -6920,6 +7034,12 @@ function updateChrome() {
     ? `<a href="#/profil" class="user-pill"><span class="role-dot" style="${state.user.role === "admin" ? "background:var(--accent)" : ""}"></span><span class="name">${esc(roles[state.user.role])}</span></a>`
     : "";
   $("#cookie").hidden = state.cookies !== null;
+  // Outils internes : visibles seulement quand l'administratrice est connectée.
+  const admin = isAdmin();
+  const tools = ADMIN_LINKS.map(([h, l, r]) => `<a href="${h}" data-route="${r}"${r === currentRoute ? ' class="active"' : ""}>${l}</a>`).join("");
+  $("#admin-bar").hidden = !admin;
+  $("#admin-bar").innerHTML = admin ? `<span class="admin-bar-title">Administration</span><nav aria-label="Outils internes">${tools}</nav>` : "";
+  $("#drawer-admin").innerHTML = admin ? `<details class="drawer-group drawer-group-admin"><summary>Administration</summary>${ADMIN_LINKS.map(([h, l]) => `<a href="${h}">${l}</a>`).join("")}</details>` : "";
 }
 
 /* ---------- Composants ---------- */
@@ -7887,7 +8007,7 @@ function viewOrderDone(id) {
       <h3 style="font-size:3rem;margin-top:12px">Commande confirmée</h3>
       <p>Commande <strong>${o.id}</strong> · ${euro(o.total)}. Un e-mail de confirmation vient de vous être envoyé.<br />Vous suivrez chaque étape depuis votre profil et vos notifications.</p>
       <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><a class="btn" href="#/profil">Suivre ma commande</a><a class="btn btn-outline" href="#/galerie">Continuer mes découvertes</a></div>
-      ${o.crm ? `<p class="hint" style="margin-top:18px">Démo · côté entreprise, cette commande vient d'arriver dans le CRM. <a class="text-link" href="#/crm/${o.crm}">Voir la fiche client dans le CRM →</a></p>` : ""}
+      ${o.crm && isAdmin() ? `<p class="hint" style="margin-top:18px">Démo · côté entreprise, cette commande vient d'arriver dans le CRM. <a class="text-link" href="#/crm/${o.crm}">Voir la fiche client dans le CRM →</a></p>` : ""}
     </div>`;
 }
 
@@ -8493,6 +8613,7 @@ function adminSpace() {
       : emptyBox("Aucun litige", "Tout va bien.");
   }
   return `
+    <nav class="admin-tools" aria-label="Outils internes">${ADMIN_LINKS.slice(1).map(([h, l]) => `<a href="${h}">${l} →</a>`).join("")}</nav>
     <div class="kpis">
       <div><b>${euro(gmv)}</b><span>Volume de ventes</span></div>
       <div><b class="pink">${euro(gmv * 0.1)}</b><span>Commissions (taux Atelier 10 %)</span></div>

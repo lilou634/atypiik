@@ -4929,3 +4929,100 @@ div.art::after {
 .crm-last .text-link {
   margin-left: auto;
 }
+
+/* Barre et menu d'administration (visibles seulement pour l'administratrice) */
+.admin-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px 20px;
+  flex-wrap: wrap;
+  padding: 7px max(16px, (100% - 1360px) / 2);
+  background: var(--accent);
+  color: var(--paper);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.admin-bar[hidden] {
+  display: none;
+}
+.admin-bar nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+}
+.admin-bar a {
+  opacity: 0.8;
+}
+.admin-bar a:hover,
+.admin-bar a.active {
+  opacity: 1;
+  box-shadow: 0 2px 0 var(--paper);
+}
+.admin-bar-title::before {
+  content: "● ";
+}
+.admin-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.admin-tools a {
+  padding: 10px 14px;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.admin-tools a:hover {
+  background: var(--accent);
+  color: var(--paper);
+}
+
+/* Menu latéral : rubriques repliables */
+.drawer .drawer-home {
+  font-size: 2rem;
+}
+.drawer-group {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+.drawer-group summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.drawer-group summary::-webkit-details-marker {
+  display: none;
+}
+.drawer-group summary::after {
+  content: "+";
+  font-family: var(--font-body);
+  font-size: 1.6rem;
+  font-weight: 400;
+}
+.drawer-group[open] summary::after {
+  content: "−";
+}
+.drawer-group a {
+  display: block;
+  padding: 8px 0 8px 14px;
+  font-size: 1.35rem;
+  border-bottom: 0;
+}
+.drawer-group a:last-child {
+  padding-bottom: 16px;
+}
+.drawer-group-admin summary {
+  color: #ffd8de;
+}

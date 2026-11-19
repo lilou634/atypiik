@@ -18,15 +18,7 @@
   </head>
   <body>
     <header class="header">
-      <div class="demo-bar">
-        <nav class="spaces-nav" aria-label="Espaces du projet">
-          <a href="#/projet" data-route="projet">Projet</a>
-          <a href="#/offre" data-route="offre">1. Vente</a>
-          <a href="#/crm" data-route="crm">2. CRM</a>
-          <a href="#/strategie" data-route="strategie">3. Stratégie</a>
-          <a href="#/communication" data-route="communication">4. Communication</a>
-        </nav>
-      </div>
+      <div class="admin-bar" id="admin-bar" hidden></div>
       <div class="container header-inner">
         <nav class="nav" aria-label="Navigation principale">
           <a href="#/galerie" data-route="galerie">Galerie</a>
@@ -75,22 +67,34 @@
       <button class="icon-link close" id="drawer-close" aria-label="Fermer le menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18" /></svg>
       </button>
-      <a href="#/">Accueil</a>
-      <a href="#/galerie">Galerie</a>
-      <a href="#/artistes">Artistes</a>
-      <a href="#/selection">Notre sélection</a>
-      <a href="#/histoire">Notre histoire</a>
-      <a href="#/aide">Comment ça marche</a>
-      <a href="#/vendre">Vendre sur ATYPIIK</a>
-      <a href="#/offre">Offres et prix</a>
-      <a href="#/crm">CRM (démo)</a>
-      <a href="#/strategie">Stratégie</a>
-      <a href="#/communication">Communication</a>
-      <a href="#/favoris">Favoris</a>
-      <a href="#/panier">Panier</a>
-      <a href="#/notifications">Notifications</a>
-      <a href="#/profil">Profil</a>
-      <a href="#/messages">Contact / Messagerie</a>
+      <a class="drawer-home" href="#/">Accueil</a>
+      <details class="drawer-group" open>
+        <summary>Découvrir</summary>
+        <a href="#/galerie">Galerie</a>
+        <a href="#/artistes">Artistes</a>
+        <a href="#/selection">Notre sélection</a>
+        <a href="#/histoire">Notre histoire</a>
+      </details>
+      <details class="drawer-group">
+        <summary>Mon compte</summary>
+        <a href="#/profil">Profil</a>
+        <a href="#/favoris">Favoris</a>
+        <a href="#/panier">Panier</a>
+        <a href="#/notifications">Notifications</a>
+        <a href="#/messages">Messagerie</a>
+      </details>
+      <details class="drawer-group">
+        <summary>Artistes</summary>
+        <a href="#/vendre">Vendre sur ATYPIIK</a>
+        <a href="#/offre">Offres et prix</a>
+        <a href="#/devenir-artiste">Devenir artiste</a>
+      </details>
+      <details class="drawer-group">
+        <summary>Aide</summary>
+        <a href="#/aide">Comment ça marche</a>
+        <a href="#/messages/support">Contact</a>
+      </details>
+      <div id="drawer-admin"></div>
     </div>
 
     <main id="app" class="container" tabindex="-1"></main>
@@ -121,16 +125,15 @@
               <a href="#/profil">Profil</a>
               <a href="#/favoris">Favoris</a>
               <a href="#/messages">Messagerie</a>
-              <a href="#/vendre">Vendre sur ATYPIIK</a>
+              <a href="#/panier">Panier</a>
             </nav>
           </div>
           <div>
-            <h4>Coulisses</h4>
+            <h4>Artistes</h4>
             <nav>
+              <a href="#/vendre">Vendre sur ATYPIIK</a>
               <a href="#/offre">Offres et prix</a>
-              <a href="#/crm">CRM</a>
-              <a href="#/strategie">Dossier stratégique</a>
-              <a href="#/communication">Plan de communication</a>
+              <a href="#/devenir-artiste">Devenir artiste</a>
             </nav>
           </div>
           <div>

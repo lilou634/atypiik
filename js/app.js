@@ -143,6 +143,12 @@ function updateChrome() {
     ? `<a href="#/profil" class="user-pill"><span class="role-dot" style="${state.user.role === "admin" ? "background:var(--accent)" : ""}"></span><span class="name">${esc(roles[state.user.role])}</span></a>`
     : "";
   $("#cookie").hidden = state.cookies !== null;
+  // Outils internes : visibles seulement quand l'administratrice est connectée.
+  const admin = isAdmin();
+  const tools = ADMIN_LINKS.map(([h, l, r]) => `<a href="${h}" data-route="${r}"${r === currentRoute ? ' class="active"' : ""}>${l}</a>`).join("");
+  $("#admin-bar").hidden = !admin;
+  $("#admin-bar").innerHTML = admin ? `<span class="admin-bar-title">Administration</span><nav aria-label="Outils internes">${tools}</nav>` : "";
+  $("#drawer-admin").innerHTML = admin ? `<details class="drawer-group drawer-group-admin"><summary>Administration</summary>${ADMIN_LINKS.map(([h, l]) => `<a href="${h}">${l}</a>`).join("")}</details>` : "";
 }
 
 /* ---------- Composants ---------- */
@@ -1110,7 +1116,7 @@ function viewOrderDone(id) {
       <h3 style="font-size:3rem;margin-top:12px">Commande confirmée</h3>
       <p>Commande <strong>${o.id}</strong> · ${euro(o.total)}. Un e-mail de confirmation vient de vous être envoyé.<br />Vous suivrez chaque étape depuis votre profil et vos notifications.</p>
       <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><a class="btn" href="#/profil">Suivre ma commande</a><a class="btn btn-outline" href="#/galerie">Continuer mes découvertes</a></div>
-      ${o.crm ? `<p class="hint" style="margin-top:18px">Démo · côté entreprise, cette commande vient d'arriver dans le CRM. <a class="text-link" href="#/crm/${o.crm}">Voir la fiche client dans le CRM →</a></p>` : ""}
+      ${o.crm && isAdmin() ? `<p class="hint" style="margin-top:18px">Démo · côté entreprise, cette commande vient d'arriver dans le CRM. <a class="text-link" href="#/crm/${o.crm}">Voir la fiche client dans le CRM →</a></p>` : ""}
     </div>`;
 }
 
@@ -1716,6 +1722,7 @@ function adminSpace() {
       : emptyBox("Aucun litige", "Tout va bien.");
   }
   return `
+    <nav class="admin-tools" aria-label="Outils internes">${ADMIN_LINKS.slice(1).map(([h, l]) => `<a href="${h}">${l} →</a>`).join("")}</nav>
     <div class="kpis">
       <div><b>${euro(gmv)}</b><span>Volume de ventes</span></div>
       <div><b class="pink">${euro(gmv * 0.1)}</b><span>Commissions (taux Atelier 10 %)</span></div>
