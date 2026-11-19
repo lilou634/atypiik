@@ -49,7 +49,7 @@ function viewProject() {
   ];
   return `
     <section class="proj-hero">
-      <span class="label muted">Projet étudiant INSEEC · Lilou Capanni</span>
+      <span class="label muted">Fondé par Lilou Capanni</span>
       <h1>L'art qui sort du rang</h1>
       <p class="lead">${esc(PROMISE)}</p>
       <div class="proj-cta"><a class="btn" href="#/offre">Commencer la visite →</a><a class="btn btn-outline" href="#/galerie">Voir la boutique</a></div>
