@@ -5026,3 +5026,194 @@ div.art::after {
 .drawer-group-admin summary {
   color: #ffd8de;
 }
+
+/* Offre de l'artiste dans son tableau de bord */
+.plan-usage {
+  margin: 6px 0 12px;
+  padding: 10px 12px;
+  background: var(--paper-2);
+  font-size: 0.85rem;
+}
+
+/* Livraison et panier par artiste */
+.ship-line {
+  margin: 4px 0;
+  font-size: 0.8rem;
+  color: var(--ink-2);
+}
+.ship-line-big {
+  margin: -4px 0 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+.cart-group {
+  border: 1px solid var(--rule);
+  margin-bottom: 16px;
+}
+.cart-group .cart-line {
+  padding-left: 14px;
+  padding-right: 14px;
+}
+.cart-group-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  padding: 12px 14px;
+  background: var(--paper-2);
+  border-bottom: 1px solid var(--rule-soft);
+}
+.cart-group-head .label {
+  color: var(--accent);
+}
+.cart-group-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--rule-soft);
+  font-size: 0.88rem;
+}
+
+/* Sur mesure : mise en avant et devis */
+.custom-cta {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 32px;
+  align-items: center;
+  padding: 36px;
+  background: var(--accent);
+  color: var(--paper);
+}
+.custom-cta .label {
+  color: #ffd8de;
+}
+.custom-cta h2 {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  text-transform: uppercase;
+  line-height: 0.95;
+  margin: 8px 0 12px;
+}
+.custom-cta .fun {
+  color: #ffd8de;
+}
+.custom-steps {
+  list-style: none;
+  counter-reset: c;
+  padding: 0;
+  margin: 18px 0 22px;
+  display: grid;
+  gap: 12px;
+}
+.custom-steps li {
+  counter-increment: c;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  column-gap: 12px;
+}
+.custom-steps li::before {
+  content: counter(c);
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  background: var(--paper);
+  color: var(--accent);
+  font-weight: 800;
+}
+.custom-steps span {
+  opacity: 0.85;
+  font-size: 0.9rem;
+}
+.custom-cta .btn {
+  background: var(--paper);
+  color: var(--accent);
+}
+.custom-cta-visual .art {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+.custom-link {
+  display: grid;
+  gap: 4px;
+  margin: 14px 0;
+  padding: 14px 16px;
+  border: 1px solid var(--accent);
+  background: var(--accent-soft);
+}
+.custom-link .text-link {
+  justify-self: start;
+  margin-top: 4px;
+}
+.quote-box {
+  margin: 12px 0;
+  padding: 14px;
+  border: 1px solid var(--accent);
+  background: var(--paper);
+}
+.quote-box .label {
+  color: var(--accent);
+}
+.quote-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 10px 0;
+}
+.quote-grid span {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--ink-3);
+}
+.quote-total {
+  margin: 0;
+  font-size: 0.9rem;
+}
+@media (max-width: 860px) {
+  .custom-cta {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 24px;
+  }
+  .quote-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Administration en lecture seule, chat sécurisé */
+.admin-readonly {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.admin-readonly .label {
+  color: var(--accent);
+}
+.chat-safe {
+  margin: 8px 0 0;
+  font-size: 0.75rem;
+}
+.seller-rules {
+  margin: 10px 0 0;
+  padding-left: 1.1em;
+  display: grid;
+  gap: 6px;
+  font-size: 0.85rem;
+}
+
+/* Connexion administrateur (page séparée) */
+.admin-login {
+  max-width: 480px;
+  margin: 24px auto 40px;
+}
+.admin-login h1 {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  text-transform: uppercase;
+  margin: 6px 0 16px;
+}
+.admin-login .demo-box {
+  margin-top: 16px;
+}

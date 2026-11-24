@@ -2,49 +2,49 @@
 
 const ARTISTS = [
   {
-    id: "nova", name: "Nova Lune", city: "Marseille", followers: 1840,
+    id: "nova", name: "Nova Lune", city: "Marseille", followers: 1840, plan: "atelier",
     bio: "Peintre. Des scènes calmes, des corps en mouvement, beaucoup d'eau et de lumière.",
     videos: ["Atelier : préparation des fonds", "Making-of de « Deux nageurs »"],
     press: ["Dossier de presse 2026.pdf", "Article — Beaux Arts Magazine.pdf"],
   },
   {
-    id: "ines", name: "Inès Vale", city: "Paris", followers: 2310,
+    id: "ines", name: "Inès Vale", city: "Paris", followers: 2310, plan: "pro",
     bio: "Photographe de rue et de voyage. Tirages signés, en séries limitées.",
     videos: ["Une matinée sur le Tour de France", "Le tirage, étape par étape"],
     press: ["Dossier de presse Inès Vale.pdf"],
   },
   {
-    id: "margaux", name: "Margaux Pech", city: "Nantes", followers: 3120,
+    id: "margaux", name: "Margaux Pech", city: "Nantes", followers: 3120, plan: "pro",
     bio: "Céramiste. Faïence modelée et peinte à la main : jamais deux pièces pareilles.",
     videos: ["Tournage et peinture des vases rayés"],
     press: ["Portfolio Margaux Pech.pdf"],
   },
   {
-    id: "oko", name: "Atelier Oko", city: "Bordeaux", followers: 980,
+    id: "oko", name: "Atelier Oko", city: "Bordeaux", followers: 980, plan: "atelier",
     bio: "Duo de céramistes : porcelaine, grès et objets de jeu pour la maison.",
     videos: ["Peindre une boîte d'allumettes"],
     press: [],
   },
   {
-    id: "rosa", name: "Rosa Mendes", city: "Montpellier", followers: 2640,
+    id: "rosa", name: "Rosa Mendes", city: "Montpellier", followers: 2640, plan: "pro",
     bio: "Upcycling. Des vestes et des pièces uniques taillées dans des tissus anciens et des vêtements chinés.",
     videos: ["Du canevas à la veste", "Essayage de la collection"],
     press: ["Dossier de presse Rosa Mendes.pdf"],
   },
   {
-    id: "zia", name: "Zia Okafor", city: "Lille", followers: 1205,
+    id: "zia", name: "Zia Okafor", city: "Lille", followers: 1205, plan: "atelier",
     bio: "Crochet et maille. Chaque pièce est faite à la main, une par une.",
     videos: ["Un pull en 40 heures"],
     press: [],
   },
   {
-    id: "kairo", name: "Kairo Sato", city: "Lyon", followers: 760,
+    id: "kairo", name: "Kairo Sato", city: "Lyon", followers: 760, plan: "atelier",
     bio: "Objets et petites sculptures pour la maison, entre jeu et contemplation.",
     videos: [],
     press: ["Portfolio Kairo Sato.pdf"],
   },
   {
-    id: "leonie", name: "Léonie Garnier", city: "Nice", followers: 1490,
+    id: "leonie", name: "Léonie Garnier", city: "Nice", followers: 1490, plan: "atelier",
     bio: "Bijoux en pierres naturelles et perles, montés à la main dans mon atelier.",
     videos: ["Monter un collier"],
     press: [],
@@ -258,6 +258,15 @@ const ARTWORKS = [
   },
 ];
 
+/* Livraison : chaque artiste fixe ses frais de port par œuvre, ou les inclut dans son prix.
+   Valeurs de démonstration selon le format de l'œuvre. */
+const SHIPPING_BY_SIZE = { S: 5.9, M: 8.9, L: 14.9 };
+const SHIPPING_INCLUDED = ["a7", "a9", "a28", "a29", "a26"];
+ARTWORKS.forEach((w) => {
+  if (SHIPPING_INCLUDED.includes(w.id)) w.shippingIncluded = true;
+  else w.shipping = SHIPPING_BY_SIZE[w.size] || 8.9;
+});
+
 const COLORS = {
   rouge: "#c0392b",
   bordeaux: "#6d1a2a",
@@ -428,12 +437,15 @@ const ARTIST_QUOTES = [
 
 /* Questions fréquentes (page « Comment ça marche »). */
 const FAQ = [
-  ["Qui sont les artistes d'ATYPIIK ?", "Des créateurs et créatrices indépendants, sélectionnés un par un par notre équipe. Nous vérifions que chaque pièce est bien conçue et fabriquée par la personne qui la vend."],
-  ["Combien de temps pour recevoir ma commande ?", "Chaque fiche indique le délai d'expédition de l'artiste. Les pièces en stock partent en général sous 2 à 5 jours ; les pièces faites à la commande prennent plus de temps. La livraison est suivie."],
-  ["Combien coûte la livraison ?", "Les frais de port dépendent de la taille et du poids du colis. Ils sont affichés avant le paiement et reversés à l'artiste."],
-  ["Puis-je retourner une œuvre ?", "Oui, vous disposez de 14 jours après réception pour changer d'avis, sauf pour les commandes sur mesure. Les frais de retour sont à votre charge."],
-  ["Et si mon colis arrive abîmé ?", "Signalez-le depuis votre commande avec des photos, dans les 48 h. L'artiste et notre équipe vous répondent dans le dossier, et le remboursement est effectué si le problème est confirmé."],
+  ["Qui sont les artistes d'ATYPIIK ?", "Des créateurs et créatrices indépendants, sélectionnés un par un par notre équipe. Nous vérifions que chaque pièce est bien faite par l'artiste qui la vend : pas de revente, pas de production de masse."],
+  ["Qui me vend l'œuvre ?", "L'artiste. ATYPIIK met en relation les artistes et les acheteurs et sécurise le paiement, mais c'est l'artiste qui vend, prépare et expédie votre commande. Sa fiche indique s'il vend en tant que professionnel ou particulier."],
+  ["Combien coûte la livraison ?", "Chaque artiste fixe ses frais de livraison, affichés sous le prix de l'œuvre, ou les inclut dans son prix. Ils sont payés par l'acheteur et reversés à l'artiste. Si vous achetez plusieurs œuvres au même artiste, vous ne payez qu'un seul envoi."],
+  ["Puis-je acheter chez plusieurs artistes en même temps ?", "Oui. Votre panier est regroupé par artiste : vous payez une seule fois, et chaque artiste vous envoie son colis avec ses propres frais de livraison."],
+  ["Combien de temps pour recevoir ma commande ?", "Chaque fiche indique le délai d'expédition de l'artiste. Les pièces en stock partent en général sous 2 à 5 jours ouvrés, et vous suivez chaque étape depuis votre profil."],
+  ["Puis-je demander une pièce sur mesure ?", "Oui, depuis la fiche d'une œuvre ou la page d'un artiste. Vous décrivez votre projet, l'artiste vous envoie un devis détaillé (prix, délai, livraison, retouches), puis vous l'acceptez et le payez sur ATYPIIK. L'artiste est payé après la livraison."],
+  ["Puis-je retourner une œuvre ?", "Oui, vous disposez de 14 jours après réception pour changer d'avis, sauf pour les commandes sur mesure. Les frais de retour sont à votre charge, sauf si la pièce est abîmée ou ne correspond pas à sa description."],
+  ["Et si j'ai un problème avec ma commande ?", "Ouvrez un litige depuis votre commande, avec des photos, dans les 48 h. Il se règle directement avec l'artiste, qui peut vous rembourser en tout ou en partie. ATYPIIK peut consulter les litiges et suspendre un artiste qui ne respecte pas ses engagements."],
+  ["Pourquoi mes coordonnées sont-elles masquées dans les messages ?", "Pour vous protéger. Les numéros, e-mails, liens et comptes de réseaux sociaux sont masqués automatiquement : commande, paiement et livraison se font sur ATYPIIK. Une vente conclue en dehors du site n'est ni sécurisée ni protégée en cas de problème."],
   ["Puis-je être à la fois acheteur et artiste ?", "Oui, avec un seul compte. Depuis votre espace acheteur, cliquez sur « Devenir artiste » : vous gardez vos commandes et vos favoris, et votre espace artiste s'ouvre dès que l'équipe a validé votre travail. Un artiste peut aussi acheter les œuvres des autres artistes ; ses achats sont dans l'onglet « Mes achats »."],
   ["Le paiement est-il sécurisé ?", "Oui. Le paiement passe par un prestataire de paiement agréé : vos données bancaires ne transitent jamais par nos serveurs. L'artiste est payé une fois la commande livrée. Dans cette démo, aucun paiement n'est réellement effectué."],
-  ["Puis-je demander une pièce sur mesure ?", "Oui, depuis la page d'un artiste. Vous décrivez votre projet, l'artiste vous envoie un devis, et rien n'est payé avant que vous l'acceptiez."],
 ];

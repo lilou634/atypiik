@@ -42,8 +42,8 @@ function viewProject() {
     ["#/communication", "04", "Communication", "Comment le vendre", ["9 posts dont 5 vidéos", "Calendrier et partenariats", "10 premiers clients"]],
   ];
   const figures = [
-    ["90 %", "du prix pour l'artiste"],
-    ["10 % / 7 %", "de commission, selon la formule"],
+    ["Jusqu'à 90 %", "du prix pour l'artiste"],
+    ["15 % / 10 %", "de commission, selon la formule"],
     ["0 €", "de frais pour l'acheteur"],
     ["3 000 € HT", "de chiffre d'affaires mensuel visé à 12 mois"],
   ];
@@ -75,10 +75,10 @@ function viewProject() {
 // Comparatif des deux formules : [libellé, Atelier, Pro] ; true = inclus, false = non inclus, texte = valeur.
 const PLAN_COMPARE = [
   ["Prix de l'abonnement", "0 €", "12,90 € HT / mois (15,48 € TTC)"],
-  ["Commission sur chaque vente", "10 %", "7 %"],
-  ["Ce que garde l'artiste", "90 %", "93 %"],
+  ["Commission sur chaque vente", "15 %", "10 %"],
+  ["Ce que garde l'artiste", "85 %", "90 %"],
+  ["Œuvres en vente en même temps", "Jusqu'à 10", "Illimité"],
   ["Boutique et mini-site d'artiste", true, true],
-  ["Publication illimitée d'œuvres", true, true],
   ["Paiement sécurisé, versement sous 7 jours après livraison", true, true],
   ["Messagerie avec les acheteurs", true, true],
   ["Médiation en cas de litige", true, true],
@@ -117,7 +117,7 @@ function viewOffer() {
       <h2>Atelier ou Atelier Pro ?</h2>
       <div class="table-wrap"><table><thead><tr><th></th><th>Atelier</th><th class="pro">Atelier Pro</th></tr></thead>
         <tbody>${PLAN_COMPARE.map(([l, a, b]) => `<tr><td>${esc(l)}</td><td>${cell(a)}</td><td class="pro">${cell(b)}</td></tr>`).join("")}</tbody></table></div>
-      <p class="hint">Prix en euros. TVA de 20 % incluse dans la commission et ajoutée aux abonnements. L'offre Pro devient rentable pour l'artiste au-delà de 430 € de ventes par mois.</p>
+      <p class="hint">Prix en euros. TVA de 20 % incluse dans la commission et ajoutée aux abonnements.</p>
     </section>
     ${isAdmin() ? `    <section class="proj-demo">
       <h2>Tester l'achat</h2>
@@ -196,6 +196,9 @@ function confirmSub(p) {
     history: [[today(), `Abonnement ${p.name} souscrit sur le site (${id})`]], next: [today(), "Appel de bienvenue et aide à la première mise en ligne"],
   });
   state.subDone = { id, plan: p.id, name: s.name };
+  // Un artiste déjà inscrit qui s'abonne change d'offre tout de suite.
+  const me = state.user && state.user.artistId && artistById(state.user.artistId);
+  if (me) me.plan = p.id;
   state.sub = null;
   save();
   nav("#/abonnement-ok/" + id);
@@ -257,7 +260,7 @@ function crmStats() {
   const sales = won.filter((c) => c.type === "acheteur").reduce((s, c) => s + c.value, 0);
   const subs = won.filter((c) => c.type === "artiste").reduce((s, c) => s + c.value, 0);
   const open = state.crm.filter((c) => !["gagne", "perdu"].includes(c.stage));
-  return { won, lost, sales, subs, ca: subs + (sales * COMMISSION) / (1 + VAT), open, pipe: open.reduce((s, c) => s + c.value, 0), pipeSales: open.filter((c) => c.type === "acheteur").reduce((s, c) => s + c.value, 0), pipeSubs: open.filter((c) => c.type === "artiste").reduce((s, c) => s + c.value, 0), rate: state.crm.length ? won.length / state.crm.length : 0 };
+  return { won, lost, sales, subs, ca: subs + (sales * AVG_COMMISSION) / (1 + VAT), open, pipe: open.reduce((s, c) => s + c.value, 0), pipeSales: open.filter((c) => c.type === "acheteur").reduce((s, c) => s + c.value, 0), pipeSubs: open.filter((c) => c.type === "artiste").reduce((s, c) => s + c.value, 0), rate: state.crm.length ? won.length / state.crm.length : 0 };
 }
 function viewCRM(param) {
   if (param && !["tableau", "contacts", "pipeline"].includes(param)) return viewContact(param);
@@ -274,7 +277,7 @@ function viewCRM(param) {
   const todo = state.crm.filter((c) => !["perdu"].includes(c.stage) && c.next).sort((a, b) => a.next[0].localeCompare(b.next[0])).slice(0, 6);
   return `${head}
     <div class="kpis kpis-explained">
-      <div><b class="pink">${ht(st.ca)}</b><span>Chiffre d'affaires ATYPIIK</span><small>Abonnements Pro sur 12 mois (${ht(st.subs)}) + 10 % des commandes, hors TVA</small></div>
+      <div><b class="pink">${ht(st.ca)}</b><span>Chiffre d'affaires ATYPIIK</span><small>Abonnements Pro sur 12 mois (${ht(st.subs)}) + 13,5 % des commandes (commission moyenne), hors TVA</small></div>
       <div><b>${st.won.length}</b><span>Clients</span><small>Contacts à l'étape « Gagné »</small></div>
       <div><b>${Math.round(st.rate * 100)} %</b><span>Taux de conversion</span><small>${st.won.length} gagnés ÷ ${state.crm.length} contacts</small></div>
       <div><b>${euro(st.pipeSales)} TTC</b><span>En négociation</span><small>Commandes espérées, + ${ht(st.pipeSubs)} d'abonnements</small></div>
@@ -541,7 +544,7 @@ function viewStrategy() {
     </section>
 
     <section class="strat" id="prix"><h2 class="strat-h">5. Le prix</h2>
-      <p class="lead">Commission de 10 % sans abonnement, ou 7 % avec Atelier Pro à 12,90 € HT par mois. Gratuit pour les acheteurs.</p>
+      <p class="lead">Commission de 15 % sans abonnement, ou 10 % avec Atelier Pro à 12,90 € HT par mois. Gratuit pour les acheteurs.</p>
       <div class="trends">${PRICING.map(([t, d, k]) => `<div class="panel"><h3>${t}</h3><p>${esc(d)} ${src(...k)}</p></div>`).join("")}</div>
     </section>
 
@@ -572,7 +575,7 @@ function viewCom() {
   return `
     <div class="page-head"><span class="label muted">Plan de communication</span><h1>Comment le vendre</h1><p>De quoi lancer la communication dès demain : la marque, les canaux, 9 posts prêts à publier, le calendrier de 4 semaines, les partenariats, les 10 premiers clients et les indicateurs.</p></div>
     <div class="brief">
-      <div><span class="label muted">La promesse</span><b>L'art qui sort du rang</b><p>sélection à la main, 90 % pour l'artiste</p></div>
+      <div><span class="label muted">La promesse</span><b>L'art qui sort du rang</b><p>sélection à la main, jusqu'à 90 % pour l'artiste</p></div>
       <div><span class="label muted">Les canaux</span><b>3 réseaux</b><p>Instagram, TikTok et Pinterest, plus la newsletter</p></div>
       <div><span class="label muted">Le contenu</span><b>9 posts</b><p>dont 5 vidéos, sur 4 semaines</p></div>
       <div><span class="label muted">Le lancement</span><b>16 nov. → 4 déc.</b><p>de l'ouverture au public au drop de Noël</p></div>
@@ -650,11 +653,47 @@ const ADMIN_LINKS = [
 ];
 // Version vitrine (lien à montrer) : les outils internes n'existent pas, même avec la connexion de démo.
 const VITRINE = typeof window !== "undefined" && window.ATYPIIK_VITRINE === true;
+// Les outils internes n'existent pas pour le public : un visiteur qui tape l'adresse voit « page introuvable ».
 function adminOnly([view, bind]) {
   if (VITRINE) return [viewNotFound];
-  const locked = () =>
-    `<div class="page-head"><span class="label muted">Administration</span><h1>Espace réservé</h1><p>Cette page est un outil interne d'ATYPIIK. Connectez-vous avec le compte administrateur pour y accéder (en démo : bouton « Administrateur »).</p></div>${loginForms()}`;
-  return [() => (isAdmin() ? view() : locked()), () => (isAdmin() ? bind && bind() : bindLogin())];
+  return [() => (isAdmin() ? view() : viewNotFound()), () => isAdmin() && bind && bind()];
+}
+
+/* Connexion administrateur : page séparée, à une adresse qui n'est liée nulle part sur le site.
+   Sur le vrai site : mot de passe fort + code de double authentification + blocage après 5 essais. */
+const ADMIN_LOGIN_ROUTE = "gestion-atypiik";
+function viewAdminLogin() {
+  if (VITRINE) return viewNotFound();
+  if (isAdmin()) return emptyBox("Vous êtes connectée", "Votre espace d'administration est ouvert.", '<a class="btn" href="#/profil">Tableau admin</a>');
+  const tries = state.adminTries || 0;
+  const locked = tries >= 5;
+  return `
+    <div class="admin-login">
+      <span class="label muted">ATYPIIK · accès administrateur</span>
+      <h1>Connexion</h1>
+      ${locked ? '<p class="alert">Trop d\'essais incorrects : l\'accès est bloqué pendant 15 minutes.</p>' : ""}
+      <form class="panel" id="admin-login-form">
+        <div class="field"><label for="al-email">E-mail administrateur</label><input id="al-email" type="email" required autocomplete="username" ${locked ? "disabled" : ""} /></div>
+        <div class="field"><label for="al-pass">Mot de passe</label><input id="al-pass" type="password" required autocomplete="current-password" ${locked ? "disabled" : ""} /></div>
+        <div class="field"><label for="al-code">Code de double authentification (application sur votre téléphone)</label><input id="al-code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required placeholder="123 456" ${locked ? "disabled" : ""} /></div>
+        <button class="btn btn-block" ${locked ? "disabled" : ""}>Se connecter</button>
+        <p class="hint">${tries && !locked ? `${5 - tries} essai(s) restant(s) avant blocage.` : "Accès réservé à l'administratrice d'ATYPIIK."}</p>
+      </form>
+      <div class="demo-box"><strong>Démo</strong> — la vraie authentification sera branchée sur le site en ligne.
+        <div class="btns"><button type="button" class="btn btn-small" data-act="demo-login" data-id="admin">Connexion de démo administratrice</button></div>
+      </div>
+    </div>`;
+}
+function bindAdminLogin() {
+  const f = $("#admin-login-form");
+  if (!f) return;
+  f.addEventListener("submit", (e) => {
+    e.preventDefault();
+    // Démo : aucun mot de passe n'est stocké dans le code, chaque essai compte comme un échec.
+    state.adminTries = (state.adminTries || 0) + 1;
+    toast("Identifiants ou code incorrects.");
+    render(true);
+  });
 }
 
 const PROJECT_VIEWS = {
@@ -665,6 +704,7 @@ const PROJECT_VIEWS = {
   crm: adminOnly([() => viewCRM(currentParam), bindCRM]),
   strategie: adminOnly([viewStrategy]),
   communication: adminOnly([viewCom]),
+  [ADMIN_LOGIN_ROUTE]: [viewAdminLogin, bindAdminLogin],
 };
 
 /* ---------- Devenir artiste depuis un compte acheteur ---------- */
@@ -678,7 +718,7 @@ function becomeArtistBox() {
   if (p && p.status === "refusé")
     return `<div class="become panel"><div><span class="label muted">Votre candidature artiste</span><h2>Non retenue pour le moment</h2><p>Vous pourrez candidater de nouveau avec de nouvelles pièces.</p></div></div>`;
   return `<div class="become panel"><div><span class="label muted">Vous créez aussi ?</span><h2>Ouvrez votre atelier</h2>
-    <p>Gardez votre compte, vos commandes et vos favoris : ajoutez simplement un espace artiste. Gratuit, 10 % de commission sur vos ventes.</p></div>
+    <p>Gardez votre compte, vos commandes et vos favoris : ajoutez simplement un espace artiste. Gratuit, 15 % de commission sur vos ventes (10 % avec Atelier Pro).</p></div>
     <div class="become-cta"><a class="btn" href="#/devenir-artiste">Devenir artiste</a></div></div>`;
 }
 function viewBecomeArtist() {
@@ -703,11 +743,17 @@ function viewBecomeArtist() {
         <div class="field"><label>Formule</label>
           ${PLANS.map((p, i) => `<label class="check"><input type="radio" name="ba-plan" value="${p.id}" ${i === 0 ? "checked" : ""} /> <b>${esc(p.name)}</b> · ${p.price ? ht(p.price) + " / mois, " : "gratuit, "}${p.commission} % de commission</label>`).join("")}
         </div>
+        <div class="seller-terms"><ul class="seller-rules">
+              <li><b>Vous vendez en votre nom</b> : vous fixez vos prix et vos frais de livraison, et vous êtes responsable de vos commandes. ATYPIIK met en relation et sécurise le paiement.</li>
+              <li><b>Tout passe par ATYPIIK</b> : commandes, devis et paiements. Les coordonnées sont masquées dans les échanges, et vendre en dehors du site après une mise en relation est interdit.</li>
+              <li><b>Les litiges</b> se règlent entre vous et l'acheteur. ATYPIIK peut les consulter et suspendre une boutique en cas de litiges répétés.</li>
+            </ul></div>
+        <label class="check"><input type="checkbox" required id="ba-cgu" /> J'accepte ces règles et les&nbsp;<a href="#/legal/cgu" style="text-decoration:underline">conditions vendeurs</a></label>
         <button class="btn btn-block">Envoyer ma candidature</button>
       </form>
       <aside class="summary"><h3>Comment ça se passe</h3>
         <ol class="facts"><li>Vous envoyez votre candidature.</li><li>L'équipe regarde votre travail, sous 48 h.</li><li>Une fois validé, votre espace artiste s'ouvre dans votre profil et vous publiez vos œuvres.</li></ol>
-        <p class="hint">Vous gardez 90 % du prix de chaque vente (93 % avec Atelier Pro).</p></aside>
+        <p class="hint">Vous gardez 85 % du prix de chaque vente (90 % avec Atelier Pro).</p></aside>
     </div>`;
 }
 function bindBecomeArtist() {
@@ -837,3 +883,141 @@ PROJECT_ACTIONS["v3d-view"] = (el) => {
   [v3d.rx, v3d.ry] = { face: [0, 0], tranche: [-6, -72], dos: [0, 180] }[v];
   render3d();
 };
+
+/* ---------- Sur mesure : mise en avant, devis détaillé, paiement sur le site ---------- */
+// Section de l'accueil : la commande sur mesure, point fort d'ATYPIIK.
+function customSection() {
+  return `
+    <section class="section custom-cta">
+      <div class="custom-cta-text">
+        <span class="label">Sur mesure</span>
+        <h2>Une pièce <span class="fun">rien que pour vous</span></h2>
+        <p>Un portrait de votre animal, un vase à vos couleurs, une veste à votre taille : demandez à l'artiste de votre choix.</p>
+        <ol class="custom-steps">
+          <li><b>Décrivez votre idée</b><span>à l'artiste, avec vos images d'inspiration</span></li>
+          <li><b>Recevez un devis</b><span>prix, délai, livraison et retouches compris</span></li>
+          <li><b>Acceptez et payez sur ATYPIIK</b><span>l'artiste crée votre pièce, vous êtes protégé jusqu'à la livraison</span></li>
+        </ol>
+        <a class="btn" href="#/artistes">Choisir un artiste</a>
+      </div>
+      <div class="custom-cta-visual">${visual(byId("a18"))}</div>
+    </section>`;
+}
+// Bloc qui détaille un devis (vu par l'acheteur et par l'artiste).
+function quoteBlock(q) {
+  if (!q || typeof q !== "object") return "";
+  return `<div class="quote-box">
+      <span class="label">Devis de l'artiste</span>
+      <p>${esc(q.details)}</p>
+      <div class="quote-grid">
+        <div><span>Prix de la pièce</span><b>${euro(q.price)} TTC</b></div>
+        <div><span>Livraison</span><b>${q.shipping ? euro(q.shipping) : "Incluse"}</b></div>
+        <div><span>Délai de création</span><b>${q.weeks} semaine${q.weeks > 1 ? "s" : ""}</b></div>
+        <div><span>Retouches incluses</span><b>${q.revisions}</b></div>
+      </div>
+      <p class="quote-total">Total à payer : <b>${euro(q.price + q.shipping)} TTC</b> · valable jusqu'au ${frDate(q.validUntil)}</p>
+    </div>`;
+}
+// Formulaire de devis, côté artiste.
+function viewQuote(reqId) {
+  const r = state.requests.find((x) => x.id === reqId);
+  if (!r) return viewNotFound();
+  if (!state.user || state.user.artistId !== r.artist) return needLogin("Connectez-vous avec le compte de l'artiste concerné pour répondre à cette demande.");
+  return `
+    <div class="page-head"><span class="label muted">Demande ${r.id} · de ${esc(r.buyer)}</span><h1>Envoyer un devis</h1><p>Le client accepte et paie sur ATYPIIK : votre paiement est garanti, et vous êtes protégé en cas de litige.</p></div>
+    <div class="two-col">
+      <form class="panel" id="quote-form" data-id="${r.id}">
+        <div class="field"><label for="qt-details">Ce que vous allez créer</label><textarea id="qt-details" rows="4" required placeholder="Format, matériaux, couleurs, étapes…"></textarea></div>
+        <div class="field-row">
+          <div class="field"><label for="qt-price">Prix de la pièce TTC (€)</label><input id="qt-price" type="number" min="1" step="1" required /></div>
+          <div class="field"><label for="qt-ship">Livraison (€, 0 si incluse)</label><input id="qt-ship" type="number" min="0" step="0.1" value="8.90" /></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label for="qt-weeks">Délai de création (semaines)</label><input id="qt-weeks" type="number" min="1" value="3" required /></div>
+          <div class="field"><label for="qt-rev">Retouches incluses</label><select id="qt-rev"><option>Aucune</option><option selected>1 série de retouches</option><option>2 séries de retouches</option><option>Illimitées avant livraison</option></select></div>
+        </div>
+        <div class="field"><label for="qt-valid">Devis valable (jours)</label><input id="qt-valid" type="number" min="1" value="15" /></div>
+        <div class="payout" id="qt-payout"></div>
+        <button class="btn">Envoyer le devis</button>
+      </form>
+      <aside class="panel"><h3>La demande</h3><p><b>${esc(r.type)}</b></p><p>${esc(r.text)}</p><p class="hint">Budget : ${esc(r.budget)}${r.deadline ? ` · ${esc(r.deadline)}` : ""}</p></aside>
+    </div>`;
+}
+function bindQuote(reqId) {
+  const f = $("#quote-form");
+  if (!f) return bindLogin();
+  const upd = () => ($("#qt-payout").innerHTML = payoutHtml(+$("#qt-price").value || 0));
+  $("#qt-price").addEventListener("input", upd);
+  upd();
+  f.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const r = state.requests.find((x) => x.id === reqId);
+    const valid = new Date();
+    valid.setDate(valid.getDate() + (+$("#qt-valid").value || 15));
+    r.quote = {
+      details: maskContacts($("#qt-details").value.trim()), price: +$("#qt-price").value, shipping: Math.max(0, +$("#qt-ship").value || 0),
+      weeks: Math.max(1, +$("#qt-weeks").value || 1), revisions: $("#qt-rev").value, validUntil: valid.toISOString().slice(0, 10),
+    };
+    r.status = "devis envoyé";
+    (state.threads[r.artist] = state.threads[r.artist] || []).push({ from: "artist", text: `Devis envoyé pour « ${r.type} » : ${euro(r.quote.price + r.quote.shipping)} TTC livraison comprise, ${r.quote.weeks} semaine(s). Vous pouvez l'accepter et le payer depuis votre espace, onglet « Sur mesure ».` });
+    notify(`${artistById(r.artist).name} vous a envoyé un devis de ${euro(r.quote.price + r.quote.shipping)} pour votre commande sur mesure.`, "#/profil");
+    state.tab.seller = "surmesure";
+    save();
+    toast("Devis envoyé");
+    nav("#/profil");
+  });
+}
+// Acceptation et paiement du devis, côté acheteur.
+function viewQuotePay(reqId) {
+  const r = state.requests.find((x) => x.id === reqId);
+  if (!r || !r.quote || typeof r.quote !== "object") return viewNotFound();
+  if (!state.user || state.user.name !== r.buyer) return needLogin("Connectez-vous avec le compte qui a fait la demande pour accepter ce devis.");
+  if (r.status === "payée") return emptyBox("Devis déjà payé", `Commande ${r.order}. L'artiste a commencé votre pièce.`, '<a class="btn" href="#/profil">Suivre ma commande</a>');
+  const a = artistById(r.artist);
+  return `
+    <div class="page-head"><span class="label muted">Sur mesure · ${esc(a.name)}</span><h1>Accepter et payer</h1><p>Le paiement est conservé par ATYPIIK et versé à l'artiste après la livraison de votre pièce.</p></div>
+    <div class="cart">
+      <form class="panel" id="quotepay-form" data-id="${r.id}">
+        <h2>Livraison</h2>
+        <div class="field"><label for="qp-street">Adresse</label><input id="qp-street" required placeholder="12 rue des Arts" /></div>
+        <div class="field-row"><div class="field"><label for="qp-zip">Code postal</label><input id="qp-zip" required pattern="[0-9]{5}" /></div><div class="field"><label for="qp-city">Ville</label><input id="qp-city" required /></div></div>
+        <h2>Paiement</h2>
+        <div class="field"><label for="qp-num">Numéro de carte</label><input id="qp-num" required inputmode="numeric" placeholder="4242 4242 4242 4242" /></div>
+        <div class="field-row"><div class="field"><label for="qp-exp">Expiration</label><input id="qp-exp" required placeholder="MM/AA" /></div><div class="field"><label for="qp-cvc">CVC</label><input id="qp-cvc" required inputmode="numeric" placeholder="123" /></div></div>
+        <p class="hint">Démo : aucun paiement n'est effectué, n'entrez pas une vraie carte.</p>
+        <button class="btn btn-block">Accepter le devis et payer ${euro(r.quote.price + r.quote.shipping)}</button>
+      </form>
+      <aside class="summary"><h3>${esc(r.type)}</h3>${quoteBlock(r.quote)}</aside>
+    </div>`;
+}
+function bindQuotePay(reqId) {
+  const f = $("#quotepay-form");
+  if (!f) return bindLogin();
+  f.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const r = state.requests.find((x) => x.id === reqId);
+    const q = r.quote;
+    // La pièce sur mesure devient une œuvre privée, vendue, rattachée à la commande.
+    const w = {
+      id: "sm-" + r.id + "-" + Date.now(), title: "Sur mesure : " + r.type, artist: r.artist, type: "Sur mesure", color: "", size: "M",
+      price: q.price, shipping: q.shipping, shippingIncluded: !q.shipping, technique: "Pièce sur mesure", dims: "—", description: q.details,
+      art: "linear-gradient(135deg, #6d1a2a, #d9c9b0)", variants: [{ label: "Pièce sur mesure", stock: 0 }], hidden: true, sold: true, custom: true,
+    };
+    state.works.push(w);
+    const id = "CMD-2026-" + String(1000 + state.orders.length + Math.floor(Math.random() * 8000)).padStart(4, "0");
+    state.orders.unshift({
+      id, date: today(), status: 0, buyer: state.user.name, address: `${$("#qp-street").value.trim()}, ${$("#qp-zip").value.trim()} ${$("#qp-city").value.trim()}`,
+      lines: [{ id: w.id, variant: 0, qty: 1, price: q.price }], total: q.price + q.shipping, items: q.price, shipping: q.shipping,
+      parcels: [{ artist: r.artist, shipping: q.shipping, lines: [w.id] }], custom: r.id,
+    });
+    crmFromOrder(state.orders[0]);
+    r.status = "payée";
+    r.order = id;
+    (state.threads[r.artist] = state.threads[r.artist] || []).push({ from: "buyer", text: `J'accepte votre devis et je viens de le payer (commande ${id}). Merci !` });
+    notify(`Devis accepté et payé : commande ${id}. ${artistById(r.artist).name} commence votre pièce.`, "#/profil");
+    save();
+    nav("#/commande/" + id);
+  });
+}
+PROJECT_VIEWS["devis"] = [() => viewQuote(currentParam), () => bindQuote(currentParam)];
+PROJECT_VIEWS["devis-paiement"] = [() => viewQuotePay(currentParam), () => bindQuotePay(currentParam)];

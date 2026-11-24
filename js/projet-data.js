@@ -13,17 +13,18 @@ const PLANS = [
     id: "atelier",
     name: "Atelier",
     price: 0,
-    commission: 10,
+    commission: 15,
     tagline: "Pour se lancer sans risque",
     included: [
       "Boutique et mini-site d'artiste",
-      "Publication illimitée d'œuvres",
+      "Jusqu'à 10 œuvres en vente en même temps",
       "Paiement sécurisé et versement sous 7 jours après livraison",
       "Messagerie avec les acheteurs",
-      "Médiation en cas de litige",
+      "Espace de résolution des litiges avec l'acheteur",
     ],
     excluded: [
-      "Commission réduite à 7 %",
+      "Commission réduite à 10 %",
+      "Publication illimitée d'œuvres",
       "Candidature prioritaire aux drops et à la Sélection",
       "Statistiques détaillées",
       "Conseil personnalisé",
@@ -35,11 +36,12 @@ const PLANS = [
     id: "pro",
     name: "Atelier Pro",
     price: 12.9,
-    commission: 7,
+    commission: 10,
     tagline: "Pour vendre plus et plus souvent",
     included: [
       "Tout le contenu de l'offre Atelier",
-      "Commission réduite à 7 % au lieu de 10 %",
+      "Commission réduite à 10 % au lieu de 15 %",
+      "Publication illimitée d'œuvres",
       "Candidature prioritaire aux drops et à la Sélection",
       "Statistiques de visites, favoris et ventes",
       "Un conseil personnalisé par trimestre (visio 30 min)",
@@ -146,7 +148,7 @@ const BRAND = {
     ["Fier", "on montre le travail des artistes en grand, avec leur nom, toujours"],
   ],
   messages: [
-    ["L'artiste garde 90 %", "Sur chaque vente, 90 % du prix revient à l'artiste (93 % avec Atelier Pro). On le dit et on le montre."],
+    ["L'artiste garde jusqu'à 90 %", "Sur chaque vente, 85 % du prix revient à l'artiste, et 90 % avec Atelier Pro. On le dit et on le montre."],
     ["Chaque artiste est choisi à la main", "Pas de revente ni de production de masse : chaque boutique est validée par l'équipe avant d'ouvrir."],
     ["De l'art qui entre dans votre vie", "Des pièces uniques pour offrir ou pour votre maison, achetées directement à ceux qui les créent, sans passer par une galerie."],
   ],
@@ -164,7 +166,7 @@ const CHANNELS = [
 const POSTS = [
   { n: 1, network: "Instagram", format: "Carrousel 5 images (1080 × 1350)", date: "2026-11-16", goal: "Notoriété : présenter le concept",
     work: "a4", overlay: "L'art qui sort du rang",
-    text: "ATYPIIK ouvre au public 🎨\nAprès deux mois de test avec nos premiers artistes, la boutique est ouverte à tous. Une boutique en ligne où chaque artiste est choisi à la main, et où 90 % du prix va directement à l'artiste.\n\nPeinture, céramique, bijoux, crochet, photo : des pièces uniques, au prix fixé par chaque artiste.\n\nSwipe pour rencontrer nos 8 premiers artistes 👉\n\n#art #artisteemergent #faitmain #artfrancais #decointerieure" },
+    text: "ATYPIIK ouvre au public 🎨\nAprès deux mois de test avec nos premiers artistes, la boutique est ouverte à tous. Une boutique en ligne où chaque artiste est choisi à la main, et où jusqu'à 90 % du prix va directement à l'artiste.\n\nPeinture, céramique, bijoux, crochet, photo : des pièces uniques, au prix fixé par chaque artiste.\n\nSwipe pour rencontrer nos 8 premiers artistes 👉\n\n#art #artisteemergent #faitmain #artfrancais #decointerieure" },
   { n: 2, network: "TikTok", format: "Vidéo verticale 14 s (9:16)", video: "assets/com/post-2.mp4", poster: "assets/com/post-2.jpg", date: "2026-11-17", goal: "Notoriété : faire connaître un artiste",
     work: "a6", overlay: "Dans l'atelier de Margaux",
     text: "POV : tu entres dans l'atelier d'une céramiste à Nantes ✨\nDe la boule de faïence au vase rayé peint à la main, en 14 secondes.\nSes pièces sont sur ATYPIIK, lien en bio.\n\n#ceramique #pottery #artisan #atelier #tiktokart" },
@@ -172,8 +174,8 @@ const POSTS = [
     work: "a3", overlay: "Idées déco murale faites main",
     text: "Idées déco murale faites main : tirages photo signés, toiles et céramiques d'artistes émergents. Pièces uniques ou en édition limitée, livrées chez toi.\nLien : la galerie ATYPIIK." },
   { n: 4, network: "Instagram", format: "Reel 15 s (9:16)", video: "assets/com/post-4.mp4", poster: "assets/com/post-4.jpg", date: "2026-11-23", goal: "Recruter des artistes",
-    work: "a1", overlay: "Artiste ? Garde 90 %",
-    text: "Tu crées et tu veux vendre sans laisser la moitié du prix en commission ?\nSur ATYPIIK, tu gardes 90 % de chaque vente. Pas d'abonnement obligatoire.\n\nOn sélectionne nos artistes à la main : envoie ton portfolio via le lien en bio.\n\n#artistefrancais #vendresonart #illustration #creatrice" },
+    work: "a1", overlay: "Artiste ? Garde jusqu'à 90 %",
+    text: "Tu crées et tu veux vendre sans laisser la moitié du prix en commission ?\nSur ATYPIIK, tu gardes 85 % de chaque vente sans abonnement, et 90 % avec l'offre Pro.\n\nOn sélectionne nos artistes à la main : envoie ton portfolio via le lien en bio.\n\n#artistefrancais #vendresonart #illustration #creatrice" },
   { n: 5, network: "TikTok", format: "Vidéo verticale 16 s (9:16), texte animé", video: "assets/com/post-5.mp4", poster: "assets/com/post-5.jpg", date: "2026-11-25", goal: "Confiance : expliquer la sélection",
     work: "a7", overlay: "Comment on choisit nos artistes",
     text: "On reçoit des dizaines de candidatures, voilà comment on choisit 👇\n1. Des pièces faites main, pas revendues\n2. Une vraie patte, qu'on reconnaît\n3. Des photos honnêtes\nEt toi, tu postulerais ?\n\n#artiste #selection #faitmain #petitecreatrice" },
@@ -193,7 +195,7 @@ const POSTS = [
 
 const CALENDAR = [
   ["Semaine 1 · 16-22 nov.", "Ouverture au public", ["Lun. 16 : post 1, carrousel d'ouverture (Instagram)", "Mar. 17 : post 2, dans l'atelier (TikTok)", "Mer. 18 : post 3, déco murale (Pinterest)", "Jeu. 19 : newsletter n° 1, « ATYPIIK ouvre au public »", "Sam. 21 : stand au marché de créateurs local"]],
-  ["Semaine 2 · 23-29 nov.", "Recrutement d'artistes", ["Lun. 23 : post 4, artiste garde 90 % (Instagram)", "Mer. 25 : post 5, notre sélection (TikTok)", "Mer. 25 : visite d'une école d'art (piste de partenariat)", "Jeu. 26 : newsletter n° 2, coups de cœur", "Ven. 27 : post 6, cadeaux de Noël (Pinterest)"]],
+  ["Semaine 2 · 23-29 nov.", "Recrutement d'artistes", ["Lun. 23 : post 4, l'artiste garde jusqu'à 90 % (Instagram)", "Mer. 25 : post 5, notre sélection (TikTok)", "Mer. 25 : visite d'une école d'art (piste de partenariat)", "Jeu. 26 : newsletter n° 2, coups de cœur", "Ven. 27 : post 6, cadeaux de Noël (Pinterest)"]],
   ["Semaine 3 · 30 nov.-6 déc.", "Drop de Noël", ["Mar. 1er : post 7, story du drop (Instagram)", "Jeu. 3 : newsletter n° 3, rappel du drop", "Ven. 4 : post 8, unboxing (TikTok)", "Ven. 4 à 18 h : ouverture du drop céramique", "Sam. 5 : live Instagram avec l'artiste du drop"]],
   ["Semaine 4 · 7-13 déc.", "Derniers cadeaux", ["Lun. 7 : post 9, artiste de la semaine (Instagram)", "Mer. 9 : rappel « commande avant le 15 pour Noël » (stories)", "Jeu. 10 : newsletter n° 4, idées cadeaux de dernière minute", "Ven. 11 : bilan des indicateurs et choix des posts à reconduire"]],
 ];
@@ -266,7 +268,7 @@ const PROBLEM = {
     ["Les places de marché généralistes sont saturées : Etsy compte environ 5,8 millions de vendeurs actifs, ce qui rend un artiste débutant difficile à trouver.", "etsyQ3"],
   ],
   frequency: "À chaque vente pour l'artiste (la commission est prélevée sur chaque œuvre) et à chaque recherche de cadeau ou de déco pour l'acheteur, qui tombe surtout sur des produits fabriqués en série.",
-  cost: "Estimation : pour une œuvre vendue 200 €, l'artiste perd 80 € sur Saatchi Art (40 %) et 100 € sur Singulart (50 %), contre 20 € sur ATYPIIK (10 %).",
+  cost: "Estimation : pour une œuvre vendue 200 €, l'artiste perd 80 € sur Saatchi Art (40 %) et 100 € sur Singulart (50 %), contre 30 € sur ATYPIIK (15 %), et 20 € avec l'offre Atelier Pro (10 %).",
 };
 
 const PERSONAS = [
@@ -301,26 +303,26 @@ const COMPETITORS = [
   { name: "Saatchi Art", type: "Galerie en ligne internationale", fee: "40 % du prix de vente des originaux", buyer: "Œuvres souvent au-delà de 500 €", diff: "Commission quatre fois plus élevée, catalogue international, peu de petits prix.", src: ["saatchi"] },
   { name: "Singulart", type: "Galerie en ligne d'artistes sélectionnés", fee: "50 % HT du prix de vente", buyer: "Œuvres de plusieurs centaines à plusieurs milliers d'euros", diff: "Commission cinq fois plus élevée, ciblée sur les collectionneurs aisés.", src: ["singulart"] },
   { name: "Artmajeur", type: "Galerie en ligne ouverte à tous", fee: "Inscription gratuite, abonnements payants ; la commission varie selon la formule", buyer: "Très large choix, qualité inégale", diff: "Pas de sélection à l'entrée ; nous choisissons chaque artiste et mettons en avant des drops.", src: ["artmajeur"] },
-  { name: "ATYPIIK", type: "Boutique d'artistes émergents sélectionnés", fee: "10 % (Atelier, sans abonnement) ou 7 % + 12,90 € HT / mois (Atelier Pro), frais de paiement inclus", buyer: "Prix fixé librement par chaque artiste, sans frais de service pour l'acheteur", diff: "Sélection à la main, artiste qui garde 90 à 93 %, drops et commandes sur mesure.", src: [], us: true },
+  { name: "ATYPIIK", type: "Boutique d'artistes émergents sélectionnés", fee: "15 % (Atelier, sans abonnement) ou 10 % + 12,90 € HT / mois (Atelier Pro), frais de paiement inclus", buyer: "Prix fixé librement par chaque artiste, sans frais de service pour l'acheteur", diff: "Sélection à la main, artiste qui garde 85 à 90 %, drops et commandes sur mesure.", src: [], us: true },
 ];
 
 const PRICING = [
-  ["Concurrents", "Les galeries en ligne prennent 40 à 50 % ; Etsy, sans sélection, revient à environ 11 % sur une vente de 50 € (6,5 % + 4 % + 0,30 € + annonce). À 10 %, ATYPIIK est le moins cher des acteurs qui sélectionnent leurs artistes, et au niveau d'Etsy.", ["saatchi", "singulart", "etsyFees"]],
-  ["Coûts", "Le paiement par carte européenne coûte environ 1,5 % + 0,25 € par transaction. Sur un panier de 90 €, notre commission de 9 € TTC fait 7,50 € HT ; après 1,60 € de frais de paiement, il reste 5,90 € de marge brute HT.", ["stripe"]],
-  ["Valeur pour le client", "L'artiste qui vend 200 € garde 180 € chez nous contre 100 € à 120 € en galerie en ligne. L'offre Pro devient rentable pour lui au-delà de 430 € de ventes par mois : 3 % d'économie de commission × 430 € ≈ 12,90 € (516 € pour un artiste non assujetti à la TVA, qui paie 15,48 € TTC).", []],
+  ["Concurrents", "Les galeries en ligne qui sélectionnent leurs artistes prennent 40 à 50 %. À 15 %, ou 10 % avec Atelier Pro, ATYPIIK prend trois à cinq fois moins. Etsy revient à environ 11 % sur une vente de 50 € (6,5 % + 4 % + 0,30 € + annonce), mais sans aucune sélection.", ["saatchi", "singulart", "etsyFees"]],
+  ["Coûts", "Le paiement par carte européenne coûte environ 1,5 % + 0,25 € par transaction. Sur un panier de 90 €, notre commission de 15 % fait 13,50 € TTC, soit 11,25 € HT ; après 1,60 € de frais de paiement, il reste 9,65 € de marge brute HT (5,90 € avec un artiste en Atelier Pro).", ["stripe"]],
+  ["Valeur pour le client", "L'artiste qui vend 200 € garde 170 € chez nous, et 180 € avec l'offre Pro, contre 100 € à 120 € en galerie en ligne. L'offre Pro s'adresse aux artistes qui vendent régulièrement : commission réduite, publication illimitée et mise en avant.", []],
 ];
 
 const MODEL = {
   how: [
-    "Une commission sur chaque vente : 10 % avec l'offre Atelier, 7 % avec Atelier Pro. L'acheteur ne paie aucun frais de service, seulement l'œuvre et la livraison.",
+    "Une commission sur chaque vente : 15 % avec l'offre Atelier, 10 % avec Atelier Pro. L'acheteur ne paie aucun frais de service, seulement l'œuvre et la livraison.",
     "Un abonnement Atelier Pro à 12,90 € HT par mois pour les artistes qui vendent régulièrement.",
     "Plus tard : shootings photo et emballages vendus en option aux artistes.",
   ],
-  goal: "Objectif à 12 mois : 3 000 € HT de chiffre d'affaires par mois (novembre 2027).",
+  goal: "Objectif à 12 mois : au moins 3 000 € HT de chiffre d'affaires par mois (scénario ci-dessous : 3 775,50 € HT).",
   rows: [
     ["Artistes en Atelier Pro", "120 artistes × 12,90 € HT", 1548],
     ["Volume de ventes mensuel", "220 commandes × 90 € de panier moyen = 19 800 € TTC", null],
-    ["Commissions", "19 800 € × 9,1 % de commission moyenne (70 % des artistes en Atelier à 10 %, 30 % en Pro à 7 %) = 1 801,80 € TTC, soit 1 501,50 € HT", 1501.5],
+    ["Commissions", "19 800 € × 13,5 % de commission moyenne (70 % des artistes en Atelier à 15 %, 30 % en Pro à 10 %) = 2 673 € TTC, soit 2 227,50 € HT", 2227.5],
   ],
   hypotheses: "Hypothèses (estimations) : panier moyen de 90 €, au milieu du budget de notre persona acheteuse (40 à 150 € par achat), à confirmer avec les premières ventes ; 400 artistes inscrits dont 30 % en Pro (120) ; un artiste vend en moyenne 0,55 pièce par mois (220 commandes).",
 };

@@ -12,12 +12,25 @@ const app = $("#app");
 const euro = (n) => n.toLocaleString("fr-FR", { style: "currency", currency: "EUR", maximumFractionDigits: n % 1 ? 2 : 0 }).replace(/\u202f/g, "\u00a0");
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const today = () => new Date().toISOString().slice(0, 10);
+/* Protection contre les ventes hors plateforme : les coordonnées personnelles
+   (e-mail, téléphone, liens, comptes de réseaux sociaux) sont masquées dans les échanges. */
+const MASK = "[coordonnée masquée]";
+const CONTACT_PATTERNS = [
+  /[A-Z0-9._%+-]+\s*(?:@|\(at\)|\[at\]|\sat\s|\sarobase\s)\s*[A-Z0-9-]+(?:\s*(?:\.|\(dot\)|\spoint\s)\s*[A-Z0-9-]+)+/gi,
+  /\b(?:https?:\/\/|www\.)\S+/gi,
+  /\b(?!atypiik\b)[a-z0-9-]+\.(?:com|fr|net|org|io|me|be|ch|shop|art|store|co)\b(?:\/\S*)?/gi,
+  /\b(?:insta(?:gram)?|snap(?:chat)?|whats ?app|telegram|tiktok|facebook|fb|signal|wechat)\s*(?::|=|->|→)\s*@?[\w.]+/gi,
+  /(?:\+|00)?\d(?:[\s.\-/]?\d){8,}/g,
+  /@[a-z0-9_.]{3,}/gi,
+];
+const maskContacts = (text) => CONTACT_PATTERNS.reduce((t, re) => t.replace(re, MASK), String(text ?? ""));
+const hasContacts = (text) => maskContacts(text) !== String(text ?? "");
 const frDate = (d) => new Date(d).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
 const clone = (o) => JSON.parse(JSON.stringify(o));
 const initials = (name) => name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
 
 /* ---------- Persistance ---------- */
-const DATA_VERSION = 10;
+const DATA_VERSION = 11;
 const store = {
   get(key, fallback) {
     try {
@@ -106,11 +119,22 @@ function save() {
 
 /* ---------- Accès aux données ---------- */
 const isAdmin = () => state.user?.role === "admin";
-const visibleWorks = () => state.works.filter((w) => !w.hidden);
+// Les œuvres masquées et celles des artistes suspendus ne sont pas visibles du public.
+const visibleWorks = () => state.works.filter((w) => !w.hidden && !artistById(w.artist)?.suspended);
 const byId = (id) => state.works.find((w) => w.id === id);
 const artistById = (id) => state.artists.find((a) => a.id === id);
 const artistOf = (w) => artistById(w.artist) || { id: w.artist, name: "Artiste", city: "", bio: "", followers: 0, videos: [], press: [] };
-const COMMISSION = 0.1;
+// Commissions : 15 % avec l'offre Atelier (sans abonnement), 10 % avec Atelier Pro.
+const COMMISSION_RATES = { atelier: 0.15, pro: 0.1 };
+const ATELIER_LIMIT = 10; // œuvres en vente en même temps avec l'offre Atelier
+const AVG_COMMISSION = 0.135; // 70 % des artistes en Atelier, 30 % en Pro (hypothèse du modèle économique)
+const planOf = (artistId) => (artistById(artistId) || {}).plan || "atelier";
+const commissionOf = (artistId) => COMMISSION_RATES[planOf(artistId)];
+const pct = (r) => Math.round(r * 100) + " %";
+const netOf = (s) => s.price * s.qty * (1 - commissionOf(byId(s.work)?.artist));
+// Œuvres en vente (ni vendues ni masquées) : limitées à 10 avec l'offre Atelier.
+const activeCount = (artistId) => state.works.filter((w) => w.artist === artistId && !w.sold && !w.hidden).length;
+const canPublish = (artistId) => planOf(artistId) === "pro" || activeCount(artistId) < ATELIER_LIMIT;
 const totalStock = (w) => w.variants.reduce((s, v) => s + v.stock, 0);
 const STEPS = ["Confirmée", "En préparation", "Expédiée", "Livrée"];
 
@@ -271,7 +295,7 @@ function reviewList(list, showWork = false) {
       (r) => `<article class="review">
         <div class="review-top">${stars(r.rating, false)}<span class="mono muted">${esc(r.author)} · ${frDate(r.date)} · avis fictif (démo)</span></div>
         ${showWork && byId(r.work) ? `<a class="review-work" href="#/oeuvre/${r.work}">${esc(byId(r.work).title)}</a>` : ""}
-        <p>${esc(r.text)}</p>
+        <p>${esc(maskContacts(r.text))}</p>
       </article>`,
     )
     .join("");
@@ -346,6 +370,7 @@ function viewHome() {
     ${featuredSection()}
 
     ${dropSection()}
+    ${customSection()}
 
     <section class="section story">
       <div class="story-media">
@@ -514,6 +539,7 @@ function viewProduct(id) {
         <div class="by">par <a href="#/artiste/${a.id}">${esc(a.name)}</a> ${selectedBadge(true)} · ${esc(a.city)}</div>
         ${workReviews.length ? `<a class="rating-link" href="#avis" data-act="to-reviews">${stars(ratingOf(workReviews))} <span class="muted">(${plural(workReviews.length, "avis")})</span></a>` : ""}
         <div class="product-price">${euro(w.price)} <small>TTC</small></div>
+        <p class="ship-line ship-line-big">${shipLabel(w)}</p>
         <p class="demo-note">Œuvre, artiste et prix fictifs (démo) : la photo sert d'illustration.</p>
         <ul class="facts">
           <li><b>${esc(editionOf(w))}</b></li>
@@ -530,6 +556,7 @@ function viewProduct(id) {
           <button class="btn btn-chrome" id="buy-now" data-act="buy-now" data-id="${w.id}">Acheter maintenant</button>
           <button class="btn fav-inline ${state.favs.includes(w.id) ? "on" : ""}" data-act="fav" data-id="${w.id}" aria-label="Favori">${heart}</button>
         </div>
+        <a class="custom-link" href="#/commande-perso/${a.id}"><b>Envie d'une pièce sur mesure ?</b><span>Demandez un devis à ${esc(a.name)} : prix, délai et retouches, payé sur ATYPIIK.</span><span class="text-link">Demander un devis →</span></a>
         <dl class="specs">
           <dt>Description</dt><dd>${esc(w.description || `${w.type} originale de ${a.name}.`)}</dd>
           <dt>Technique</dt><dd>${esc(w.technique)}</dd>
@@ -539,7 +566,7 @@ function viewProduct(id) {
         <div class="artist-mini">
           ${avatar(a, true)}
           <div><strong>${esc(a.name)}</strong><div class="card-artist">${esc(a.bio)}</div></div>
-          <div class="card-actions" style="margin:0"><a class="btn btn-small btn-outline" href="#/commande-perso/${a.id}">Sur mesure</a><a class="btn btn-small btn-outline" href="#/messages/${a.id}">Écrire</a></div>
+          <div class="card-actions" style="margin:0"><a class="btn btn-small" href="#/commande-perso/${a.id}">Sur mesure</a><a class="btn btn-small btn-outline" href="#/messages/${a.id}">Écrire</a></div>
         </div>
       </div>
     </div>
@@ -633,13 +660,14 @@ function viewArtists() {
   return `
     <div class="page-head"><h1>Les <span class="fun">artistes</span></h1><p>Découvrez les créateurs et créatrices d'ATYPIIK, leurs œuvres et leurs coulisses. Suivez vos préférés pour ne manquer aucune nouveauté.</p><p class="demo-note">Tous les artistes présentés sont fictifs (démo) : leurs profils sont inventés et leurs photos servent d'illustration.</p></div>
     ${sugg.length ? `<section><div class="section-head"><div><h2>Suggestions <span class="fun">d'artistes</span></h2></div></div><div class="features">${sugg.map(artistFeature).join("")}</div></section>` : ""}
-    <section class="section"><div class="section-head"><div><h2>Tous les <span class="fun">artistes</span></h2></div><span class="mono muted">${plural(state.artists.length, "artiste")}</span></div>
-      <div class="grid">${state.artists.map(artistCard).join("")}</div></section>`;
+    <section class="section"><div class="section-head"><div><h2>Tous les <span class="fun">artistes</span></h2></div><span class="mono muted">${plural(state.artists.filter((x) => !x.suspended).length, "artiste")}</span></div>
+      <div class="grid">${state.artists.filter((x) => !x.suspended).map(artistCard).join("")}</div></section>`;
 }
 
 function viewArtist(id) {
   const a = artistById(id);
   if (!a) return viewNotFound();
+  if (a.suspended && !isAdmin() && state.user?.artistId !== id) return emptyBox("Boutique indisponible", "Cette boutique n'est pas accessible pour le moment.", '<a class="btn" href="#/artistes">Voir les autres artistes</a>');
   const works = visibleWorks().filter((w) => w.artist === id);
   const posts = postsOf(id);
   const media = state.media[id] || {};
@@ -676,11 +704,11 @@ function viewArtist(id) {
         <span class="label muted">${esc(disciplineOf(id))} · ${esc(a.city)}</span>
         <h1>${esc(a.name)}</h1>
         ${selectedBadge()}
-        <p>${esc(a.bio)}</p>
+        <p>${esc(maskContacts(a.bio))}</p>
         <p class="demo-note">Profil d'artiste fictif (démo) : nom, biographie, œuvres et posts sont inventés, les photos servent d'illustration.</p>
         <div class="artist-stats">${reviewsOf((r) => r.artist === id).length ? `<span>${stars(ratingOf(reviewsOf((r) => r.artist === id)))} ${plural(reviewsOf((r) => r.artist === id).length, "avis")}</span>` : ""}<span><b>${(a.followers + (state.follows.includes(id) ? 1 : 0)).toLocaleString("fr-FR")}</b> abonnés</span><span><b>${works.length}</b> œuvres</span><span><b>${posts.length}</b> posts</span></div>
       </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">${followBtn(id)}<a class="btn btn-outline" href="#/commande-perso/${id}">Commande personnalisée</a><a class="btn btn-outline" href="#/messages/${id}">Contacter</a></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">${followBtn(id)}<a class="btn" href="#/commande-perso/${id}">Demander une pièce sur mesure</a><a class="btn btn-outline" href="#/messages/${id}">Contacter</a></div>
     </div>
     ${tabs("artist", [["accueil", "Accueil"], ["oeuvres", "Œuvres", works.length], ["posts", "Posts", posts.length], ["coulisses", "Coulisses"], ["avis", "Avis", reviewsOf((r) => r.artist === id).length], ["presse", "Presse"]], tab)}
     ${body}`;
@@ -692,7 +720,7 @@ function viewSell() {
     ["Candidatez", "Présentez votre travail en quelques minutes : vos œuvres, votre discipline, votre ville."],
     ["On regarde votre travail", "Notre équipe étudie chaque candidature à la main et vous répond sous une semaine."],
     ["Ouvrez votre boutique", "Votre page artiste, vos œuvres et vos déclinaisons, vos coulisses : tout est prêt en une soirée."],
-    ["Vendez, on s'occupe du reste", "Vous expédiez la pièce. Sous 7 jours après la livraison, vous recevez 90 % du prix de vente (93 % avec Atelier Pro) et la totalité des frais de port."],
+    ["Vendez, on s'occupe du reste", "Vous expédiez la pièce. Sous 7 jours après la livraison, vous recevez 85 % du prix de vente (90 % avec Atelier Pro) et la totalité des frais de port."],
   ];
   return `
     <section class="sell-hero">
@@ -706,9 +734,18 @@ function viewSell() {
     </section>
 
     <section class="section sell-numbers">
-      <div><b>10 %</b><span>de commission, tout compris, sans abonnement ni frais d'annonce avec l'offre Atelier. Ou 7 % avec Atelier Pro (12,90 € HT par mois).</span></div>
-      <div><b>90 %</b><span>du prix pour vous, plus l'intégralité des frais de port.</span></div>
+      <div><b>15 %</b><span>de commission, tout compris, sans abonnement ni frais d'annonce avec l'offre Atelier. Ou 10 % avec Atelier Pro (12,90 € HT par mois).</span></div>
+      <div><b>85 à 90 %</b><span>du prix pour vous, selon votre offre, plus l'intégralité des frais de port.</span></div>
       <div><b>0 €</b><span>pour ouvrir votre boutique. Vous ne payez que si vous vendez.</span></div>
+    </section>
+
+    <section class="section sell-rules">
+      <div class="section-head"><div><h2>Les règles <span class="fun">du jeu</span></h2></div></div>
+      <div class="trends">
+        <div class="panel"><h3>Vous êtes le vendeur</h3><p>Vous fixez vos prix et vos frais de livraison, vous expédiez vos commandes et vous en êtes responsable. ATYPIIK vous met en relation avec les acheteurs et sécurise le paiement.</p></div>
+        <div class="panel"><h3>Tout passe par le site</h3><p>Commandes, devis sur mesure et paiements se font sur ATYPIIK. Les coordonnées sont masquées dans les messages, et vendre en dehors du site après une mise en relation est interdit.</p></div>
+        <div class="panel"><h3>Les litiges, entre vous et l'acheteur</h3><p>Vous les réglez directement depuis le dossier de la commande. ATYPIIK peut les consulter et suspendre une boutique en cas de litiges répétés.</p></div>
+      </div>
     </section>
 
     <section class="section">
@@ -811,14 +848,14 @@ function countdownHtml(date) {
 setInterval(() => $$("[data-countdown]").forEach((el) => (el.innerHTML = countdownHtml(el.dataset.countdown))), 1000);
 
 /* ---------- Commandes personnalisées ---------- */
-const REQ_TAG = { nouvelle: "pink", "devis envoyé": "grey", acceptée: "green", déclinée: "grey" };
+const REQ_TAG = { nouvelle: "pink", "devis envoyé": "grey", acceptée: "green", payée: "green", déclinée: "grey" };
 function viewCustomRequest(id) {
   const a = artistById(id);
   if (!a) return viewNotFound();
   if (!state.user) return needLogin("Connectez-vous pour demander une pièce sur mesure.");
   const works = visibleWorks().filter((w) => w.artist === id).slice(0, 3);
   return `
-    <div class="page-head"><div><span class="ref">${esc(a.name)} · ${esc(disciplineOf(id))}</span><h1>Commande <span class="fun">sur mesure</span></h1></div><p>Décrivez votre projet : ${esc(a.name)} vous répond avec un devis dans la messagerie. Rien n'est payé avant que vous acceptiez.</p></div>
+    <div class="page-head"><div><span class="ref">${esc(a.name)} · ${esc(disciplineOf(id))}</span><h1>Commande <span class="fun">sur mesure</span></h1></div><p>Décrivez votre projet : ${esc(a.name)} vous envoie un devis détaillé (prix, délai, livraison, retouches). Vous l'acceptez et le payez sur ATYPIIK : rien n'est payé avant votre accord, et l'artiste est payé après la livraison.</p></div>
     <div class="two-col">
       <form class="panel" id="request-form" data-artist="${id}">
         <div class="field"><label for="rq-type">Ce que vous imaginez</label><input id="rq-type" required placeholder="Ex. un portrait de mon chien, un vase pour un cadeau…" /></div>
@@ -840,11 +877,13 @@ function requestCard(r, forArtist) {
   return `
     <div class="order">
       <div class="order-top"><div><strong>${esc(r.type)}</strong> <span class="muted">· ${r.id} · ${frDate(r.date)}</span></div><span class="tag ${REQ_TAG[r.status] || ""}">${r.status}</span></div>
-      <p>${esc(r.text)}</p>
+      <p>${esc(maskContacts(r.text))}</p>
+      ${quoteBlock(r.quote)}
+      ${r.status === "payée" ? `<p class="hint">Payée sur ATYPIIK · commande ${esc(r.order || "")}</p>` : ""}
       <div class="order-foot"><span class="hint">${forArtist ? `De ${esc(r.buyer)}` : `Pour ${esc(artistById(r.artist)?.name || "")}`} · Budget : ${esc(r.budget)}${r.deadline ? ` · ${esc(r.deadline)}` : ""}</span>
         <div class="card-actions" style="margin:0">
-          ${forArtist && r.status === "nouvelle" ? `<button class="btn btn-small" data-act="req-quote" data-id="${r.id}">Envoyer un devis</button><button class="btn btn-small btn-outline" data-act="req-decline" data-id="${r.id}">Décliner</button>` : ""}
-          ${!forArtist && r.status === "devis envoyé" ? `<button class="btn btn-small" data-act="req-accept" data-id="${r.id}">Accepter le devis${r.quote ? ` (${euro(r.quote)})` : ""}</button>` : ""}
+          ${forArtist && r.status === "nouvelle" ? `<a class="btn btn-small" href="#/devis/${r.id}">Faire un devis</a><button class="btn btn-small btn-outline" data-act="req-decline" data-id="${r.id}">Décliner</button>` : ""}
+          ${!forArtist && r.status === "devis envoyé" && r.quote ? `<a class="btn btn-small" href="#/devis-paiement/${r.id}">Accepter et payer ${euro(r.quote.price + r.quote.shipping)}</a><button class="btn btn-small btn-outline" data-act="req-decline" data-id="${r.id}">Refuser</button>` : ""}
           <a class="btn btn-small btn-outline" href="#/messages/${r.artist}">Messagerie</a>
         </div>
       </div>
@@ -863,7 +902,7 @@ function postCard(p, full = false) {
       <div class="post-body">
         <span class="ref">${frDate(p.date)}${p.media?.video ? " · Vidéo" : ""}</span>
         <h3><a href="#/post/${p.id}">${esc(p.title)}</a></h3>
-        <p>${esc(full ? p.text : cut(p.text, 150))}</p>
+        <p>${esc(maskContacts(full ? p.text : cut(p.text, 150)))}</p>
         ${full ? "" : `<a class="text-link" href="#/post/${p.id}">Lire la suite</a>`}
       </div>
     </article>`;
@@ -880,7 +919,7 @@ function viewPost(id) {
       <span class="ref">${frDate(p.date)}${p.media?.video ? " · Vidéo coulisses" : ""}</span>
       <p class="demo-note">Post fictif (démo), publié par un artiste fictif.</p>
       <h1>${esc(p.title)}</h1>
-      <p class="post-text">${esc(p.text)}</p>
+      <p class="post-text">${esc(maskContacts(p.text))}</p>
       <div class="card-actions">${followBtn(a.id)}<a class="btn btn-outline" href="#/artiste/${a.id}">Voir le profil</a></div>
     </article>
     ${others.length ? `<section class="section"><div class="section-head"><h2>Autres <span class="fun">posts</span></h2></div><div class="posts">${others.map((x) => postCard(x)).join("")}</div></section>` : ""}`;
@@ -953,7 +992,29 @@ function viewFavs() {
 
 /* ---------- Panier ---------- */
 function cartLines() {
-  return state.cart.map((l) => ({ ...l, w: byId(l.id) })).filter((l) => l.w);
+  return state.cart.map((l, idx) => ({ ...l, idx, w: byId(l.id) })).filter((l) => l.w);
+}
+/* Livraison : fixée par l'artiste pour chaque œuvre, ou incluse dans le prix. */
+const shipOf = (w) => (w.shippingIncluded ? 0 : w.shipping || 0);
+const shipLabel = (w) => (w.shippingIncluded ? "Livraison incluse dans le prix" : `+ ${euro(shipOf(w))} de livraison, payée par l'acheteur`);
+// Un colis par artiste : il facture une seule fois le port, au montant le plus élevé de ses œuvres du panier.
+function cartGroups(lines) {
+  const groups = new Map();
+  lines.forEach((l) => {
+    if (!groups.has(l.w.artist)) groups.set(l.w.artist, { artist: artistOf(l.w), lines: [] });
+    groups.get(l.w.artist).lines.push(l);
+  });
+  return [...groups.values()].map((g) => ({
+    ...g,
+    subtotal: g.lines.reduce((t, l) => t + l.w.price * l.qty, 0),
+    shipping: Math.max(0, ...g.lines.map((l) => shipOf(l.w))),
+  }));
+}
+function cartTotals(lines) {
+  const groups = cartGroups(lines);
+  const items = groups.reduce((t, g) => t + g.subtotal, 0);
+  const shipping = groups.reduce((t, g) => t + g.shipping, 0);
+  return { groups, items, shipping, total: items + shipping };
 }
 function viewCart() {
   const lines = cartLines();
@@ -964,16 +1025,22 @@ function viewCart() {
   return `
     <div class="page-head"><h1>Mon <span class="fun">panier</span></h1></div>
     <div class="cart">
-      <div>${lines
-        .map((l, i) => {
-          const v = l.w.variants[l.variant];
-          const ko = l.w.sold || v.stock === 0;
-          return `
+      <div>${cartGroups(lines)
+        .map((g, n, all) => `
+        <section class="cart-group">
+          <header class="cart-group-head"><span class="label">Colis ${n + 1} sur ${all.length}</span><b>${esc(g.artist.name)}</b><span class="muted">${esc(g.artist.city || "")}</span></header>
+          ${g.lines
+            .map((l) => {
+              const i = l.idx;
+              const v = l.w.variants[l.variant];
+              const ko = l.w.sold || v.stock === 0;
+              return `
           <div class="cart-line">
             <a class="thumb" href="#/oeuvre/${l.w.id}">${visual(l.w)}</a>
             <div>
               <div class="card-title">${esc(l.w.title)}</div>
-              <div class="card-artist">${esc(artistOf(l.w).name)} · ${esc(v.label)} · ${euro(l.w.price)}</div>
+              <div class="card-artist">${esc(v.label)} · ${euro(l.w.price)}</div>
+              <div class="ship-line">${shipLabel(l.w)}</div>
               ${ko ? '<div class="alert">⚠ Cet article n\'est plus disponible.</div>' : v.stock < l.qty ? `<div class="alert">⚠ Plus que ${v.stock} en stock.</div>` : ""}
               <button class="link-btn" data-act="cart-remove" data-i="${i}">Supprimer</button>
             </div>
@@ -983,29 +1050,35 @@ function viewCart() {
               <button data-act="cart-qty" data-i="${i}" data-d="1" aria-label="Plus" ${l.qty >= v.stock ? "disabled" : ""}>+</button>
             </div>
           </div>`;
-        })
-        .join("")}</div>
+            })
+            .join("")}
+          <footer class="cart-group-foot"><span>Livraison de ce colis, envoyé par ${esc(g.artist.name)}</span><b>${g.shipping ? euro(g.shipping) : "Incluse"}</b></footer>
+        </section>`)
+        .join("")}
+        ${cartGroups(lines).length > 1 ? `<p class="hint">Vous achetez chez ${cartGroups(lines).length} artistes : un seul paiement, et chaque artiste vous envoie son colis.</p>` : ""}
+      </div>
       ${summaryBox(lines, `<a class="btn btn-block" href="#/paiement" ${blocked ? "data-blocked" : ""} style="margin-top:16px${blocked ? ";opacity:.35;pointer-events:none" : ""}">Passer au paiement</a>`)}
     </div>`;
 }
 /* split = true sur la page de paiement : on y détaille la répartition du montant.
    Les frais de port dépendent de la taille du colis : ils ne sont pas encore chiffrés. */
 function summaryBox(lines, cta = "", split = false) {
-  const total = lines.reduce((s, l) => s + l.w.price * l.qty, 0);
+  const t = cartTotals(lines);
   return `
     <aside class="summary">
       <h3>Récapitulatif</h3>
-      <div class="summary-row"><span>Sous-total</span><span>${euro(total)}</span></div>
-      <div class="summary-row"><span>Livraison suivie</span><span class="mono">Selon le colis</span></div>
-      <div class="summary-row total"><span>Total œuvres TTC</span><span>${euro(total)}</span></div>
-      <p class="hint">Les frais de port dépendent de la taille du colis et s'ajoutent au total.</p>
+      <div class="summary-row"><span>Œuvres</span><span>${euro(t.items)}</span></div>
+      <div class="summary-row"><span>Livraison (${t.groups.length} colis)</span><span>${t.shipping ? euro(t.shipping) : "Incluse"}</span></div>
+      ${t.groups.length > 1 ? t.groups.map((g) => `<div class="summary-row sub"><span>${esc(g.artist.name)}</span><span>${g.shipping ? euro(g.shipping) : "incluse"}</span></div>`).join("") : ""}
+      <div class="summary-row total"><span>Total TTC</span><span>${euro(t.total)}</span></div>
+      <p class="hint">Les frais de livraison sont fixés par chaque artiste et payés par l'acheteur.</p>
       ${
         split
           ? `<div class="split">
               <span class="mono">Où va votre argent</span>
-              <div class="summary-row sub"><span>Aux artistes (90 % des œuvres)</span><span>${euro(total * (1 - COMMISSION))}</span></div>
-              <div class="summary-row sub"><span>ATYPIIK (10 % des œuvres)</span><span>${euro(total * COMMISSION)}</span></div>
-              <p class="hint">Les frais de port sont reversés aux artistes.</p>
+              <div class="summary-row sub"><span>Aux artistes (85 à 90 % des œuvres)</span><span>${euro(lines.reduce((t, l) => t + l.w.price * l.qty * (1 - commissionOf(l.w.artist)), 0))}</span></div>
+              <div class="summary-row sub"><span>ATYPIIK (commission de 15 % ou 10 %)</span><span>${euro(lines.reduce((t, l) => t + l.w.price * l.qty * commissionOf(l.w.artist), 0))}</span></div>
+              <div class="summary-row sub"><span>Livraison, reversée aux artistes</span><span>${euro(t.shipping)}</span></div>
             </div>`
           : ""
       }
@@ -1050,7 +1123,7 @@ function viewCheckout() {
             <div class="field"><label for="cc-cvc">CVC</label><input id="cc-cvc" required inputmode="numeric" placeholder="123" autocomplete="cc-csc" /></div>
           </div>
           <p class="hint">Démo : aucun paiement réel n'est effectué, n'entrez pas une vraie carte. Utilisez par exemple 4242 4242 4242 4242.</p>
-          <button class="btn btn-block">Payer ${euro(total)} + frais de port</button>
+          <button class="btn btn-block">Payer ${euro(cartTotals(lines).total)}</button>
         </form>`;
   return `
     <div class="page-head"><h1>Commande</h1></div>
@@ -1087,7 +1160,8 @@ function placeOrder() {
     toast(`« ${bad.w.title} » n'est plus disponible en quantité suffisante.`);
     return nav("#/panier");
   }
-  const total = lines.reduce((s, l) => s + l.w.price * l.qty, 0);
+  const t = cartTotals(lines);
+  const total = t.total;
   const a = state.checkout.address;
   const id = "CMD-2026-" + String(1000 + state.orders.length + Math.floor(Math.random() * 8000)).padStart(4, "0");
   lines.forEach((l) => {
@@ -1098,11 +1172,14 @@ function placeOrder() {
     id, date: today(), status: 0, buyer: state.user.name,
     address: `${a.street}, ${a.zip} ${a.city}`,
     lines: lines.map((l) => ({ id: l.id, variant: l.variant, qty: l.qty, price: l.w.price })), total,
+    items: t.items, shipping: t.shipping,
+    // Un colis par artiste, avec ses propres frais de port (reversés à l'artiste).
+    parcels: t.groups.map((g) => ({ artist: g.artist.id, shipping: g.shipping, lines: g.lines.map((l) => l.id) })),
   });
   crmFromOrder(state.orders[0]);
   state.cart = [];
   state.checkout = { step: 1, address: a };
-  if (state.prefs.orders) notify(`Commande ${id} confirmée — ${euro(total)}. L'artiste prépare votre colis.`, "#/profil");
+  if (state.prefs.orders) notify(`Commande ${id} confirmée — ${euro(total)}. ${t.groups.length > 1 ? `Les ${t.groups.length} artistes préparent vos colis.` : "L'artiste prépare votre colis."}`, "#/profil");
   save();
   nav("#/commande/" + id);
 }
@@ -1114,7 +1191,8 @@ function viewOrderDone(id) {
     <div class="empty" style="border-style:solid;border-color:var(--ink)">
       <span class="label muted">Merci</span>
       <h3 style="font-size:3rem;margin-top:12px">Commande confirmée</h3>
-      <p>Commande <strong>${o.id}</strong> · ${euro(o.total)}. Un e-mail de confirmation vient de vous être envoyé.<br />Vous suivrez chaque étape depuis votre profil et vos notifications.</p>
+      <p>Commande <strong>${o.id}</strong> · ${euro(o.total)}${o.shipping ? `, dont ${euro(o.shipping)} de livraison` : ""}. Un e-mail de confirmation vient de vous être envoyé.<br />Vous suivrez chaque étape depuis votre profil et vos notifications.</p>
+      ${o.parcels && o.parcels.length > 1 ? `<p class="hint">Vous recevrez ${o.parcels.length} colis, un par artiste : ${o.parcels.map((p) => esc((artistById(p.artist) || {}).name || "")).join(", ")}.</p>` : ""}
       <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><a class="btn" href="#/profil">Suivre ma commande</a><a class="btn btn-outline" href="#/galerie">Continuer mes découvertes</a></div>
       ${o.crm && isAdmin() ? `<p class="hint" style="margin-top:18px">Démo · côté entreprise, cette commande vient d'arriver dans le CRM. <a class="text-link" href="#/crm/${o.crm}">Voir la fiche client dans le CRM →</a></p>` : ""}
     </div>`;
@@ -1164,16 +1242,17 @@ function viewMessages(param) {
       <div class="threads">${keys
         .map((k) => {
           const last = (state.threads[k] || []).slice(-1)[0];
-          return `<a class="thread ${k === current ? "on" : ""}" href="#/messages/${k}">${k !== "support" && !seller && artistById(k) ? avatar(artistById(k), true) : `<div class="avatar sm">${k === "support" ? "A" : initials(label(k))}</div>`}<div><strong>${esc(label(k))}</strong><small>${esc(last?.text || "Nouvelle conversation")}</small></div></a>`;
+          return `<a class="thread ${k === current ? "on" : ""}" href="#/messages/${k}">${k !== "support" && !seller && artistById(k) ? avatar(artistById(k), true) : `<div class="avatar sm">${k === "support" ? "A" : initials(label(k))}</div>`}<div><strong>${esc(label(k))}</strong><small>${esc(maskContacts(last?.text || "Nouvelle conversation"))}</small></div></a>`;
         })
         .join("")}</div>
       <div class="conv">
         <div class="conv-head">${current !== "support" && !seller && artistById(current) ? avatar(artistById(current), true) : `<div class="avatar sm">${current === "support" ? "A" : initials(label(current))}</div>`}<strong>${esc(label(current))}</strong>${current !== "support" && !seller ? `<a class="link-btn" style="margin-left:auto" href="#/artiste/${current}">Voir le profil</a>` : ""}</div>
-        <div class="chat" id="chat">${msgs.length ? msgs.map((m) => `<div class="bubble ${m.from === meFrom ? "me" : ""}">${esc(m.text)}</div>`).join("") : '<p class="hint">Posez votre question : dimensions, livraison, commande personnalisée…</p>'}</div>
+        <div class="chat" id="chat">${msgs.length ? msgs.map((m) => `<div class="bubble ${m.from === meFrom ? "me" : ""}">${esc(maskContacts(m.text))}</div>`).join("") : '<p class="hint">Posez votre question : dimensions, livraison, commande personnalisée…</p>'}</div>
         <form class="chat-form" id="chat-form" data-key="${current}" data-from="${meFrom}">
           <input id="chat-input" placeholder="Votre message…" aria-label="Votre message" autocomplete="off" />
           <button class="btn btn-small">Envoyer</button>
         </form>
+        <p class="hint chat-safe">🔒 Pour votre sécurité, les numéros, e-mails, liens et comptes de réseaux sociaux sont masqués automatiquement. Commande, paiement et livraison se font sur ATYPIIK : c'est ce qui vous protège.</p>
       </div>
     </div>`;
 }
@@ -1185,8 +1264,10 @@ function bindMessages() {
   const form = $("#chat-form");
   form.addEventListener("submit", (e) => {
     e.preventDefault();
-    const text = $("#chat-input").value.trim();
-    if (!text) return;
+    const raw = $("#chat-input").value.trim();
+    if (!raw) return;
+    const text = maskContacts(raw);
+    if (text !== raw) toast("Coordonnées masquées : les échanges et paiements restent sur ATYPIIK.");
     const key = form.dataset.key;
     const from = form.dataset.from;
     (state.threads[key] = state.threads[key] || []).push({ from, text });
@@ -1221,7 +1302,6 @@ function loginForms() {
           <div class="btns">
             <button type="button" class="btn btn-small" data-act="demo-login" data-id="acheteur">Acheteur</button>
             <button type="button" class="btn btn-small btn-chrome" data-act="demo-login" data-id="vendeur">Artiste</button>
-            ${VITRINE ? "" : `<button type="button" class="btn btn-small btn-outline" data-act="demo-login" data-id="admin">Administrateur</button>`}
           </div>
         </div>
       </form>
@@ -1238,7 +1318,12 @@ function loginForms() {
           </div>
           <div class="seller-terms">
             <strong>Comment se passe le paiement</strong>
-            <p>Vous fixez votre prix. Sur chaque vente, ATYPIIK prélève une commission de <b>10 %</b> (7 % avec Atelier Pro) et vous recevez <b>90 %</b> (93 %), versés sous 7 jours après la livraison. Les frais de port, qui dépendent de la taille du colis, sont payés par l'acheteur et vous sont reversés.</p>
+            <p>Vous fixez votre prix. Sur chaque vente, ATYPIIK prélève une commission de <b>15 %</b> (10 % avec Atelier Pro) et vous recevez <b>85 %</b> (90 %), versés sous 7 jours après la livraison. Vous fixez aussi vos frais de livraison, payés par l'acheteur et reversés intégralement.</p>
+            <ul class="seller-rules">
+              <li><b>Vous vendez en votre nom</b> : vous fixez vos prix et vos frais de livraison, et vous êtes responsable de vos commandes. ATYPIIK met en relation et sécurise le paiement.</li>
+              <li><b>Tout passe par ATYPIIK</b> : commandes, devis et paiements. Les coordonnées sont masquées dans les échanges, et vendre en dehors du site après une mise en relation est interdit.</li>
+              <li><b>Les litiges</b> se règlent entre vous et l'acheteur. ATYPIIK peut les consulter et suspendre une boutique en cas de litiges répétés.</li>
+            </ul>
           </div>
         </div>
         <div class="field"><label for="su-pass">Mot de passe</label><input id="su-pass" type="password" required minlength="8" autocomplete="new-password" /></div>
@@ -1454,7 +1539,7 @@ function sellerSpace() {
   if (tab === "dashboard") {
     body = `
       <div class="kpis">
-        <div><b>${euro(gross * 0.9)}</b><span>Revenus nets (90 %)</span></div>
+        <div><b>${euro(sales.reduce((t, x) => t + netOf(x), 0))}</b><span>Revenus nets (${pct(1 - commissionOf(id))})</span></div>
         <div><b>${sales.length}</b><span>Ventes</span></div>
         <div><b class="${toShip ? "pink" : ""}">${toShip}</b><span>À expédier</span></div>
         <div><b>${a.followers.toLocaleString("fr-FR")}</b><span>Abonnés</span></div>
@@ -1465,6 +1550,7 @@ function sellerSpace() {
           ${toShip ? `<p>${toShip} commande${toShip > 1 ? "s" : ""} à préparer ou expédier.</p><button class="btn btn-small" data-act="tab" data-key="seller" data-id="ventes">Voir les ventes</button>` : '<p class="hint">Aucune commande en attente.</p>'}
         </div>
         <div class="panel"><h3>Votre vitrine</h3><p class="hint">${works.length} œuvre${works.length > 1 ? "s" : ""} en ligne · ${works.filter((w) => totalStock(w) === 0).length} en rupture.</p>
+          <p class="plan-usage">${planOf(id) === "pro" ? "<b>Atelier Pro</b> · publication illimitée · commission de 10 %" : `<b>Atelier</b> · ${activeCount(id)} / ${ATELIER_LIMIT} œuvres en vente · commission de 15 % · <a class="text-link" href="#/abonnement/pro">Passer à Atelier Pro</a>`}</p>
           <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-small btn-chrome" data-act="tab" data-key="seller" data-id="ajouter">Publier une œuvre</button><a class="btn btn-small btn-outline" href="#/artiste/${id}">Voir ma page publique</a></div>
         </div>
       </div>`;
@@ -1478,7 +1564,7 @@ function sellerSpace() {
               (w) => `<tr>
               <td><a href="#/oeuvre/${w.id}" style="display:flex;gap:10px;align-items:center">${visual(w, "display:block;width:44px;height:44px;flex:none")}<strong>${esc(w.title)}</strong></a></td>
               <td>${w.variants.map((v, i) => `<label style="display:flex;gap:6px;align-items:center;margin:2px 0"><span style="min-width:90px">${esc(v.label)}</span><input type="number" min="0" value="${v.stock}" style="width:64px;padding:4px;border:1px solid var(--ink)" data-act="edit-stock" data-id="${w.id}" data-i="${i}" aria-label="Stock ${esc(v.label)}" /></label>`).join("")}</td>
-              <td class="num"><input type="number" min="1" value="${w.price}" style="width:90px;padding:4px;border:1px solid var(--ink);text-align:right" data-act="edit-price" data-id="${w.id}" aria-label="Prix" /><div class="mono muted" style="margin-top:4px">net ${euro(w.price * (1 - COMMISSION))} + port</div></td>
+              <td class="num"><input type="number" min="1" value="${w.price}" style="width:90px;padding:4px;border:1px solid var(--ink);text-align:right" data-act="edit-price" data-id="${w.id}" aria-label="Prix" /><div class="mono muted" style="margin-top:4px">net ${euro(w.price * (1 - commissionOf(w.artist)))} + port</div></td>
               <td>${w.hidden ? '<span class="tag pink">Masquée</span>' : w.sold ? '<span class="tag grey">Vendue</span>' : totalStock(w) ? '<span class="tag green">En ligne</span>' : '<span class="tag pink">Rupture</span>'}</td>
               <td class="num"><button class="btn btn-small btn-outline" data-act="save-work" data-id="${w.id}">Enregistrer</button></td>
             </tr>`,
@@ -1486,15 +1572,22 @@ function sellerSpace() {
             .join("")}</tbody></table></div>`
       : emptyBox("Aucune œuvre", "Publiez votre première œuvre.");
   }
-  if (tab === "ajouter") body = addWorkForm();
+  if (tab === "ajouter")
+    body = canPublish(id)
+      ? addWorkForm()
+      : emptyBox(
+          `Limite de ${ATELIER_LIMIT} œuvres atteinte`,
+          `Avec l'offre Atelier, vous pouvez avoir ${ATELIER_LIMIT} œuvres en vente en même temps. Retirez une œuvre, ou passez à Atelier Pro pour publier sans limite et payer 10 % de commission au lieu de 15 %.`,
+          '<a class="btn" href="#/abonnement/pro">Passer à Atelier Pro</a>',
+        );
   if (tab === "ventes") {
     body = sales.length
       ? `<div class="table-wrap"><table>
-          <thead><tr><th>Commande</th><th>Date</th><th>Acheteur</th><th>Œuvre</th><th class="num">Vente</th><th class="num">Net (90 %)</th><th>Statut</th><th></th></tr></thead>
+          <thead><tr><th>Commande</th><th>Date</th><th>Acheteur</th><th>Œuvre</th><th class="num">Vente</th><th class="num">Net (${pct(1 - commissionOf(id))})</th><th>Statut</th><th></th></tr></thead>
           <tbody>${sales
             .map(
               (s) => `<tr><td>${s.order}</td><td>${frDate(s.date)}</td><td>${esc(s.buyer)}</td><td>${esc(byId(s.work)?.title)} × ${s.qty}</td>
-              <td class="num">${euro(s.price * s.qty)}</td><td class="num">${euro(s.price * s.qty * 0.9)}</td>
+              <td class="num">${euro(s.price * s.qty)}</td><td class="num">${euro(netOf(s))}</td>
               <td><span class="tag ${s.status === 3 ? "green" : s.status === 2 ? "grey" : "pink"}">${STEPS[s.status]}</span>${disputeOf(s.order) ? ` <a class="tag pink" href="#/litige/${disputeOf(s.order).id}">Litige</a>` : ""}</td>
               <td class="num">${s.status < 3 ? `<button class="btn btn-small" data-act="advance" data-src="${s.src}" data-id="${s.order}">${s.status < 2 ? "Marquer expédiée" : "Marquer livrée"}</button>` : ""}</td></tr>`,
             )
@@ -1558,6 +1651,7 @@ function sellerSpace() {
       ? bought.map((o) => orderCard(o)).join("")
       : emptyBox("Aucun achat", "Vous pouvez acheter les œuvres des autres artistes avec ce même compte : elles apparaîtront ici.", '<a class="btn" href="#/galerie">Explorer la galerie</a>');
   return (
+    (a?.suspended ? `<div class="admin-readonly panel"><span class="label">Boutique suspendue</span><p>Vos œuvres ne sont plus visibles sur ATYPIIK, conformément aux conditions vendeurs (litiges répétés ou non-respect des règles). Contactez l'équipe pour en savoir plus.</p></div>` : "") +
     tabs(
       "seller",
       [
@@ -1586,6 +1680,11 @@ function addWorkForm() {
         <div class="field"><label for="wk-type">Type d'art</label><select id="wk-type"><option>Peinture</option><option>Photographie</option><option>Céramique</option><option>Mode</option><option>Crochet</option><option>Bijoux</option><option>Maison & déco</option></select></div>
         <div class="field"><label for="wk-price">Prix de vente TTC (€)</label><input id="wk-price" type="number" min="1" required /></div>
       </div>
+      <div class="field-row">
+        <div class="field"><label for="wk-ship">Frais de livraison (€), payés par l'acheteur</label><input id="wk-ship" type="number" min="0" step="0.1" value="8.90" /></div>
+        <div class="field"><span>&nbsp;</span><label class="check"><input type="checkbox" id="wk-ship-incl" /> Livraison incluse dans mon prix</label></div>
+      </div>
+      <p class="hint">Si vous vendez plusieurs œuvres au même acheteur, il ne paie qu'une fois la livraison : le montant le plus élevé de vos œuvres.</p>
       <div class="payout" id="payout" aria-live="polite"></div>
       <div class="field-row">
         <div class="field"><label for="wk-color">Couleur dominante</label><select id="wk-color">${Object.keys(COLORS).map((c) => `<option>${c}</option>`).join("")}</select></div>
@@ -1609,12 +1708,13 @@ function addWorkForm() {
 
 function payoutHtml(price) {
   if (!price) return `<span class="mono">Ce que vous recevez</span><p class="hint">Saisissez un prix pour voir le calcul.</p>`;
+  const rate = commissionOf(state.user?.artistId);
   return `
     <span class="mono">Ce que vous recevez</span>
     <div class="summary-row sub"><span>Prix de vente</span><span>${euro(price)}</span></div>
-    <div class="summary-row sub"><span>Commission ATYPIIK (10 %)</span><span>− ${euro(price * COMMISSION)}</span></div>
-    <div class="summary-row total"><span>Vous recevez</span><span>${euro(price * (1 - COMMISSION))}</span></div>
-    <p class="hint">+ les frais de port, payés par l'acheteur selon la taille du colis.</p>`;
+    <div class="summary-row sub"><span>Commission ATYPIIK (${pct(rate)}, offre ${planOf(state.user?.artistId) === "pro" ? "Atelier Pro" : "Atelier"})</span><span>− ${euro(price * rate)}</span></div>
+    <div class="summary-row total"><span>Vous recevez</span><span>${euro(price * (1 - rate))}</span></div>
+    <p class="hint">+ les frais de livraison que vous fixez, payés par l'acheteur et reversés intégralement.</p>`;
 }
 
 function bindSeller() {
@@ -1627,6 +1727,7 @@ function bindSeller() {
   if (wf)
     wf.addEventListener("submit", (e) => {
       e.preventDefault();
+      if (!canPublish(state.user.artistId)) return render();
       const variants = $$("#variant-rows .vrow")
         .map((r) => {
           const [l, s] = $$("input", r);
@@ -1641,6 +1742,7 @@ function bindSeller() {
         technique: $("#wk-tech").value.trim() || "—", dims: $("#wk-dims").value.trim() || "—", description: $("#wk-desc").value.trim(),
         art: `linear-gradient(${Math.floor(Math.random() * 360)}deg, ${pick()}, ${pick()} 55%, ${pick()})`,
         variants: variants.length ? variants : [{ label: "Original", stock: 1 }], isNew: true,
+        shippingIncluded: $("#wk-ship-incl").checked, shipping: $("#wk-ship-incl").checked ? 0 : Math.max(0, +$("#wk-ship").value || 0),
       };
       state.works.unshift(w);
       if (state.follows.includes(w.artist) && state.prefs.news) notify(`${artistOf(w).name}, que vous suivez, a publié « ${w.title} ».`, "#/oeuvre/" + w.id);
@@ -1700,23 +1802,30 @@ function adminSpace() {
       .join("")}</tbody></table></div>`;
   }
   if (tab === "finances") {
-    body = `<div class="table-wrap"><table><thead><tr><th>Commande</th><th>Date</th><th>Œuvre</th><th>Artiste</th><th class="num">Montant</th><th class="num">Artiste 90 %</th><th class="num">Commission 10 %</th><th>Virement</th></tr></thead><tbody>${sales
+    body = `<div class="table-wrap"><table><thead><tr><th>Commande</th><th>Date</th><th>Œuvre</th><th>Artiste</th><th class="num">Montant</th><th class="num">Part artiste</th><th class="num">Commission</th><th>Virement</th></tr></thead><tbody>${sales
       .map((s) => {
         const w = byId(s.work);
         const t = s.price * s.qty;
         return `<tr><td>${s.order}</td><td>${frDate(s.date)}</td><td>${esc(w?.title)}</td><td>${esc(w ? artistOf(w).name : "")}</td>
-        <td class="num">${euro(t)}</td><td class="num">${euro(t * 0.9)}</td><td class="num"><strong>${euro(t * 0.1)}</strong></td>
+        <td class="num">${euro(t)}</td><td class="num">${euro(netOf(s))}</td><td class="num"><strong>${euro(t - netOf(s))}</strong> <span class="muted">${w ? pct(commissionOf(w.artist)) : ""}</span></td>
         <td>${s.status === 3 ? '<span class="tag green">Versé</span>' : '<span class="tag grey">En séquestre</span>'}</td></tr>`;
       })
       .join("")}</tbody></table></div>`;
   }
   if (tab === "litiges") {
-    body = state.disputes.length
+    const byArtist = state.artists.map((ar) => [ar, disputesOfArtist(ar.id)]).filter(([, l]) => l.length);
+    body = `<div class="admin-readonly panel"><span class="label">Lecture seule</span><p>Les litiges se règlent entre l'acheteur et l'artiste. Vous les consultez pour repérer un artiste qui pose problème, et vous pouvez suspendre sa boutique, comme le prévoient les conditions vendeurs.</p></div>
+      ${byArtist.length ? `<h3 class="label" style="margin:18px 0 8px">Suivi par artiste</h3><div class="table-wrap"><table><thead><tr><th>Artiste</th><th class="num">Litiges</th><th class="num">En cours</th><th>Boutique</th><th></th></tr></thead><tbody>${byArtist
+        .map(([ar, l]) => `<tr><td><strong>${esc(ar.name)}</strong></td><td class="num">${l.length}</td><td class="num">${l.filter(disputeOpen).length}</td><td>${ar.suspended ? '<span class="tag pink">Suspendue</span>' : '<span class="tag green">Active</span>'}</td>
+          <td class="num"><button class="btn btn-small ${ar.suspended ? "" : "btn-outline"}" data-act="suspend-artist" data-id="${ar.id}">${ar.suspended ? "Réactiver" : "Suspendre"}</button></td></tr>`)
+        .join("")}</tbody></table></div>` : ""}
+      <h3 class="label" style="margin:18px 0 8px">Tous les litiges</h3>`;
+    body += state.disputes.length
       ? `<div class="table-wrap"><table><thead><tr><th>Litige</th><th>Commande</th><th>Acheteur</th><th>Motif</th><th class="num">Photos</th><th class="num">Montant</th><th>Statut</th><th></th></tr></thead><tbody>${state.disputes
           .map(
             (d) => `<tr><td><a href="#/litige/${d.id}"><strong>${d.id}</strong></a></td><td>${d.order}</td><td>${esc(d.buyer)}</td><td>${esc(d.reason)}</td><td class="num">${d.photos?.length || 0}</td><td class="num">${euro(d.amount)}</td>
             <td><span class="tag ${DISPUTE_TAG[d.status] || ""}">${d.status}</span></td>
-            <td class="num"><a class="btn btn-small ${disputeOpen(d) ? "" : "btn-outline"}" href="#/litige/${d.id}">Ouvrir le dossier</a></td></tr>`,
+            <td class="num"><a class="btn btn-small btn-outline" href="#/litige/${d.id}">Consulter</a></td></tr>`,
           )
           .join("")}</tbody></table></div>`
       : emptyBox("Aucun litige", "Tout va bien.");
@@ -1725,7 +1834,7 @@ function adminSpace() {
     <nav class="admin-tools" aria-label="Outils internes">${ADMIN_LINKS.slice(1).map(([h, l]) => `<a href="${h}">${l} →</a>`).join("")}</nav>
     <div class="kpis">
       <div><b>${euro(gmv)}</b><span>Volume de ventes</span></div>
-      <div><b class="pink">${euro(gmv * 0.1)}</b><span>Commissions (taux Atelier 10 %)</span></div>
+      <div><b class="pink">${euro(sales.reduce((t, x) => t + x.price * x.qty - netOf(x), 0))}</b><span>Commissions (15 % ou 10 %)</span></div>
       <div><b>${state.artists.length}</b><span>Artistes actifs</span></div>
       <div><b class="${openDisputes.length ? "pink" : "green"}">${openDisputes.length}</b><span>Litiges ouverts</span></div>
     </div>
@@ -1754,6 +1863,7 @@ function disputeWork(d) {
 function myDisputeRole() {
   return state.user?.role === "admin" ? "admin" : state.user?.role === "vendeur" ? "artist" : "buyer";
 }
+const disputesOfArtist = (artistId) => state.disputes.filter((d) => disputeWork(d)?.artist === artistId);
 function canSeeDispute(d) {
   if (!state.user) return false;
   if (state.user.role === "vendeur") return disputeWork(d)?.artist === state.user.artistId;
@@ -1826,19 +1936,21 @@ function viewDispute(id) {
             .map(
               (m) => `<div class="msg from-${m.from} ${m.from === me ? "mine" : ""}">
                 <div class="msg-meta mono"><span class="role">${ROLE_LABEL[m.from]}</span> ${esc(who(m))} · ${frDate(m.date)}</div>
-                ${m.text ? `<p>${esc(m.text)}</p>` : ""}
+                ${m.text ? `<p>${esc(maskContacts(m.text))}</p>` : ""}
                 ${m.photos?.length ? `<div class="msg-photos">${m.photos.map((p) => `<img src="${p.src}" alt="Photo jointe" />`).join("")}</div>` : ""}
               </div>`,
             )
             .join("")}</div>
           ${
-            open
+            open && me !== "admin"
               ? `<form class="reply" id="dispute-reply" data-id="${d.id}">
                   <div class="field"><label for="dr-text">Votre message (${ROLE_LABEL[me].toLowerCase()})</label><textarea id="dr-text" rows="3" placeholder="Écrire une réponse…"></textarea></div>
                   ${photoInput("dr-photos", "Ajouter des photos")}
                   <button class="btn btn-small">Envoyer</button>
                 </form>`
-              : '<p class="hint">Ce dossier est clos : il n\'est plus possible d\'y répondre.</p>'
+              : me === "admin" && open
+                ? '<p class="hint">Lecture seule : ce litige se règle entre l\'acheteur et l\'artiste.</p>'
+                : '<p class="hint">Ce dossier est clos : il n\'est plus possible d\'y répondre.</p>'
           }
         </section>
       </div>
@@ -1851,15 +1963,26 @@ function viewDispute(id) {
           ${a ? `<div class="summary-row"><span>Artiste</span><span><a href="#/artiste/${a.id}" class="by">${esc(a.name)}</a></span></div>` : ""}
         </div>
         ${
-          me === "admin" && open
+          me === "admin"
+            ? `<div class="panel admin-readonly">
+                <span class="label">Administration · lecture seule</span>
+                <p>ATYPIIK met en relation : ce litige se règle directement entre l'acheteur et l'artiste. Vous le consultez pour veiller à la qualité du site.</p>
+                ${a ? `<p class="hint">${esc(a.name)} : ${plural(disputesOfArtist(a.id).length, "litige")} au total, dont ${disputesOfArtist(a.id).filter(disputeOpen).length} en cours.</p>
+                <button class="btn btn-small ${a.suspended ? "" : "btn-outline"}" data-act="suspend-artist" data-id="${a.id}">${a.suspended ? "Réactiver la boutique" : "Suspendre l'artiste"}</button>` : ""}
+              </div>`
+            : ""
+        }
+        ${
+          me === "artist" && open
             ? `<form class="panel decision" id="dispute-decision" data-id="${d.id}">
-                <h3>Décision</h3>
+                <h3>Votre réponse</h3>
+                <p class="hint">En tant que vendeur, c'est vous qui réglez ce litige avec l'acheteur.</p>
                 <label class="check"><input type="radio" name="dec" value="full" checked /> Rembourser intégralement (${euro(d.amount)})</label>
                 <label class="check"><input type="radio" name="dec" value="partial" /> Remboursement partiel</label>
                 <div class="field"><input id="dec-amount" type="number" min="1" max="${d.amount}" placeholder="Montant en €" aria-label="Montant du remboursement partiel" /></div>
                 <label class="check"><input type="radio" name="dec" value="info" /> Demander des précisions</label>
                 <label class="check"><input type="radio" name="dec" value="reject" /> Refuser le litige</label>
-                <div class="field"><label for="dec-note">Explication envoyée aux deux parties</label><textarea id="dec-note" rows="3" required></textarea></div>
+                <div class="field"><label for="dec-note">Explication envoyée à l'acheteur</label><textarea id="dec-note" rows="3" required></textarea></div>
                 <button class="btn btn-block">Valider la décision</button>
               </form>`
             : ""
@@ -1885,7 +2008,7 @@ function bindReport() {
 function viewLegal(key) {
   const pages = {
     mentions: ["Mentions légales", "<p>Éditeur : projet étudiant réalisé par Lilou Capanni dans le cadre d'une épreuve de l'INSEEC Grande École. ATYPIIK n'est pas une société immatriculée et ne vend rien : ce site est une démonstration.</p><p>Directrice de la publication : Lilou Capanni.</p><p>Hébergement : Vercel Inc. (États-Unis).</p><p>Contact : via la page Contact du site.</p>"],
-    cgu: ["CGU / CGV", "<p>Les présentes conditions encadrent l'utilisation de la marketplace ATYPIIK par les acheteurs et les artistes vendeurs.</p><p><strong>Commission :</strong> ATYPIIK prélève 10 % du prix de vente TTC de chaque transaction (7 % avec l'offre Atelier Pro). L'artiste perçoit 90 % (93 % avec l'offre Atelier Pro), versés sous 7 jours après la livraison.</p><p><strong>Livraison :</strong> les frais de port dépendent de la taille et du poids du colis. Ils sont payés par l'acheteur et reversés à l'artiste ; ils n'entrent pas dans le calcul de la commission.</p><p><strong>Rétractation :</strong> 14 jours à compter de la réception, hors œuvres réalisées sur commande personnalisée.</p>"],
+    cgu: ["CGU / CGV", "<p class='hint'>Version de démonstration : à faire relire par un juriste avant le lancement.</p><p><strong>Rôle d'ATYPIIK :</strong> ATYPIIK est une place de marché. Elle met en relation des artistes vendeurs, sélectionnés à l'entrée, et des acheteurs, et sécurise le paiement. ATYPIIK n'est pas le vendeur des œuvres : chaque artiste vend en son nom, fixe ses prix et ses frais de livraison, prépare et expédie ses commandes, et en est responsable.</p><p><strong>Commission :</strong> ATYPIIK prélève 15 % du prix de vente TTC de chaque transaction (10 % avec l'offre Atelier Pro). L'artiste perçoit 85 % (90 % avec l'offre Atelier Pro), versés sous 7 jours après la livraison. Avec l'offre Atelier, un artiste peut avoir 10 œuvres en vente en même temps ; avec Atelier Pro, sans limite.</p><p><strong>Livraison :</strong> les frais de livraison sont fixés par l'artiste pour chaque œuvre, ou inclus dans son prix. Ils sont payés par l'acheteur et reversés à l'artiste ; ils n'entrent pas dans le calcul de la commission. Une commande passée chez plusieurs artistes donne lieu à un colis par artiste.</p><p><strong>Sur mesure :</strong> l'artiste répond à une demande par un devis (prix, délai, livraison, retouches). Le devis est accepté et payé sur ATYPIIK. Les pièces sur mesure ne bénéficient pas du droit de rétractation.</p><p><strong>Ventes et échanges sur le site uniquement :</strong> toute commande, tout paiement et tout devis passent par ATYPIIK. Il est interdit d'échanger des coordonnées personnelles ou de conclure en dehors du site une vente issue d'une mise en relation par ATYPIIK. Les coordonnées sont masquées automatiquement dans les échanges. Un manquement peut entraîner la suspension du compte.</p><p><strong>Litiges :</strong> un litige se règle entre l'acheteur et l'artiste, depuis le dossier ouvert sur la commande. ATYPIIK n'arbitre pas les litiges, mais peut les consulter pour veiller à la qualité du site, et peut suspendre ou retirer un artiste en cas de litiges répétés ou de non-respect des présentes conditions.</p><p><strong>Rétractation :</strong> 14 jours à compter de la réception, hors œuvres réalisées sur commande personnalisée.</p>"],
   };
   if (key === "rgpd")
     return `
@@ -2157,9 +2280,17 @@ const actions = {
     const p = state.pending.find((x) => x.id === el.dataset.id);
     p.status = "validé";
     p.artistId = "art" + Date.now();
-    state.artists.push({ id: p.artistId, name: p.name, city: p.city, bio: `${p.discipline}.`, followers: 0, videos: [], press: [] });
+    state.artists.push({ id: p.artistId, name: p.name, city: p.city, bio: `${p.discipline}.`, followers: 0, plan: p.plan || "atelier", videos: [], press: [] });
     save();
     toast(`${p.name} peut maintenant vendre sur ATYPIIK.`);
+    render(true);
+  },
+  "suspend-artist"(el) {
+    if (!isAdmin()) return;
+    const ar = artistById(el.dataset.id);
+    ar.suspended = !ar.suspended;
+    save();
+    toast(ar.suspended ? `Boutique de ${ar.name} suspendue : ses œuvres ne sont plus visibles.` : `Boutique de ${ar.name} réactivée.`);
     render(true);
   },
   "seller-ko"(el) {
@@ -2252,7 +2383,7 @@ document.addEventListener("submit", async (e) => {
     const photos = await readPhotos($("#rq-photos").files);
     const r = {
       id: "R-" + (202 + state.requests.length), artist, buyer: state.user.name, date: today(), status: "nouvelle",
-      type: $("#rq-type").value.trim(), text: $("#rq-text").value.trim(), budget: $("#rq-budget").value, deadline: $("#rq-deadline").value.trim(), photos,
+      type: maskContacts($("#rq-type").value.trim()), text: maskContacts($("#rq-text").value.trim()), budget: $("#rq-budget").value, deadline: $("#rq-deadline").value.trim(), photos,
     };
     state.requests.unshift(r);
     (state.threads[artist] = state.threads[artist] || []).push({ from: "buyer", text: `Demande sur mesure : ${r.type}. ${r.text} (budget ${r.budget}${r.deadline ? `, ${r.deadline}` : ""})` });
@@ -2300,15 +2431,15 @@ document.addEventListener("submit", async (e) => {
     const outcome = {
       full: ["remboursé", `Remboursement intégral de ${euro(d.amount)}`],
       partial: ["remboursement partiel", `Remboursement partiel de ${euro(part)}`],
-      info: ["en attente d'infos", "Précisions demandées par ATYPIIK"],
-      reject: ["refusé", "Litige refusé par ATYPIIK"],
+      info: ["en attente d'infos", "Précisions demandées par l'artiste"],
+      reject: ["refusé", "Litige refusé par l'artiste"],
     }[dec];
     d.status = outcome[0];
-    d.messages.push({ from: "admin", date: today(), text: `${outcome[1]}. ${note}` });
+    d.messages.push({ from: "artist", date: today(), text: `${outcome[1]}. ${maskContacts(note)}` });
     d.history.push({ date: today(), text: outcome[1] });
     notify(`Litige ${d.id} : ${outcome[1].toLowerCase()}.`, "#/litige/" + d.id);
     save();
-    toast("Décision enregistrée — l'acheteur et l'artiste sont notifiés.");
+    toast("Réponse enregistrée : l'acheteur est notifié.");
     return render(true);
   }
   if (f.id === "post-form") {
