@@ -34,3 +34,8 @@ out = root / "dist" / "ATYPIIK.html"
 out.parent.mkdir(exist_ok=True)
 out.write_text(html, encoding="utf-8")
 print(f"OK -> {out.relative_to(root)} ({out.stat().st_size // 1024} Ko)")
+
+# Version vitrine, à montrer : sans accès aux outils internes (CRM, stratégie, communication).
+vitrine = root / "dist" / "ATYPIIK-vitrine.html"
+vitrine.write_text(html.replace("<script>", "<script>window.ATYPIIK_VITRINE = true;\n", 1), encoding="utf-8")
+print(f"OK -> {vitrine.relative_to(root)} ({vitrine.stat().st_size // 1024} Ko)")

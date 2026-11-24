@@ -648,7 +648,10 @@ const ADMIN_LINKS = [
   ["#/communication", "Communication", "communication"],
   ["#/projet", "Vue d'ensemble", "projet"],
 ];
+// Version vitrine (lien à montrer) : les outils internes n'existent pas, même avec la connexion de démo.
+const VITRINE = typeof window !== "undefined" && window.ATYPIIK_VITRINE === true;
 function adminOnly([view, bind]) {
+  if (VITRINE) return [viewNotFound];
   const locked = () =>
     `<div class="page-head"><span class="label muted">Administration</span><h1>Espace réservé</h1><p>Cette page est un outil interne d'ATYPIIK. Connectez-vous avec le compte administrateur pour y accéder (en démo : bouton « Administrateur »).</p></div>${loginForms()}`;
   return [() => (isAdmin() ? view() : locked()), () => (isAdmin() ? bind && bind() : bindLogin())];

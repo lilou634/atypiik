@@ -1221,7 +1221,7 @@ function loginForms() {
           <div class="btns">
             <button type="button" class="btn btn-small" data-act="demo-login" data-id="acheteur">Acheteur</button>
             <button type="button" class="btn btn-small btn-chrome" data-act="demo-login" data-id="vendeur">Artiste</button>
-            <button type="button" class="btn btn-small btn-outline" data-act="demo-login" data-id="admin">Administrateur</button>
+            ${VITRINE ? "" : `<button type="button" class="btn btn-small btn-outline" data-act="demo-login" data-id="admin">Administrateur</button>`}
           </div>
         </div>
       </form>
