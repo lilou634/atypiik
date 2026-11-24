@@ -5334,6 +5334,12 @@ fieldset.field { border: 0; padding: 0; margin: 0; min-width: 0; }
 .opt-add { display: flex; flex-wrap: wrap; gap: 6px; align-items: stretch; }
 .field .opt-add input { flex: 1 1 180px; min-width: 0; padding: 6px 10px; }
 
+/* Bouton bloqué tant que les CGU ne sont pas acceptées ; offre rappelée dans le calcul */
+.cgu-lock { margin-top: 6px; }
+.btn[disabled] { cursor: not-allowed; }
+.payout-plan { font-size: 0.85rem; margin: 6px 0 10px; }
+.vgrid-net { white-space: nowrap; font-weight: 600; }
+
     </style>
   </head>
   <body>
@@ -7090,7 +7096,8 @@ function viewBecomeArtist() {
               <li><b>Les litiges</b> se règlent entre vous et l'acheteur. ATYPIIK peut les consulter et suspendre une boutique en cas de litiges répétés.</li>
             </ul></div>
         <label class="check"><input type="checkbox" required id="ba-cgu" /> J'accepte ces règles et les&nbsp;<a href="#/legal/cgu" style="text-decoration:underline">conditions vendeurs</a></label>
-        <button class="btn btn-block">Envoyer ma candidature</button>
+        <button class="btn btn-block" id="ba-submit" disabled>Envoyer ma candidature</button>
+        <p class="hint cgu-lock" id="ba-lock">Cochez « J'accepte ces règles » pour envoyer votre candidature.</p>
       </form>
       <aside class="summary"><h3>Comment ça se passe</h3>
         <ol class="facts"><li>Vous envoyez votre candidature.</li><li>L'équipe regarde votre travail, sous 48 h.</li><li>Une fois validé, votre espace artiste s'ouvre dans votre profil et vous publiez vos œuvres.</li></ol>
@@ -7104,6 +7111,10 @@ function bindBecomeArtist() {
     bindLogin();
     return presetSignup("artiste");
   }
+  $("#ba-cgu").addEventListener("change", (e) => {
+    $("#ba-submit").disabled = !e.target.checked;
+    $("#ba-lock").hidden = e.target.checked;
+  });
   f.addEventListener("submit", (e) => {
     e.preventDefault();
     const u = state.user;
@@ -8717,7 +8728,8 @@ function loginForms() {
         </div>
         <div class="field"><label for="su-pass">Mot de passe</label><input id="su-pass" type="password" required minlength="8" autocomplete="new-password" /></div>
         <label class="check"><input type="checkbox" required id="su-cgu" /> J'accepte les&nbsp;<a href="#/legal/cgu" style="text-decoration:underline">CGU / CGV</a></label>
-        <button class="btn btn-block btn-chrome">Créer mon compte</button>
+        <button class="btn btn-block btn-chrome" id="su-submit" disabled>Créer mon compte</button>
+        <p class="hint cgu-lock" id="su-lock">Cochez « J'accepte les CGU / CGV » pour continuer.</p>
         <p class="hint">Les comptes artistes sont validés par l'équipe ATYPIIK avant la mise en vente.</p>
       </form>
     </div>`;
@@ -8737,7 +8749,17 @@ function bindLogin() {
     const email = $("#li-email").value.trim();
     login({ name: email.split("@")[0].replace(/^\w/, (c) => c.toUpperCase()), email, role: "acheteur" });
   });
-  $("#su-role").addEventListener("change", (e) => ($("#su-artist").hidden = e.target.value !== "vendeur"));
+  // Le bouton reste bloqué tant que les CGU ne sont pas cochées ; son texte suit le type de compte.
+  const syncSignup = () => {
+    const artist = $("#su-role").value === "vendeur";
+    $("#su-artist").hidden = !artist;
+    $("#su-submit").disabled = !$("#su-cgu").checked;
+    $("#su-submit").textContent = artist ? "Envoyer ma candidature" : "Créer mon compte";
+    $("#su-lock").hidden = $("#su-cgu").checked;
+  };
+  $("#su-role").addEventListener("change", syncSignup);
+  $("#su-cgu").addEventListener("change", syncSignup);
+  syncSignup();
   $("#signup-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const name = $("#su-name").value.trim();
@@ -9104,7 +9126,7 @@ function addWorkForm() {
             <div class="opt-add"><input id="wk-newcolor" placeholder="Autre couleur (ex. Vert sapin)" aria-label="Nouvelle couleur" maxlength="30" /><button type="button" class="btn btn-small btn-outline" data-act="add-color">+ Ajouter une couleur</button></div>
           </div>
           <p class="hint">Cochez les tailles et les couleurs disponibles, ou seulement l'une des deux. Laissez le prix vide pour garder le prix de base.</p>
-          <div class="table-wrap"><table class="vgrid"><thead><tr><th>Combinaison</th><th>Stock</th><th>Prix TTC (€)</th></tr></thead><tbody id="vgrid-body"><tr><td colspan="3" class="muted">Cochez des tailles ou des couleurs pour créer le tableau.</td></tr></tbody></table></div>
+          <div class="table-wrap"><table class="vgrid"><thead><tr><th>Combinaison</th><th>Stock</th><th>Prix TTC (€)</th><th>Vous recevez</th></tr></thead><tbody id="vgrid-body"><tr><td colspan="4" class="muted">Cochez des tailles ou des couleurs pour créer le tableau.</td></tr></tbody></table></div>
         </div>
       </fieldset>
       <button class="btn btn-chrome">Publier l'œuvre</button>
@@ -9122,14 +9144,19 @@ function gridOptions() {
     .filter((o) => o.values.length);
 }
 function payoutHtml(price) {
-  if (!price) return `<span class="mono">Ce que vous recevez</span><p class="hint">Saisissez un prix pour voir le calcul.</p>`;
+  // L'offre de l'artiste connecté est retrouvée automatiquement : 15 % en Atelier, 10 % en Atelier Pro.
+  const pro = planOf(state.user?.artistId) === "pro";
+  const planLine = `<p class="payout-plan">Votre offre : <b>${pro ? "Atelier Pro" : "Atelier"}</b> · commission de ${pro ? "10" : "15"} %, calculée automatiquement</p>`;
+  if (!price) return `<span class="mono">Ce que vous recevez</span>${planLine}<p class="hint">Saisissez un prix pour voir le calcul.</p>`;
   const rate = commissionOf(state.user?.artistId);
   return `
     <span class="mono">Ce que vous recevez</span>
+    ${planLine}
     <div class="summary-row sub"><span>Prix de vente</span><span>${euro(price)}</span></div>
     <div class="summary-row sub"><span>Commission ATYPIIK (${pct(rate)}, offre ${planOf(state.user?.artistId) === "pro" ? "Atelier Pro" : "Atelier"})</span><span>− ${euro(price * rate)}</span></div>
     <div class="summary-row total"><span>Vous recevez</span><span>${euro(price * (1 - rate))}</span></div>
-    <p class="hint">+ les frais de livraison que vous fixez, payés par l'acheteur et reversés intégralement.</p>`;
+    <p class="hint">+ les frais de livraison que vous fixez, payés par l'acheteur et reversés intégralement.</p>
+    ${pro ? "" : `<p class="hint">Avec Atelier Pro, vous recevriez ${euro(price * (1 - COMMISSION_RATES.pro))} sur cette vente. <a class="text-link" href="#/abonnement/pro">Voir l'offre</a></p>`}`;
 }
 
 function bindSeller() {
@@ -9156,11 +9183,22 @@ function bindSeller() {
             .map((c) => {
               const label = opts.map((o) => c[o.name]).join(" · ");
               const [st, pr] = keep[label] || ["1", ""];
-              return `<tr data-label="${esc(label)}"><td>${esc(label)}</td><td><input type="number" min="0" value="${esc(st)}" aria-label="Stock ${esc(label)}" /></td><td><input type="number" min="1" step="1" value="${esc(pr)}" placeholder="${esc($("#wk-price").value || "base")}" aria-label="Prix ${esc(label)}" /></td></tr>`;
+              return `<tr data-label="${esc(label)}"><td>${esc(label)}</td><td><input type="number" min="0" value="${esc(st)}" aria-label="Stock ${esc(label)}" /></td><td><input type="number" min="1" step="1" value="${esc(pr)}" placeholder="${esc($("#wk-price").value || "base")}" aria-label="Prix ${esc(label)}" /></td><td class="num vgrid-net"></td></tr>`;
             })
             .join("")
-        : '<tr><td colspan="3" class="muted">Cochez des tailles ou des couleurs pour créer le tableau.</td></tr>';
+        : '<tr><td colspan="4" class="muted">Cochez des tailles ou des couleurs pour créer le tableau.</td></tr>';
+      updateNets();
     };
+    // Net de chaque combinaison, calculé avec la commission de l'offre de l'artiste.
+    const updateNets = () => {
+      const rate = commissionOf(state.user.artistId);
+      $$("#vgrid-body tr[data-label]").forEach((tr) => {
+        const pr = +$$("input", tr)[1].value || +$("#wk-price").value || 0;
+        $(".vgrid-net", tr).textContent = pr ? euro(pr * (1 - rate)) : "—";
+      });
+    };
+    $("#vgrid-body").addEventListener("input", updateNets);
+    $("#wk-price").addEventListener("input", updateNets);
     $("#opt-def").addEventListener("change", (e) => e.target.type === "checkbox" && rebuild());
     $("#opt-def").addEventListener("vgrid-rebuild", rebuild);
     $("#wk-newcolor").addEventListener("keydown", (e) => {

@@ -5262,3 +5262,9 @@ fieldset.field { border: 0; padding: 0; margin: 0; min-width: 0; }
 .opt-check input:focus-visible + span { outline: 2px solid var(--ink); outline-offset: 2px; }
 .opt-add { display: flex; flex-wrap: wrap; gap: 6px; align-items: stretch; }
 .field .opt-add input { flex: 1 1 180px; min-width: 0; padding: 6px 10px; }
+
+/* Bouton bloqué tant que les CGU ne sont pas acceptées ; offre rappelée dans le calcul */
+.cgu-lock { margin-top: 6px; }
+.btn[disabled] { cursor: not-allowed; }
+.payout-plan { font-size: 0.85rem; margin: 6px 0 10px; }
+.vgrid-net { white-space: nowrap; font-weight: 600; }

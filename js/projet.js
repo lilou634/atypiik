@@ -765,7 +765,8 @@ function viewBecomeArtist() {
               <li><b>Les litiges</b> se règlent entre vous et l'acheteur. ATYPIIK peut les consulter et suspendre une boutique en cas de litiges répétés.</li>
             </ul></div>
         <label class="check"><input type="checkbox" required id="ba-cgu" /> J'accepte ces règles et les&nbsp;<a href="#/legal/cgu" style="text-decoration:underline">conditions vendeurs</a></label>
-        <button class="btn btn-block">Envoyer ma candidature</button>
+        <button class="btn btn-block" id="ba-submit" disabled>Envoyer ma candidature</button>
+        <p class="hint cgu-lock" id="ba-lock">Cochez « J'accepte ces règles » pour envoyer votre candidature.</p>
       </form>
       <aside class="summary"><h3>Comment ça se passe</h3>
         <ol class="facts"><li>Vous envoyez votre candidature.</li><li>L'équipe regarde votre travail, sous 48 h.</li><li>Une fois validé, votre espace artiste s'ouvre dans votre profil et vous publiez vos œuvres.</li></ol>
@@ -779,6 +780,10 @@ function bindBecomeArtist() {
     bindLogin();
     return presetSignup("artiste");
   }
+  $("#ba-cgu").addEventListener("change", (e) => {
+    $("#ba-submit").disabled = !e.target.checked;
+    $("#ba-lock").hidden = e.target.checked;
+  });
   f.addEventListener("submit", (e) => {
     e.preventDefault();
     const u = state.user;
