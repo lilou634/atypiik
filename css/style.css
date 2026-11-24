@@ -5241,3 +5241,12 @@ fieldset.field { border: 0; padding: 0; margin: 0; min-width: 0; }
 .plan-opt ul { margin: 0; padding-left: 18px; font-size: .85rem; }
 .plan-opt-pro .plan-opt-head b::after { content: " ★"; }
 @media (max-width: 520px) { .opt-def { grid-template-columns: 1fr; } }
+/* Un seul trait sous le titre quand la liste d'étapes suit un en-tête de section. */
+.section-head + .steps-list { border-top: 0; }
+/* Cartes d'offre : pas de style de champ texte sur le bouton radio, texte normal. */
+.plan-opt, .field .plan-opt { font-family: inherit; font-size: 0.9rem; text-transform: none; color: var(--ink); }
+.field .plan-opt input { width: auto; height: auto; padding: 0; border: 0; box-shadow: none; margin: 0; }
+.field .plan-opt input:focus { box-shadow: none; outline: none; }
+.field .plan-opt input:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.plan-opt-head span { font-size: 0.8rem; white-space: nowrap; }
+.plan-opt-pro .plan-opt-head b::after { content: ""; }
