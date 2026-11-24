@@ -1,287 +1,18 @@
 /* Données de démonstration — à remplacer par l'API (PostgreSQL) plus tard. */
 
-const ARTISTS = [
-  {
-    id: "nova", name: "Nova Lune", city: "Marseille", followers: 1840, plan: "atelier",
-    bio: "Peintre. Des scènes calmes, des corps en mouvement, beaucoup d'eau et de lumière.",
-    videos: ["Atelier : préparation des fonds", "Making-of de « Deux nageurs »"],
-    press: ["Dossier de presse 2026.pdf", "Article — Beaux Arts Magazine.pdf"],
-  },
-  {
-    id: "ines", name: "Inès Vale", city: "Paris", followers: 2310, plan: "pro",
-    bio: "Photographe de rue et de voyage. Tirages signés, en séries limitées.",
-    videos: ["Une matinée sur le Tour de France", "Le tirage, étape par étape"],
-    press: ["Dossier de presse Inès Vale.pdf"],
-  },
-  {
-    id: "margaux", name: "Margaux Pech", city: "Nantes", followers: 3120, plan: "pro",
-    bio: "Céramiste. Faïence modelée et peinte à la main : jamais deux pièces pareilles.",
-    videos: ["Tournage et peinture des vases rayés"],
-    press: ["Portfolio Margaux Pech.pdf"],
-  },
-  {
-    id: "oko", name: "Atelier Oko", city: "Bordeaux", followers: 980, plan: "atelier",
-    bio: "Duo de céramistes : porcelaine, grès et objets de jeu pour la maison.",
-    videos: ["Peindre une boîte d'allumettes"],
-    press: [],
-  },
-  {
-    id: "rosa", name: "Rosa Mendes", city: "Montpellier", followers: 2640, plan: "pro",
-    bio: "Upcycling. Des vestes et des pièces uniques taillées dans des tissus anciens et des vêtements chinés.",
-    videos: ["Du canevas à la veste", "Essayage de la collection"],
-    press: ["Dossier de presse Rosa Mendes.pdf"],
-  },
-  {
-    id: "zia", name: "Zia Okafor", city: "Lille", followers: 1205, plan: "atelier",
-    bio: "Crochet et maille. Chaque pièce est faite à la main, une par une.",
-    videos: ["Un pull en 40 heures"],
-    press: [],
-  },
-  {
-    id: "kairo", name: "Kairo Sato", city: "Lyon", followers: 760, plan: "atelier",
-    bio: "Objets et petites sculptures pour la maison, entre jeu et contemplation.",
-    videos: [],
-    press: ["Portfolio Kairo Sato.pdf"],
-  },
-  {
-    id: "leonie", name: "Léonie Garnier", city: "Nice", followers: 1490, plan: "atelier",
-    bio: "Bijoux en pierres naturelles et perles, montés à la main dans mon atelier.",
-    videos: ["Monter un collier"],
-    press: [],
-  },
-];
+const ARTISTS = []; // site réel : rempli par les vrais comptes
 
 /* Catalogue de démonstration, illustré par de vraies photos (assets/photos/). */
 // Toutes les combinaisons de plusieurs options : [{Taille:"S",Couleur:"Noir"}, …].
 function combine(options) {
   return options.reduce((acc, o) => acc.flatMap((a) => o.values.map((v) => ({ ...a, [o.name]: v }))), [{}]);
 }
-const ARTWORKS = [
-  {
-    id: "a1", title: "Deux nageurs", artist: "nova", type: "Peinture", color: "vert", size: "L", price: 1450,
-    technique: "Huile sur toile, caisse américaine en chêne", dims: "80 × 100 cm",
-    description: "Deux silhouettes flottent dans une eau profonde peinte à grands coups de couteau.",
-    img: "assets/photos/a1.jpg", art: "#768b74",
-    variants: [{ label: "Original", stock: 0 }], sold: true, isNew: true,
-  },
-  {
-    id: "a2", title: "Promenade", artist: "nova", type: "Peinture", color: "bleu", size: "L", price: 1800,
-    technique: "Huile sur toile", dims: "100 × 140 cm",
-    description: "Un pas pressé, deux dalmatiens, un fond bleu ciel : une scène de rue figée en plein mouvement.",
-    img: "assets/photos/a2.jpg", art: "#9b9693",
-    variants: [{ label: "Original", stock: 0 }], sold: true,
-  },
-  {
-    id: "a3", title: "Fenêtre aux rosiers", artist: "nova", type: "Peinture", color: "jaune", size: "S", price: 95,
-    technique: "Acrylique sur mini-toile", dims: "15 × 15 cm",
-    description: "Une petite fenêtre provençale envahie de rosiers.",
-    img: "assets/photos/a3.jpg", art: "#9f8b65",
-    variants: [{ label: "Original", stock: 0 }], sold: true,
-  },
-  {
-    id: "a4", title: "Café de la Poste", artist: "ines", type: "Photographie", color: "bleu", size: "M", price: 320,
-    technique: "Tirage pigmentaire, cadre en noyer", dims: "40 × 50 cm",
-    description: "Le passage du peloton devant un café de village, pris au 1/15e de seconde.",
-    img: "assets/photos/a4.jpg", art: "#9e8f85",
-    variants: [{ label: "40 × 50 cm encadré", stock: 3 }, { label: "60 × 80 cm encadré", stock: 1 }], isNew: true,
-  },
-  {
-    id: "a5", title: "Lac, onze heures", artist: "ines", type: "Photographie", color: "bleu", size: "L", price: 890,
-    technique: "Tirage fine art, caisse blanche", dims: "100 × 70 cm",
-    description: "Une piscine au bord d'un lac italien, en fin de matinée.",
-    img: "assets/photos/a5.jpg", art: "#797b7d",
-    variants: [{ label: "70 × 50 cm", stock: 2 }, { label: "100 × 70 cm", stock: 1 }],
-  },
-  {
-    id: "a6", title: "Vases rayés", artist: "margaux", type: "Céramique", color: "multicolore", size: "M", price: 85,
-    technique: "Faïence modelée et peinte à la main", dims: "12 à 24 cm",
-    description: "Des vases aux formes souples, rayés au pinceau.",
-    img: "assets/photos/a6.jpg", art: "#ac998e",
-    variants: [{ label: "Petit — jaune", stock: 3 }, { label: "Moyen — rose", stock: 2 }, { label: "Grand — bleu", stock: 0 }], isNew: true,
-  },
-  {
-    id: "a7", title: "Tasses empilables", artist: "margaux", type: "Céramique", color: "noir", size: "S", price: 34,
-    technique: "Grès émaillé", dims: "8 × 8 cm",
-    description: "Des tasses qui s'empilent, à l'anse percée.",
-    img: "assets/photos/a7.jpg", art: "#b3b0ab",
-    variants: [{ label: "Mouchetée", stock: 6 }, { label: "Terracotta", stock: 4 }, { label: "Rayée", stock: 0 }],
-  },
-  {
-    id: "a8", title: "Assiette Dalmatien", artist: "margaux", type: "Céramique", color: "noir", size: "S", price: 48,
-    technique: "Faïence émaillée", dims: "Ø 22 cm",
-    description: "Une assiette creuse à pois noirs, émail brillant.",
-    img: "assets/photos/a8.jpg", art: "#443f3d",
-    variants: [{ label: "À l'unité", stock: 5 }],
-  },
-  {
-    id: "a9", title: "Repose-cuillères Ravioli", artist: "margaux", type: "Céramique", color: "jaune", size: "S", price: 28,
-    technique: "Faïence émaillée", dims: "12 × 12 cm",
-    description: "Un repose-cuillère en forme de ravioli, pour la cuisine.",
-    img: "assets/photos/a9.jpg", art: "#a69256",
-    variants: [{ label: "Uni", stock: 5 }, { label: "Rayé", stock: 3 }, { label: "Vichy", stock: 2 }],
-  },
-  {
-    id: "a10", title: "Boîtes à œufs", artist: "oko", type: "Céramique", color: "vert", size: "S", price: 42,
-    technique: "Grès émaillé", dims: "6 ou 12 œufs",
-    description: "Des boîtes à œufs aux bords ondulés.",
-    img: "assets/photos/a10.jpg", art: "#8e856c",
-    variants: [{ label: "Céladon — 12 œufs", stock: 2 }, { label: "Moucheté — 6 œufs", stock: 4 }],
-  },
-  {
-    id: "a11", title: "Échecs Bonbon", artist: "oko", type: "Maison & déco", color: "multicolore", size: "M", price: 260,
-    technique: "Pièces en céramique, plateau en bois peint", dims: "40 × 40 cm",
-    description: "Un jeu d'échecs aux pièces modelées une à une, rose et vert.",
-    img: "assets/photos/a11.jpg", art: "#85715e",
-    variants: [{ label: "Original", stock: 1 }], isNew: true,
-  },
-  {
-    id: "a12", title: "Boîtes d'allumettes", artist: "oko", type: "Céramique", color: "bleu", size: "S", price: 39,
-    technique: "Porcelaine peinte, rehauts d'or", dims: "6 × 4 cm",
-    description: "Des boîtes d'allumettes en porcelaine, avec un message doré à l'intérieur.",
-    img: "assets/photos/a12.jpg", art: "#958f88",
-    variants: [{ label: "Léopard", stock: 2 }, { label: "Crabe", stock: 1 }, { label: "Lapin", stock: 3 }, { label: "Colombe", stock: 0 }],
-  },
-  {
-    id: "a13", title: "Cadres galets", artist: "oko", type: "Céramique", color: "multicolore", size: "S", price: 45,
-    technique: "Céramique émaillée", dims: "10 à 15 cm",
-    description: "De petits cadres photo aux formes de galets.",
-    img: "assets/photos/a13.jpg", art: "#90817a",
-    variants: [{ label: "Rouge", stock: 3 }, { label: "Bleu", stock: 2 }, { label: "Vert", stock: 4 }],
-  },
-  {
-    id: "a14", title: "Bougeoirs fleurs", artist: "margaux", type: "Céramique", color: "rouge", size: "S", price: 32,
-    technique: "Faïence peinte à la main", dims: "Ø 10 cm",
-    description: "Des bougeoirs pour bougies chauffe-plat, en forme de fleur.",
-    img: "assets/photos/a14.jpg", art: "#b49c90",
-    variants: [{ label: "Rayé rouge", stock: 4 }, { label: "Rayé noir", stock: 3 }, { label: "Brique", stock: 2 }],
-  },
-  {
-    id: "a15", title: "Le lecteur", artist: "kairo", type: "Maison & déco", color: "beige", size: "S", price: 120,
-    technique: "Résine minérale mouchetée", dims: "18 × 20 cm",
-    description: "Une petite figure plongée dans son livre.",
-    img: "assets/photos/a15.jpg", art: "#886644",
-    variants: [{ label: "Pièce", stock: 3 }],
-  },
-  {
-    id: "a16", title: "Serre-livres Pause", artist: "kairo", type: "Maison & déco", color: "noir", size: "M", price: 160,
-    technique: "Résine minérale, vendus par paire", dims: "26 cm",
-    description: "Deux personnages qui retiennent vos livres.",
-    img: "assets/photos/a16.jpg", art: "#aba7a5",
-    variants: [{ label: "Crème et brun", stock: 2 }],
-  },
-  {
-    id: "a17", title: "Dominos peints", artist: "kairo", type: "Maison & déco", color: "multicolore", size: "S", price: 75,
-    technique: "Bois de hêtre peint à la main", dims: "28 pièces",
-    description: "Un jeu de dominos peint à la main, couleur par couleur.",
-    img: "assets/photos/a17.jpg", art: "#c6a898",
-    variants: [{ label: "Boîte complète", stock: 4 }],
-  },
-  {
-    id: "a18", title: "Pull Granny", artist: "zia", type: "Crochet", color: "bleu", size: "M", price: 180,
-    technique: "Crochet main, laine mérinos", dims: "Taille unique",
-    description: "Un pull ajouré à volants, crocheté à la main.",
-    img: "assets/photos/a18.jpg", art: "#69767f",
-    variants: [{ label: "Bleu et jaune", stock: 1 }, { label: "Rose et rouge", stock: 2 }], isNew: true,
-  },
-  {
-    id: "a19", title: "Sac Nuage", artist: "zia", type: "Crochet", color: "beige", size: "M", price: 95,
-    technique: "Crochet en trapilho", dims: "30 × 18 cm",
-    description: "Un sac à main bombé, en fil de t-shirt recyclé.",
-    img: "assets/photos/a19.jpg", art: "#a49c96",
-    options: [{ name: "Taille", values: ["Petit", "Grand"] }, { name: "Couleur", values: ["Noir", "Camel", "Crème"] }],
-    variants: [
-      { label: "Petit · Noir", values: { Taille: "Petit", Couleur: "Noir" }, stock: 2 },
-      { label: "Petit · Camel", values: { Taille: "Petit", Couleur: "Camel" }, stock: 3 },
-      { label: "Petit · Crème", values: { Taille: "Petit", Couleur: "Crème" }, stock: 1 },
-      { label: "Grand · Noir", values: { Taille: "Grand", Couleur: "Noir" }, stock: 1, price: 125 },
-      { label: "Grand · Camel", values: { Taille: "Grand", Couleur: "Camel" }, stock: 0, price: 125 },
-      { label: "Grand · Crème", values: { Taille: "Grand", Couleur: "Crème" }, stock: 2, price: 125 },
-    ],
-  },
-  {
-    id: "a20", title: "Housse Popcorn", artist: "zia", type: "Crochet", color: "rouge", size: "S", price: 55,
-    technique: "Crochet en laine, pour ordinateur 13 à 14 pouces", dims: "35 × 25 cm",
-    description: "Une housse d'ordinateur en point popcorn.",
-    img: "assets/photos/a20.jpg", art: "#98756b",
-    variants: [{ label: "Rouge", stock: 4 }, { label: "Crème", stock: 0 }],
-  },
-  {
-    id: "a21", title: "Veste Mimosa", artist: "rosa", type: "Mode", color: "jaune", size: "M", price: 210,
-    technique: "Coton matelassé, biais crème", dims: "Tailles S à L",
-    description: "Une veste matelassée légère, à porter ouverte.",
-    img: "assets/photos/a21.jpg", art: "#9a7d5b",
-    options: [{ name: "Taille", values: ["S", "M", "L"] }, { name: "Couleur", values: ["Mimosa", "Ciel"] }],
-    variants: [
-      { label: "S · Mimosa", values: { Taille: "S", Couleur: "Mimosa" }, stock: 1 },
-      { label: "M · Mimosa", values: { Taille: "M", Couleur: "Mimosa" }, stock: 2 },
-      { label: "L · Mimosa", values: { Taille: "L", Couleur: "Mimosa" }, stock: 0 },
-      { label: "S · Ciel", values: { Taille: "S", Couleur: "Ciel" }, stock: 0 },
-      { label: "M · Ciel", values: { Taille: "M", Couleur: "Ciel" }, stock: 1 },
-      { label: "L · Ciel", values: { Taille: "L", Couleur: "Ciel" }, stock: 1 },
-    ],
-  },
-  {
-    id: "a22", title: "Veste Voilier", artist: "rosa", type: "Mode", color: "bleu", size: "M", price: 340,
-    technique: "Denim brut et canevas brodé ancien", dims: "Taille M",
-    description: "Une veste en denim brut, avec un canevas de voilier chiné au dos.",
-    img: "assets/photos/a22.jpg", art: "#747069",
-    variants: [{ label: "Pièce unique — M", stock: 0 }], sold: true, isNew: true,
-  },
-  {
-    id: "a23", title: "Veste Pastorale", artist: "rosa", type: "Mode", color: "multicolore", size: "M", price: 290,
-    technique: "Tapisserie ancienne, denim et coton imprimé", dims: "Taille S/M",
-    description: "Une veste courte, manches bouffantes aux citrons et tapisserie au dos.",
-    img: "assets/photos/a23.jpg", art: "#9c8b6f",
-    variants: [{ label: "Pièce unique — S/M", stock: 1 }],
-  },
-  {
-    id: "a24", title: "Veste Ruban", artist: "rosa", type: "Mode", color: "rouge", size: "L", price: 260,
-    technique: "Toile imprimée, poches et col en denim", dims: "Tailles S/M ou L/XL",
-    description: "Une veste zippée à grand motif rouge et rose.",
-    img: "assets/photos/a24.jpg", art: "#84414a",
-    variants: [{ label: "S/M", stock: 1 }, { label: "L/XL", stock: 1 }],
-  },
-  {
-    id: "a25", title: "Blazer Perles", artist: "rosa", type: "Mode", color: "jaune", size: "M", price: 240,
-    technique: "Blazer en laine chiné, perles de verre cousues main", dims: "Taille M",
-    description: "Un blazer vintage brodé de perles colorées.",
-    img: "assets/photos/a25.jpg", art: "#b6945d",
-    variants: [{ label: "Pièce unique — M", stock: 1 }],
-  },
-  {
-    id: "a26", title: "Cravate Fleurs", artist: "rosa", type: "Mode", color: "rouge", size: "S", price: 75,
-    technique: "Fleurs en tissu cousues main", dims: "Longueur 140 cm",
-    description: "Une cravate entièrement couverte de petites fleurs rouges.",
-    img: "assets/photos/a26.jpg", art: "#614040",
-    variants: [{ label: "Rouge", stock: 3 }],
-  },
-  {
-    id: "a27", title: "Maillot Dentelle", artist: "rosa", type: "Mode", color: "rouge", size: "S", price: 85,
-    technique: "Maillot de foot recyclé, liens et dentelle", dims: "Tailles S ou M",
-    description: "Un maillot de foot retravaillé avec liens et dentelle.",
-    img: "assets/photos/a27.jpg", art: "#e5a367",
-    variants: [{ label: "S", stock: 1 }, { label: "M", stock: 1 }],
-  },
-  {
-    id: "a28", title: "Collier Sienne", artist: "leonie", type: "Bijoux", color: "bordeaux", size: "S", price: 120,
-    technique: "Œil-de-tigre, perles baroques, laiton doré", dims: "42 cm + chaînette",
-    description: "Un collier asymétrique : œil-de-tigre d'un côté, perles baroques de l'autre.",
-    img: "assets/photos/a28.jpg", art: "#d2c6b8",
-    variants: [{ label: "Pièce", stock: 3 }], isNew: true,
-  },
-  {
-    id: "a29", title: "Créoles Lagune", artist: "leonie", type: "Bijoux", color: "vert", size: "S", price: 48,
-    technique: "Apatite, perle d'eau douce, acier doré", dims: "Ø 3 cm",
-    description: "De petites créoles en apatite, avec une perle d'eau douce.",
-    img: "assets/photos/a29.jpg", art: "#bfae9b",
-    variants: [{ label: "La paire", stock: 6 }],
-  },
-];
+const ARTWORKS = []; // site réel : rempli par les vrais comptes
 
 /* Livraison : chaque artiste fixe ses frais de port par œuvre, ou les inclut dans son prix.
    Valeurs de démonstration selon le format de l'œuvre. */
 const SHIPPING_BY_SIZE = { S: 5.9, M: 8.9, L: 14.9 };
-const SHIPPING_INCLUDED = ["a7", "a9", "a28", "a29", "a26"];
+const SHIPPING_INCLUDED = [];
 ARTWORKS.forEach((w) => {
   if (SHIPPING_INCLUDED.includes(w.id)) w.shippingIncluded = true;
   else w.shipping = SHIPPING_BY_SIZE[w.size] || 8.9;
@@ -299,88 +30,16 @@ const COLORS = {
 };
 
 /* Données de démo pour l'espace administrateur. */
-const SEED_PENDING_SELLERS = [
-  { id: "p1", name: "Léa Moreau", email: "lea.moreau@example.com", city: "Nantes", discipline: "Céramique", status: "en attente" },
-  { id: "p2", name: "Studio Ghost", email: "studio.ghost@example.com", city: "Toulouse", discipline: "Sérigraphie", status: "en attente" },
-];
+const SEED_PENDING_SELLERS = []; // site réel : rempli par les vrais comptes
 
 /* Litiges (démo). Les photos de démonstration réutilisent le visuel de l'œuvre concernée ;
    les vraies photos envoyées par les acheteurs sont stockées en image (data URL). */
-const SEED_DISPUTES = [
-  {
-    id: "L-1042",
-    order: "CMD-2026-0975",
-    work: "a4",
-    buyer: "Jade P.",
-    date: "2026-10-12",
-    reason: "Colis abîmé à la livraison",
-    description:
-      "Le carton était enfoncé sur un côté et le verre du cadre est fêlé dans le coin inférieur droit. Le tirage lui-même a l'air intact mais je ne peux pas l'accrocher comme ça.",
-    amount: 320,
-    status: "ouvert",
-    photos: [
-      { work: "a4", caption: "Tirage à la réception" },
-      { work: "a4", caption: "Détail du coin fêlé", zoom: true },
-      { work: "a4", caption: "Emballage", tone: "carton" },
-    ],
-    messages: [
-      { from: "buyer", date: "2026-10-12", text: "Bonjour, le colis est arrivé abîmé, j'ai mis les photos. Que peut-on faire ?" },
-      { from: "artist", date: "2026-10-13", text: "Je suis désolée ! Je peux renvoyer un nouveau cadre, ou vous rembourser la différence si vous gardez le tirage." },
-    ],
-    history: [
-      { date: "2026-10-12", text: "Litige ouvert par l'acheteur" },
-      { date: "2026-10-13", text: "Réponse de l'artiste" },
-    ],
-  },
-];
+const SEED_DISPUTES = []; // site réel : rempli par les vrais comptes
 
 /* Posts des artistes : nouvelles, coulisses, expositions. */
-const SEED_POSTS = [
-  {
-    id: "p-nova-1", artist: "nova", date: "2026-10-10", title: "Une nouvelle série en préparation",
-    text: "Je travaille depuis cet été sur une série de six toiles autour de l'eau et des nageurs. Les premières sont presque sèches, je vous montre bientôt le résultat. Merci à toutes les personnes qui suivent l'atelier !",
-    media: { work: "a1" },
-  },
-  {
-    id: "p-nova-2", artist: "nova", date: "2026-09-21", title: "Dans l'atelier",
-    text: "Petite visite de l'atelier : les pigments, les toiles en attente, et la fameuse table pleine de pots. Une vidéo des coulisses est disponible sur ma page.",
-    media: { work: "a2", video: true },
-  },
-  {
-    id: "p-nova-3", artist: "nova", date: "2026-08-30", title: "Exposition au Panier",
-    text: "Trois de mes toiles sont exposées tout le mois de septembre dans une petite galerie du quartier du Panier. Venez dire bonjour le samedi !",
-    media: { work: "a3" },
-  },
-  {
-    id: "p-ines-1", artist: "ines", date: "2026-10-08", title: "Sur le passage du Tour",
-    text: "Une matinée entière devant le Café de la Poste à attendre le peloton. Trois secondes de passage, une seule image retenue.",
-    media: { work: "a4", video: true },
-  },
-  {
-    id: "p-ines-2", artist: "ines", date: "2026-09-15", title: "Les grands formats arrivent",
-    text: "Vous me l'avez beaucoup demandé : « Lac, onze heures » existe maintenant en grand format, en série limitée.",
-    media: { work: "a5" },
-  },
-  {
-    id: "p-kairo-1", artist: "kairo", date: "2026-10-02", title: "Couler une figure, étape par étape",
-    text: "Chaque figure est coulée, poncée puis patinée à la main. Je vous montre les étapes en vidéo.",
-    media: { work: "a15", video: true },
-  },
-  {
-    id: "p-zia-1", artist: "zia", date: "2026-09-27", title: "Nouveau coloris pour le pull Granny",
-    text: "Le pull Granny existe maintenant en rose et rouge. Toujours fait main, comptez trois semaines de délai.",
-    media: { work: "a18" },
-  },
-];
+const SEED_POSTS = []; // site réel : rempli par les vrais comptes
 /* Ventes passées (démo) pour l'espace artiste et les commissions. */
-const SEED_SALES = [
-  { order: "CMD-2026-0912", date: "2026-09-28", buyer: "Hugo L.", work: "a2", qty: 1, price: 1800, status: 3 },
-  { order: "CMD-2026-0947", date: "2026-10-03", buyer: "Sarah B.", work: "a1", qty: 1, price: 1450, status: 2 },
-  { order: "CMD-2026-0961", date: "2026-10-06", buyer: "Marc D.", work: "a3", qty: 1, price: 95, status: 1 },
-  { order: "CMD-2026-0975", date: "2026-10-09", buyer: "Jade P.", work: "a4", qty: 1, price: 320, status: 1 },
-  { order: "CMD-2026-0980", date: "2026-10-10", buyer: "Yanis K.", work: "a6", qty: 2, price: 85, status: 3 },
-  { order: "CMD-2026-0986", date: "2026-10-11", buyer: "Léa M.", work: "a22", qty: 1, price: 340, status: 1 },
-];
+const SEED_SALES = []; // site réel : rempli par les vrais comptes
 
 /* « Notre histoire » — la citation est une proposition, à ajuster librement. */
 const STORY = {
@@ -414,61 +73,19 @@ const FEATURED = {
   works: ["a22", "a23", "a25"],
 };
 // Drops programmés : le site affiche tout seul le prochain, puis passe au suivant une fois la vente terminée.
-const DROPS = [
-  {
-    id: "d1", title: "Céramiques d'hiver", artist: "margaux", date: "2026-12-04T18:00:00+01:00", pieces: 24,
-    text: "24 pièces uniques — vases, bougeoirs et tasses — mises en ligne en même temps. Quand c'est parti, c'est parti.",
-    works: ["a6", "a14", "a7"],
-  },
-  {
-    id: "d2", title: "Vestes de fêtes", artist: "rosa", date: "2026-12-18T18:00:00+01:00", pieces: 8,
-    text: "8 vestes brodées à partir de tapisseries chinées, pour les fêtes. Chaque pièce n'existe qu'une fois.",
-    works: ["a23", "a25", "a24"],
-  },
-  {
-    id: "d3", title: "Crochet d'hiver", artist: "zia", date: "2027-01-15T18:00:00+01:00", pieces: 15,
-    text: "15 sacs et housses crochetés main, dans les couleurs de l'hiver.",
-    works: ["a18", "a19", "a20"],
-  },
-  {
-    id: "d4", title: "Bijoux de printemps", artist: "leonie", date: "2027-03-05T18:00:00+01:00", pieces: 20,
-    text: "20 colliers et boucles d'oreilles en perles anciennes, assemblés à la main.",
-    works: ["a28", "a29"],
-  },
-];
+const DROPS = []; // site réel : rempli par les vrais comptes
 
 /* Demandes de commande personnalisée (démo). */
-const SEED_REQUESTS = [
-  {
-    id: "R-201", artist: "nova", buyer: "Camille Roux", date: "2026-10-14", status: "nouvelle",
-    type: "Portrait d'animal", budget: "300 à 500 €", deadline: "Avant Noël",
-    text: "Bonjour ! J'adore « Promenade ». Est-ce que vous pourriez peindre mon dalmatien, Pistache, dans le même style ? Format moyen.",
-  },
-];
+const SEED_REQUESTS = []; // site réel : rempli par les vrais comptes
 
 /* Avis clients (démo). Les vrais avis ne pourront être laissés qu'après une commande livrée. */
-const SEED_REVIEWS = [
-  { work: "a1", artist: "nova", author: "Sarah B.", date: "2026-10-08", rating: 5, text: "Encore plus belle en vrai. Emballage très soigné et un petit mot de Nova dans le colis." },
-  { work: "a2", artist: "nova", author: "Hugo L.", date: "2026-10-02", rating: 5, text: "La toile est immense et les couleurs sont parfaites. Elle a changé notre salon." },
-  { work: "a3", artist: "nova", author: "Marc D.", date: "2026-09-20", rating: 4, text: "Très jolie petite toile, livrée rapidement. Un peu plus petite que je l'imaginais." },
-  { work: "a6", artist: "margaux", author: "Yanis K.", date: "2026-10-12", rating: 5, text: "Deux vases achetés, aucun n'est pareil et c'est ce qui fait leur charme." },
-  { work: "a7", artist: "margaux", author: "Léna T.", date: "2026-09-30", rating: 5, text: "Les tasses passent au lave-vaisselle sans souci et s'empilent vraiment bien." },
-  { work: "a22", artist: "rosa", author: "Léa M.", date: "2026-10-15", rating: 5, text: "Une pièce unique qu'on me complimente à chaque fois. Rosa m'a envoyé une photo du canevas d'origine." },
-  { work: "a25", artist: "rosa", author: "Inès R.", date: "2026-09-18", rating: 4, text: "Superbe blazer, les perles sont bien cousues. Taille un peu grand." },
-  { work: "a19", artist: "zia", author: "Camille R.", date: "2026-10-06", rating: 5, text: "Le sac est solide et léger, la couleur camel est magnifique." },
-  { work: "a28", artist: "leonie", author: "Chloé V.", date: "2026-10-01", rating: 5, text: "Le collier est encore plus beau porté. Fermoir solide." },
-  { work: "a4", artist: "ines", author: "Paul G.", date: "2026-09-25", rating: 5, text: "Le tirage est d'une qualité folle et le cadre en noyer est superbe." },
-];
+const SEED_REVIEWS = []; // site réel : rempli par les vrais comptes
 
 /* Délai d'expédition indicatif par catégorie (en jours ouvrés). */
 const LEAD_TIME = { Peinture: "3 à 5 jours", Photographie: "5 à 7 jours (tirage à la commande)", Céramique: "2 à 4 jours", Mode: "2 à 4 jours", Crochet: "Fait à la commande : 2 à 3 semaines", Bijoux: "1 à 3 jours", "Maison & déco": "2 à 4 jours" };
 
 /* Témoignages d'artistes pour la page « Vendre sur ATYPIIK ». */
-const ARTIST_QUOTES = [
-  { artist: "margaux", text: "J'ai vendu mes premiers vases en ligne sans avoir à créer de site. Et les acheteurs savent qui je suis." },
-  { artist: "rosa", text: "Ici, mes vestes ne sont pas noyées au milieu de produits industriels. C'est ce qui m'a convaincue." },
-  { artist: "zia", text: "Les commandes sur mesure représentent maintenant la moitié de mes ventes." },
-];
+const ARTIST_QUOTES = []; // site réel : rempli par les vrais comptes
 
 /* Questions fréquentes (page « Comment ça marche »). */
 const FAQ = [

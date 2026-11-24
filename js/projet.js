@@ -1,7 +1,6 @@
 /* =========================================================
-   ATYPIIK — espaces du projet INSEEC
-   Offre et abonnement simulé, CRM, dossier stratégique,
-   plan de communication. Chargé avant app.js, qui enregistre
+   ATYPIIK — offres, abonnement, CRM et administration
+   Chargé avant app.js, qui enregistre
    ces vues et ces actions.
    ========================================================= */
 
@@ -14,62 +13,6 @@ const src = (...keys) =>
     .join(" ");
 const stageLabel = (id) => (CRM_STAGES.find((s) => s[0] === id) || [id, id])[1];
 const crmById = (id) => state.crm.find((c) => c.id === id);
-
-/* ---------- Navigation entre les espaces du projet ---------- */
-const SPACES = [
-  ["#/projet", "Projet", "Vue d'ensemble"],
-  ["#/offre", "1. Vente", "Côté client"],
-  ["#/crm", "2. CRM", "Côté entreprise"],
-  ["#/strategie", "3. Stratégie", "Pourquoi ce produit"],
-  ["#/communication", "4. Communication", "Comment le vendre"],
-];
-// Bas de page : espace précédent, position, espace suivant (pratique pendant la présentation).
-function spaceNav(i) {
-  const prev = SPACES[i - 1], next = SPACES[i + 1];
-  return `<nav class="space-nav" aria-label="Espaces du projet">
-      ${prev ? `<a class="space-prev" href="${prev[0]}"><span class="label muted">Précédent</span><b>← ${prev[1]}</b></a>` : "<span></span>"}
-      <span class="space-dots">${SPACES.map((s, k) => `<a href="${s[0]}" class="${k === i ? "on" : ""}" aria-label="${s[1]}"></a>`).join("")}</span>
-      ${next ? `<a class="space-next" href="${next[0]}"><span class="label muted">Suivant</span><b>${next[1]} →</b></a>` : `<a class="space-next" href="#/projet"><span class="label muted">Fin du parcours</span><b>Retour au projet ↺</b></a>`}
-    </nav>`;
-}
-
-/* ---------- Accueil du projet : les quatre espaces ---------- */
-function viewProject() {
-  const spaces = [
-    ["#/offre", "01", "Vente", "Côté client", ["Promesse et offres", "Prix HT et TTC", "Achat simulé jusqu'à la confirmation"]],
-    ["#/crm", "02", "CRM", "Côté entreprise", [`${state.crm.length} contacts fictifs`, "Pipeline à faire avancer", "Tableau de bord"]],
-    ["#/strategie", "03", "Stratégie", "Pourquoi ce produit", ["Problème et personas", "Marché sourcé et concurrents", "Prix et modèle économique"]],
-    ["#/communication", "04", "Communication", "Comment le vendre", ["9 posts dont 5 vidéos", "Calendrier et partenariats", "10 premiers clients"]],
-  ];
-  const figures = [
-    ["Jusqu'à 90 %", "du prix pour l'artiste"],
-    ["15 % / 10 %", "de commission, selon la formule"],
-    ["0 €", "de frais pour l'acheteur"],
-    ["3 000 € HT", "de chiffre d'affaires mensuel visé à 12 mois"],
-  ];
-  return `
-    <section class="proj-hero">
-      <span class="label muted">Fondé par Lilou Capanni</span>
-      <h1>L'art qui sort du rang</h1>
-      <p class="lead">${esc(PROMISE)}</p>
-      <div class="proj-cta"><a class="btn" href="#/offre">Commencer la visite →</a><a class="btn btn-outline" href="#/galerie">Voir la boutique</a></div>
-    </section>
-    <div class="proj-figures">${figures.map(([b, t]) => `<div><b>${b}</b><span>${t}</span></div>`).join("")}</div>
-    <div class="spaces">${spaces
-      .map(([h, n, t, s, items]) => `<a class="space" href="${h}"><span class="space-n">${n}</span><span class="label muted">${s}</span><h2>${t}</h2><ul>${items.map((x) => `<li>${x}</li>`).join("")}</ul><span class="text-link">Ouvrir →</span></a>`)
-      .join("")}</div>
-    <section class="proj-demo">
-      <h2>La démo en 3 étapes</h2>
-      <ol>
-        <li><b>Choisir une œuvre</b><span>Dans la galerie, ajoutez une œuvre au panier (connexion de démo « Acheteur »).</span></li>
-        <li><b>Payer en démo</b><span>Carte fictive 4242 4242 4242 4242, date 12/28, CVC 123. Aucun paiement réel.</span></li>
-        <li><b>La retrouver dans le CRM</b><span>La commande apparaît en tête des contacts, marquée « Nouveau sur le site ».</span></li>
-      </ol>
-      <a class="btn btn-small" href="#/galerie">Lancer la démo</a>
-    </section>
-    <p class="hint">Site de démonstration : aucun paiement réel, aucun compte réel, toutes les personnes du CRM sont fictives. Scénario : une phase pilote fictive avec les premiers artistes depuis septembre 2026, puis l'ouverture au public le 16 novembre 2026, qui lance le plan de communication.</p>
-    ${spaceNav(0)}`;
-}
 
 /* ---------- 1. Offre ---------- */
 // Comparatif des deux formules : [libellé, Atelier, Pro] ; true = inclus, false = non inclus, texte = valeur.
@@ -100,7 +43,7 @@ function viewOffer() {
       <a class="btn btn-block${p.id === "pro" ? "" : " btn-outline"}" href="#/abonnement/${p.id}">Choisir ${esc(p.name)}</a>
     </article>`;
   return `
-    <div class="page-head"><span class="label muted">${isAdmin() ? "1. Vente · côté client" : "Offres et prix"}</span><h1>Ce que l'on vend</h1><p class="lead">${esc(PROMISE)}</p></div>
+    <div class="page-head"><span class="label muted">Offres et prix</span><h1>Ce que l'on vend</h1><p class="lead">${esc(PROMISE)}</p></div>
     <div class="offer-sides">
       <section class="offer-side">
         <span class="label muted">Pour les acheteurs</span><h2>Acheter une œuvre</h2>
@@ -119,19 +62,10 @@ function viewOffer() {
         <tbody>${PLAN_COMPARE.map(([l, a, b]) => `<tr><td>${esc(l)}</td><td>${cell(a)}</td><td class="pro">${cell(b)}</td></tr>`).join("")}</tbody></table></div>
       <p class="hint">Prix en euros. TVA de 20 % incluse dans la commission et ajoutée aux abonnements.</p>
     </section>
-    ${isAdmin() ? `    <section class="proj-demo">
-      <h2>Tester l'achat</h2>
-      <ol>
-        <li><b>Choisir une œuvre</b><span>Dans la galerie, cliquez sur « Ajouter au panier », puis sur « Acheteur » dans la connexion de démo.</span></li>
-        <li><b>Payer en démo</b><span>Carte fictive 4242 4242 4242 4242, date 12/28, CVC 123. Aucun paiement réel.</span></li>
-        <li><b>Voir la confirmation</b><span>La commande arrive aussi dans le CRM, côté entreprise.</span></li>
-      </ol>
-      <a class="btn btn-small" href="#/galerie">Choisir une œuvre</a>
-    </section>
-    ${spaceNav(1)}` : ""}`;
+`;
 }
 
-/* ---------- Abonnement simulé ---------- */
+/* ---------- Abonnement ---------- */
 function viewSubscribe(planId) {
   const p = PLANS.find((x) => x.id === planId) || PLANS[1];
   const s = state.sub || {};
@@ -150,7 +84,7 @@ function viewSubscribe(planId) {
       ? `<form class="panel" id="sub-form">
           <h2>Votre atelier</h2>
           <div class="field"><label for="sub-name">Nom ou nom d'artiste</label><input id="sub-name" required value="${esc(s.name || "")}" /></div>
-          <div class="field"><label for="sub-email">E-mail (fictif pour la démo)</label><input id="sub-email" type="email" required value="${esc(s.email || "")}" placeholder="artiste@example.com" /></div>
+          <div class="field"><label for="sub-email">E-mail</label><input id="sub-email" type="email" required value="${esc(s.email || "")}" placeholder="artiste@example.com" /></div>
           <div class="field-row">
             <div class="field"><label for="sub-city">Ville</label><input id="sub-city" required value="${esc(s.city || "")}" /></div>
             <div class="field"><label for="sub-disc">Discipline</label><input id="sub-disc" required value="${esc(s.disc || "")}" placeholder="Céramique, peinture…" /></div>
@@ -160,12 +94,12 @@ function viewSubscribe(planId) {
         </form>`
       : `<form class="panel" id="subpay-form">
           <h2>Paiement</h2>
-          <div class="field"><label for="sp-num">Numéro de carte</label><input id="sp-num" required inputmode="numeric" placeholder="4242 4242 4242 4242" /></div>
+          <div class="field"><label for="sp-num">Numéro de carte</label><input id="sp-num" required inputmode="numeric" placeholder="1234 5678 9012 3456" /></div>
           <div class="field-row">
             <div class="field"><label for="sp-exp">Expiration</label><input id="sp-exp" required placeholder="MM/AA" /></div>
             <div class="field"><label for="sp-cvc">CVC</label><input id="sp-cvc" required inputmode="numeric" placeholder="123" /></div>
           </div>
-          <p class="hint">Démo : aucun paiement n'est effectué, n'entrez pas une vraie carte.</p>
+        <p class="hint">Paiement sécurisé par Stripe : vos coordonnées bancaires ne sont jamais stockées par ATYPIIK.</p>
           <button class="btn btn-block">Payer ${ttc(p.price)}</button>
         </form>`;
   return `<div class="page-head"><h1>${esc(p.name)}</h1><p>${esc(p.tagline)}</p></div><div class="checkout-steps">${steps}</div><div class="cart">${form}${recap}</div>`;
@@ -266,10 +200,10 @@ function viewCRM(param) {
   if (param && !["tableau", "contacts", "pipeline"].includes(param)) return viewContact(param);
   const tab = ["contacts", "pipeline"].includes(param) ? param : "tableau";
   const st = crmStats();
-  const head = `<div class="page-head"><span class="label muted">Outil interne · accès démo sans identifiant</span><h1>CRM ATYPIIK</h1><p>Suivi des artistes et des acheteurs, de la prise de contact à la vente. Données fictives de la phase pilote (septembre à novembre 2026), conservées dans votre navigateur.</p></div>
+  const head = `<div class="page-head"><span class="label muted">Outil interne · administration</span><h1>CRM ATYPIIK</h1><p>Suivi des artistes et des acheteurs, de la prise de contact à la vente. Les contacts arrivent tout seuls à chaque inscription, abonnement et commande.</p></div>
     <nav class="tabs crm-tabs">${[["tableau", "Tableau de bord"], ["contacts", "Contacts"], ["pipeline", "Pipeline"]].map(([id, l]) => `<a class="${id === tab ? "on" : ""}" href="#/crm/${id}">${l}</a>`).join("")}</nav>`;
-  if (tab === "contacts") return head + crmContacts() + spaceNav(2);
-  if (tab === "pipeline") return head + crmPipeline() + spaceNav(2);
+  if (tab === "contacts") return head + crmContacts();
+  if (tab === "pipeline") return head + crmPipeline();
   const byStage = CRM_STAGES.map(([id, l]) => [l, state.crm.filter((c) => c.stage === id).length]);
   const bySource = CRM_SOURCES.map((s) => [s, state.crm.filter((c) => c.source === s).length, state.crm.filter((c) => c.source === s && c.stage === "gagne").length]).filter((x) => x[1]);
   const max = Math.max(...byStage.map((x) => x[1]), 1);
@@ -284,14 +218,13 @@ function viewCRM(param) {
     </div>
     <section class="panel crm-orders"><h2>Commandes passées sur le site</h2>
       <p class="hint">Chaque achat fait dans la boutique arrive ici et sur la fiche du client, qui passe à l'étape « Gagné ».</p>
-      ${state.orders.length ? ordersTable(state.orders.slice(0, 6)) : emptyBox("Aucune commande", "Passez une commande de démo dans la galerie : elle apparaîtra ici.")}
+      ${state.orders.length ? ordersTable(state.orders.slice(0, 6)) : emptyBox("Aucune commande", "Les commandes passées sur le site apparaîtront ici.")}
     </section>
     <div class="crm-dash">
       <section class="panel"><h2>Contacts par étape</h2>${byStage.map(([l, n]) => `<div class="bar"><span>${l}</span><i style="--w:${(n / max) * 100}%"></i><b>${n}</b></div>`).join("")}</section>
       <section class="panel"><h2>Contacts par source</h2>${bySource.map(([l, n, w]) => `<div class="bar"><span>${l}</span><i style="--w:${(n / maxS) * 100}%"></i><b>${n}<small> · ${w} gagné${w > 1 ? "s" : ""}</small></b></div>`).join("")}</section>
       <section class="panel crm-todo"><h2>Prochaines actions</h2>${todo.map((c) => `<a href="#/crm/${c.id}" class="todo"><span class="mono">${frDate(c.next[0])}</span><span><b>${esc(c.name)}</b> · ${esc(c.next[1])}</span></a>`).join("")}</section>
-    </div>
-    ${spaceNav(2)}`;
+    </div>`;
 }
 /* Montant d'un contact : abonnement Pro sur 12 mois (HT) pour un artiste, commandes (TTC) pour un acheteur. */
 const crmAmount = (c) => (!c.value ? "—" : c.type === "artiste" ? ht(c.value) : euro(c.value) + " TTC");
@@ -426,7 +359,7 @@ function viewContact(id) {
           ${c.type === "artiste" ? `<dt>Formule</dt><dd>${c.plan === "pro" ? "Atelier Pro" : "Atelier"}</dd>` : ""}
           <dt>${c.type === "artiste" ? "Abonnement sur 12 mois" : "Commandes"}</dt><dd>${c.value ? (c.type === "artiste" ? ht(c.value) : euro(c.value) + " TTC") : "—"}</dd>
         </dl>
-        <p class="hint">Coordonnées fictives (démo).</p>
+        
       </section>
       <section class="panel"><h2>Prochaine action</h2>
         <p><span class="mono">${frDate(c.next[0])}</span> · ${esc(c.next[1])}</p>
@@ -450,8 +383,8 @@ function viewNewContact() {
       <div class="field"><label for="nc-type">Type</label><select id="nc-type"><option value="artiste">Artiste</option><option value="acheteur">Acheteur</option></select></div></div>
       <div class="field-row"><div class="field"><label for="nc-company">Activité ou entreprise</label><input id="nc-company" /></div>
       <div class="field"><label for="nc-city">Ville</label><input id="nc-city" required /></div></div>
-      <div class="field-row"><div class="field"><label for="nc-email">E-mail (fictif)</label><input id="nc-email" type="email" required placeholder="nom@example.com" /></div>
-      <div class="field"><label for="nc-phone">Téléphone (fictif)</label><input id="nc-phone" placeholder="06 00 00 00 00" /></div></div>
+      <div class="field-row"><div class="field"><label for="nc-email">E-mail</label><input id="nc-email" type="email" required placeholder="nom@example.com" /></div>
+      <div class="field"><label for="nc-phone">Téléphone</label><input id="nc-phone" placeholder="06 00 00 00 00" /></div></div>
       <div class="field-row"><div class="field"><label for="nc-source">Source</label><select id="nc-source">${CRM_SOURCES.map((s) => `<option>${s}</option>`).join("")}</select></div>
       <div class="field"><label for="nc-value">Montant estimé (€ HT pour un abonnement, € TTC pour des commandes)</label><input id="nc-value" type="number" min="0" step="0.01" value="0" /></div></div>
       <button class="btn">Créer le contact</button>
@@ -489,7 +422,7 @@ const PROJECT_ACTIONS = {
     state.crm = clone(CRM_SEED);
     save();
     render(true);
-    toast("Données de démo réinitialisées");
+    toast("CRM vidé");
   },
   "post-copy": (el) => {
     const p = POSTS.find((x) => String(x.n) === el.dataset.id);
@@ -502,156 +435,11 @@ const PROJECT_ACTIONS = {
   },
 };
 
-/* ---------- 3. Stratégie ---------- */
-function viewStrategy() {
-  const m = MODEL;
-  const total = m.rows.reduce((s, r) => s + (r[2] || 0), 0);
-  return `
-    <div class="page-head"><span class="label muted">Dossier stratégique</span><h1>Pourquoi ATYPIIK</h1><p>Le problème, la cible, le marché, la concurrence, le prix et le modèle économique. Chaque chiffre de marché renvoie vers sa source ; nos propres calculs sont signalés comme estimations.</p></div>
-    <div class="brief">
-      <div><span class="label muted">Le problème</span><b>40 à 50 %</b><p>du prix pris par les galeries en ligne à l'artiste</p></div>
-      <div><span class="label muted">La cible</span><b>Clara & Hugo</b><p>une acheteuse de 27 ans, un artiste de 31 ans</p></div>
-      <div><span class="label muted">Le marché</span><b>9,2 Md$</b><p>d'art vendu en ligne en 2025, sur 59,6 Md$</p></div>
-      <div><span class="label muted">L'objectif</span><b>3 000 € HT</b><p>de chiffre d'affaires par mois à 12 mois</p></div>
-    </div>
-    <nav class="toc">${[["probleme", "Problème"], ["cible", "Cible"], ["marche", "Marché"], ["concurrence", "Concurrence"], ["prix", "Prix"], ["modele", "Modèle économique"], ["sources", "Sources"]].map(([id, l]) => `<a href="#/strategie" data-act="scroll-to" data-id="${id}">${l}</a>`).join("")}</nav>
-
-    <section class="strat" id="probleme"><h2 class="strat-h">1. Le problème</h2>
-      <h3 class="label">Qui est concerné</h3><p class="lead">${esc(PROBLEM.who)}</p>
-      <ul class="facts">${PROBLEM.facts.map(([t, ...k]) => `<li>${esc(t)} ${src(...k)}</li>`).join("")}</ul>
-      <div class="two-col"><div class="panel"><h3>À quelle fréquence</h3><p>${esc(PROBLEM.frequency)}</p></div><div class="panel"><h3>Ce que ça coûte aujourd'hui</h3><p>${esc(PROBLEM.cost)}</p></div></div>
-    </section>
-
-    <section class="strat" id="cible"><h2 class="strat-h">2. La cible : deux personas</h2>
-      <div class="personas">${PERSONAS.map(
-        (p) => `<article class="persona"><div class="persona-img">${visual(byId(p.photo))}</div><div>
-          <span class="label muted">${p.side} · persona fictif</span><h3>${p.name}, ${p.age} ans</h3><p><b>${esc(p.job)}</b></p>
-          <dl class="dl"><dt>Budget</dt><dd>${esc(p.budget)}</dd><dt>S'informe sur</dt><dd>${esc(p.info)}</dd><dt>${p.side === "Acheteuse" ? "Ce qu'elle veut" : "Ce qu'il veut"}</dt><dd>${esc(p.need)}</dd><dt>Ce qui bloque</dt><dd>${esc(p.pain)}</dd></dl></div></article>`,
-      ).join("")}</div>
-    </section>
-
-    <section class="strat" id="marche"><h2 class="strat-h">3. Le marché</h2>
-      <div class="figures">${MARKET.map((x) => `<div class="figure"><b>${x.figure}</b><p>${esc(x.label)}</p>${src(...x.src)}</div>`).join("")}</div>
-      <h3 class="label">Tendances</h3>
-      <div class="trends">${TRENDS.map(([t, d, k]) => `<div class="panel"><h3>${esc(t)}</h3><p>${esc(d)} ${src(...k)}</p></div>`).join("")}</div>
-    </section>
-
-    <section class="strat" id="concurrence"><h2 class="strat-h">4. La concurrence</h2>
-      <div class="table-wrap"><table class="compare"><thead><tr><th>Acteur</th><th>Positionnement</th><th>Ce que paie l'artiste</th><th>Prix pour l'acheteur</th><th>Ce qui nous distingue</th></tr></thead><tbody>${COMPETITORS.map(
-        (c) => `<tr class="${c.us ? "us" : ""}"><td><strong>${esc(c.name)}</strong></td><td>${esc(c.type)}</td><td>${esc(c.fee)} ${src(...c.src)}</td><td>${esc(c.buyer)}</td><td>${esc(c.diff)}</td></tr>`,
-      ).join("")}</tbody></table></div>
-      <p class="hint">Marques citées à titre de comparaison : aucune n'est partenaire d'ATYPIIK.</p>
-    </section>
-
-    <section class="strat" id="prix"><h2 class="strat-h">5. Le prix</h2>
-      <p class="lead">Commission de 15 % sans abonnement, ou 10 % avec Atelier Pro à 12,90 € HT par mois. Gratuit pour les acheteurs.</p>
-      <div class="trends">${PRICING.map(([t, d, k]) => `<div class="panel"><h3>${t}</h3><p>${esc(d)} ${src(...k)}</p></div>`).join("")}</div>
-    </section>
-
-    <section class="strat" id="modele"><h2 class="strat-h">6. Le modèle économique</h2>
-      <ul class="facts">${m.how.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
-      <div class="panel model"><h3>${esc(m.goal)}</h3>
-        <div class="table-wrap"><table><tbody>${m.rows.map(([a, b, v]) => `<tr><td><strong>${a}</strong></td><td>${b}</td><td class="num">${v ? ht(v) : ""}</td></tr>`).join("")}
-        <tr class="total"><td><strong>Chiffre d'affaires mensuel</strong></td><td>Abonnements + commissions</td><td class="num"><strong>${ht(total)}</strong></td></tr></tbody></table></div>
-        <p class="hint">${esc(m.hypotheses)}</p>
-      </div>
-    </section>
-
-    <section class="strat" id="sources"><h2 class="strat-h">Sources</h2>
-      <ol class="sources">${Object.values(SOURCES).map(([n, u]) => `<li><a href="${u}" target="_blank" rel="noopener">${esc(n)}</a></li>`).join("")}</ol>
-    </section>
-    ${spaceNav(3)}`;
-}
-
-/* ---------- 4. Communication ---------- */
-const NET_ICON = { Instagram: "IG", TikTok: "TT", Pinterest: "PI" };
-function postVisual(p) {
-  const w = byId(p.work);
-  if (p.video)
-    return `<div class="post-visual post-video"><video src="${p.video}" poster="${p.poster}" muted loop playsinline autoplay preload="metadata" aria-label="Vidéo du post ${p.n}"></video></div>`;
-  return `<div class="post-visual net-${p.network.toLowerCase()}">${visual(w)}<span class="post-logo">atypiik</span><div class="post-over"><b>${esc(p.overlay)}</b></div></div>`;
-}
-function viewCom() {
-  return `
-    <div class="page-head"><span class="label muted">Plan de communication</span><h1>Comment le vendre</h1><p>De quoi lancer la communication dès demain : la marque, les canaux, 9 posts prêts à publier, le calendrier de 4 semaines, les partenariats, les 10 premiers clients et les indicateurs.</p></div>
-    <div class="brief">
-      <div><span class="label muted">La promesse</span><b>L'art qui sort du rang</b><p>sélection à la main, jusqu'à 90 % pour l'artiste</p></div>
-      <div><span class="label muted">Les canaux</span><b>3 réseaux</b><p>Instagram, TikTok et Pinterest, plus la newsletter</p></div>
-      <div><span class="label muted">Le contenu</span><b>9 posts</b><p>dont 5 vidéos, sur 4 semaines</p></div>
-      <div><span class="label muted">Le lancement</span><b>16 nov. → 4 déc.</b><p>de l'ouverture au public au drop de Noël</p></div>
-    </div>
-    <nav class="toc">${[["marque", "Marque"], ["canaux", "Canaux"], ["posts", "Posts"], ["calendrier", "Calendrier"], ["partenariats", "Partenariats"], ["acquisition", "10 premiers clients"], ["indicateurs", "Indicateurs"]].map(([id, l]) => `<a href="#/communication" data-act="scroll-to" data-id="${id}">${l}</a>`).join("")}</nav>
-
-    <section class="strat" id="marque"><h2 class="strat-h">1. La plateforme de marque</h2>
-      <div class="brand">
-        <div class="panel"><h3>Le nom</h3><p><b>${BRAND.name}</b> · ${esc(BRAND.nameWhy)}</p></div>
-        <div class="panel"><h3>La promesse</h3><p>${esc(BRAND.promise)}</p></div>
-        <div class="panel"><h3>Le ton</h3><ul class="facts">${BRAND.tone.map(([t, d]) => `<li><b>${t}</b> : ${esc(d)}</li>`).join("")}</ul></div>
-      </div>
-      <h3 class="label">Trois messages clés</h3>
-      <div class="trends">${BRAND.messages.map(([t, d], i) => `<div class="panel"><span class="label muted">Message ${i + 1}</span><h3>${esc(t)}</h3><p>${esc(d)}</p></div>`).join("")}</div>
-    </section>
-
-    <section class="strat" id="canaux"><h2 class="strat-h">2. Les canaux</h2>
-      <div class="table-wrap"><table><thead><tr><th>Canal</th><th>Pourquoi pour notre cible</th><th>Rythme</th></tr></thead><tbody>${CHANNELS.map(([c, w, r]) => `<tr><td><strong>${c}</strong></td><td>${esc(w)}</td><td>${r}</td></tr>`).join("")}</tbody></table></div>
-    </section>
-
-    <section class="strat" id="posts"><h2 class="strat-h">3. Les 9 posts prêts à publier</h2>
-      <div class="post-filter" role="group" aria-label="Filtrer par réseau">${["Tous", "Instagram", "TikTok", "Pinterest"]
-        .map((n) => `<button class="chip${n === "Tous" ? " on" : ""}" data-act="post-filter" data-net="${n}">${n}${n === "Tous" ? "" : ` (${POSTS.filter((p) => p.network === n).length})`}</button>`)
-        .join("")}</div>
-      <div class="posts">${POSTS.map(
-        (p) => `<article class="post" data-net="${p.network}">
-          ${postVisual(p)}
-          <div class="post-body">
-            <div class="post-meta"><span class="tag">${p.network}</span><span class="mono">${frDate(p.date)}</span></div>
-            <p class="post-format"><b>Format</b> ${esc(p.format)}<br /><b>Objectif</b> ${esc(p.goal)}</p>
-            <p class="post-text">${esc(p.text).replace(/\n/g, "<br />")}</p>
-            <div class="post-actions"><button class="btn btn-small btn-outline" data-act="post-copy" data-id="${p.n}">Copier le texte</button>${p.video ? `<a class="btn btn-small btn-outline" href="${p.video}" download>Télécharger la vidéo</a>` : ""}</div>
-          </div></article>`,
-      ).join("")}</div>
-      <p class="hint">Visuels et vidéos réalisés avec les photos des œuvres du catalogue de démo. Les vidéos sont au format vertical 9:16, prêtes à publier.</p><p class="demo-note">Les artistes cités dans les posts (Margaux Pech, Rosa Mendes…), leurs œuvres et le drop sont fictifs (démo) ; les photos servent d'illustration.</p>
-    </section>
-
-    <section class="strat" id="calendrier"><h2 class="strat-h">4. Le calendrier éditorial</h2>
-      <div class="calendar">${CALENDAR.map(([w, theme, items]) => `<div class="panel"><span class="label muted">${w}</span><h3>${theme}</h3><ul class="facts">${items.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>`).join("")}</div>
-    <p class="hint">Le calendrier liste les publications phares ; le reste du rythme annoncé par canal (reposts d'œuvres, stories, épingles) se fait au fil de la semaine.</p>
-    </section>
-
-    <section class="strat" id="partenariats"><h2 class="strat-h">5. Les partenariats</h2>
-      <p class="hint">Pistes de partenariat à démarcher : aucun accord n'existe à ce jour.</p>
-      <div class="table-wrap"><table><thead><tr><th>Partenaire envisagé</th><th>Ce qu'on lui propose</th><th>Ce qu'il y gagne</th></tr></thead><tbody>${PARTNERS.map((p) => `<tr><td><strong>${esc(p.name)}</strong><br /><span class="muted">${p.kind}</span></td><td>${esc(p.offer)}</td><td>${esc(p.gain)}</td></tr>`).join("")}</tbody></table></div>
-    </section>
-
-    <section class="strat" id="acquisition"><h2 class="strat-h">6. Trouver les 10 premiers clients</h2>
-      <div class="two-col">${ACQUISITION.map(([t, items]) => `<div class="panel"><h3>${t}</h3><ol class="facts">${items.map((x) => `<li>${esc(x)}</li>`).join("")}</ol></div>`).join("")}</div>
-    </section>
-
-    <section class="strat" id="indicateurs"><h2 class="strat-h">7. Les indicateurs</h2>
-      <div class="table-wrap"><table><thead><tr><th>Indicateur</th><th>Calcul</th><th>Objectif</th></tr></thead><tbody>${KPIS.map(([a, b, c]) => `<tr><td><strong>${a}</strong></td><td>${esc(b)}</td><td>${esc(c)}</td></tr>`).join("")}</tbody></table></div>
-    </section>
-    ${spaceNav(4)}`;
-}
-PROJECT_ACTIONS["post-filter"] = (el) => {
-  const net = el.dataset.net;
-  $$('[data-act="post-filter"]').forEach((b) => b.classList.toggle("on", b === el));
-  $$("#posts .post").forEach((p) => (p.hidden = net !== "Tous" && p.dataset.net !== net));
-};
-PROJECT_ACTIONS["scroll-to"] = (el, e) => {
-  e.preventDefault();
-  const t = document.getElementById(el.dataset.id);
-  if (t) window.scrollTo({ top: t.getBoundingClientRect().top + window.scrollY - 140, behavior: "smooth" });
-};
-
-/* Outils internes de l'administratrice : barre d'administration, menu, garde d'accès. */
 const ADMIN_LINKS = [
   ["#/profil", "Tableau admin", "profil"],
   ["#/crm", "CRM", "crm"],
-  ["#/strategie", "Stratégie", "strategie"],
-  ["#/communication", "Communication", "communication"],
-  ["#/projet", "Vue d'ensemble", "projet"],
 ];
-// Version vitrine (lien à montrer) : les outils internes n'existent pas, même avec la connexion de démo.
+// Version vitrine : les outils internes n'existent pas.
 const VITRINE = typeof window !== "undefined" && window.ATYPIIK_VITRINE === true;
 // Les outils internes n'existent pas pour le public : un visiteur qui tape l'adresse voit « page introuvable ».
 function adminOnly([view, bind]) {
@@ -679,8 +467,8 @@ function viewAdminLogin() {
         <button class="btn btn-block" ${locked ? "disabled" : ""}>Se connecter</button>
         <p class="hint">${tries && !locked ? `${5 - tries} essai(s) restant(s) avant blocage.` : "Accès réservé à l'administratrice d'ATYPIIK."}</p>
       </form>
-      <div class="demo-box"><strong>Démo</strong> — la vraie authentification sera branchée sur le site en ligne.
-        <div class="btns"><button type="button" class="btn btn-small" data-act="demo-login" data-id="admin">Connexion de démo administratrice</button></div>
+      <div class="demo-box"><strong>Accès de travail</strong> — en attendant la vraie connexion (mot de passe + code), à retirer avant l'ouverture du site.
+        <div class="btns"><button type="button" class="btn btn-small" data-act="demo-login" data-id="admin">Entrer dans l'espace admin</button></div>
       </div>
     </div>`;
 }
@@ -689,7 +477,7 @@ function bindAdminLogin() {
   if (!f) return;
   f.addEventListener("submit", (e) => {
     e.preventDefault();
-    // Démo : aucun mot de passe n'est stocké dans le code, chaque essai compte comme un échec.
+    // Pas encore de vraie connexion : aucun mot de passe n'est stocké dans le code, chaque essai compte comme un échec.
     state.adminTries = (state.adminTries || 0) + 1;
     toast("Identifiants ou code incorrects.");
     render(true);
@@ -697,13 +485,10 @@ function bindAdminLogin() {
 }
 
 const PROJECT_VIEWS = {
-  projet: adminOnly([viewProject]),
   offre: [viewOffer],
   abonnement: [() => viewSubscribe(currentParam), () => bindSubscribe(currentParam)],
   "abonnement-ok": [() => viewSubDone(currentParam)],
   crm: adminOnly([() => viewCRM(currentParam), bindCRM]),
-  strategie: adminOnly([viewStrategy]),
-  communication: adminOnly([viewCom]),
   [ADMIN_LOGIN_ROUTE]: [viewAdminLogin, bindAdminLogin],
 };
 
@@ -732,7 +517,7 @@ function becomeArtistBox() {
   if (p && p.status === "en attente")
     return `<div class="become panel"><div><span class="label muted">Votre candidature artiste</span><h2>En cours de validation</h2>
       <p>L'équipe vérifie votre portfolio, en général sous 48 h. Vous pouvez continuer à acheter normalement.</p></div>
-      <div class="become-cta"><button class="btn btn-outline" data-act="demo-validate" data-id="${p.id}">Simuler la validation (démo)</button></div></div>`;
+      </div>`;
   if (p && p.status === "refusé")
     return `<div class="become panel"><div><span class="label muted">Votre candidature artiste</span><h2>Non retenue pour le moment</h2><p>Vous pourrez candidater de nouveau avec de nouvelles pièces.</p></div></div>`;
   return `<div class="become panel"><div><span class="label muted">Vous créez aussi ?</span><h2>Ouvrez votre atelier</h2>
@@ -925,7 +710,7 @@ function customSection() {
         </ol>
         <a class="btn" href="#/artistes">Choisir un artiste</a>
       </div>
-      <div class="custom-cta-visual">${visual(byId("a18"))}</div>
+      ${(() => { const w = shuffleByDay(visibleWorks().filter((x) => (typeof PHOTOS !== "undefined" && PHOTOS[x.id]) || x.img))[0]; return w ? `<div class="custom-cta-visual">${visual(w)}</div>` : ""; })()}
     </section>`;
 }
 // Bloc qui détaille un devis (vu par l'acheteur et par l'artiste).
@@ -1007,9 +792,9 @@ function viewQuotePay(reqId) {
         <div class="field"><label for="qp-street">Adresse</label><input id="qp-street" required placeholder="12 rue des Arts" /></div>
         <div class="field-row"><div class="field"><label for="qp-zip">Code postal</label><input id="qp-zip" required pattern="[0-9]{5}" /></div><div class="field"><label for="qp-city">Ville</label><input id="qp-city" required /></div></div>
         <h2>Paiement</h2>
-        <div class="field"><label for="qp-num">Numéro de carte</label><input id="qp-num" required inputmode="numeric" placeholder="4242 4242 4242 4242" /></div>
+        <div class="field"><label for="qp-num">Numéro de carte</label><input id="qp-num" required inputmode="numeric" placeholder="1234 5678 9012 3456" /></div>
         <div class="field-row"><div class="field"><label for="qp-exp">Expiration</label><input id="qp-exp" required placeholder="MM/AA" /></div><div class="field"><label for="qp-cvc">CVC</label><input id="qp-cvc" required inputmode="numeric" placeholder="123" /></div></div>
-        <p class="hint">Démo : aucun paiement n'est effectué, n'entrez pas une vraie carte.</p>
+        <p class="hint">Paiement sécurisé par Stripe : vos coordonnées bancaires ne sont jamais stockées par ATYPIIK.</p>
         <button class="btn btn-block">Accepter le devis et payer ${euro(r.quote.price + r.quote.shipping)}</button>
       </form>
       <aside class="summary"><h3>${esc(r.type)}</h3>${quoteBlock(r.quote)}</aside>

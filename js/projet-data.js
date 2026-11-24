@@ -62,74 +62,7 @@ const CRM_STAGES = [
 const CRM_SOURCES = ["Instagram", "TikTok", "Pinterest", "Partenaire", "Salon", "Bouche-à-oreille", "Site ATYPIIK"];
 
 // type : "artiste" (vend sur ATYPIIK, valeur = abonnement annuel HT) ou "acheteur" (valeur = commandes TTC)
-const CRM_SEED = [
-  { id: "c01", name: "Maëlle Garnier", type: "artiste", company: "Céramiste", city: "Lyon", source: "Instagram", stage: "gagne", plan: "pro", value: 154.8,
-    history: [["2026-09-02", "Message Instagram après un post sur ses bols émaillés"], ["2026-09-05", "Appel découverte de 20 min"], ["2026-09-12", "Abonnement Atelier Pro activé"]],
-    next: ["2026-11-18", "Point trimestriel : préparer le drop de Noël"] },
-  { id: "c02", name: "Yanis Belkacem", type: "artiste", company: "Photographe", city: "Marseille", source: "Salon", stage: "proposition", plan: "pro", value: 154.8,
-    history: [["2026-10-04", "Rencontré au salon d'art contemporain de Marseille"], ["2026-10-08", "Envoi de la présentation de l'offre Pro"]],
-    next: ["2026-11-12", "Relance par téléphone"] },
-  { id: "c03", name: "Clara Moreau", type: "acheteur", company: "", city: "Bordeaux", source: "Pinterest", stage: "gagne", value: 180,
-    history: [["2026-10-01", "Inscription via une épingle « déco murale »"], ["2026-10-03", "Commande d'une sérigraphie (180 €)"]],
-    next: ["2026-11-20", "Envoyer la sélection de Noël"] },
-  { id: "c04", name: "Hugo Lambert", type: "artiste", company: "Illustrateur", city: "Nantes", source: "TikTok", stage: "contacte", plan: "atelier", value: 0,
-    history: [["2026-10-20", "A commenté la vidéo « comment on sélectionne nos artistes »"], ["2026-10-22", "Réponse en message privé avec le lien d'inscription"]],
-    next: ["2026-11-13", "Vérifier son portfolio et l'inviter à candidater"] },
-  { id: "c05", name: "Sofia Mendes", type: "acheteur", company: "", city: "Paris", source: "Instagram", stage: "proposition", value: 240,
-    history: [["2026-10-25", "Demande de commande sur mesure (portrait de chien)"], ["2026-10-27", "Devis de l'artiste transmis : 240 €"]],
-    next: ["2026-11-11", "Relancer pour la validation du devis"] },
-  { id: "c06", name: "Lucas Petit", type: "acheteur", company: "", city: "Lille", source: "Bouche-à-oreille", stage: "nouveau", value: 0,
-    history: [["2026-11-06", "Inscription à la newsletter"]],
-    next: ["2026-11-14", "Envoyer le code de bienvenue"] },
-  { id: "c07", name: "Amandine Roche", type: "artiste", company: "Créatrice de bijoux", city: "Montpellier", source: "Partenaire", stage: "gagne", plan: "atelier", value: 0,
-    history: [["2026-09-15", "Recommandée par une école d'art partenaire"], ["2026-09-20", "Boutique ouverte, offre Atelier"]],
-    next: ["2026-11-25", "Lui proposer l'offre Pro après 5 ventes"] },
-  { id: "c08", name: "Thomas Nguyen", type: "acheteur", company: "Café Les Voisins", city: "Toulouse", source: "Salon", stage: "contacte", value: 0,
-    history: [["2026-10-10", "Gérant d'un café, cherche des œuvres pour ses murs"], ["2026-10-14", "Appel : budget 600 € pour 3 tableaux"]],
-    next: ["2026-11-15", "Envoyer une sélection de 6 œuvres"] },
-  { id: "c09", name: "Inès Rahmani", type: "artiste", company: "Peintre", city: "Marseille", source: "Instagram", stage: "gagne", plan: "pro", value: 154.8,
-    history: [["2026-08-28", "Repérée sur Instagram"], ["2026-09-01", "Visio de présentation"], ["2026-09-03", "Abonnement Atelier Pro activé"]],
-    next: ["2026-12-01", "Interview pour la rubrique « artiste de la semaine »"] },
-  { id: "c10", name: "Paul Fontaine", type: "acheteur", company: "", city: "Rennes", source: "Site ATYPIIK", stage: "perdu", value: 0,
-    history: [["2026-10-02", "Panier abandonné (tirage photo 75 €)"], ["2026-10-05", "Relance par e-mail sans réponse"]],
-    next: ["2026-12-05", "Inclure dans la campagne de Noël"] },
-  { id: "c11", name: "Julie Marchand", type: "artiste", company: "Crocheteuse", city: "Grenoble", source: "TikTok", stage: "proposition", plan: "pro", value: 154.8,
-    history: [["2026-10-18", "Vidéo crochet repérée sur TikTok"], ["2026-10-21", "Appel découverte"], ["2026-10-24", "Proposition Atelier Pro envoyée"]],
-    next: ["2026-11-12", "Répondre à ses questions sur la commission"] },
-  { id: "c12", name: "Nadia Haddad", type: "acheteur", company: "", city: "Nice", source: "Instagram", stage: "gagne", value: 95,
-    history: [["2026-10-03", "Clic sur une publicité Instagram"], ["2026-10-03", "Commande d'un tirage (95 €)"]],
-    next: ["2026-11-19", "Demander un avis après réception"] },
-  { id: "c13", name: "Romain Girard", type: "artiste", company: "Sculpteur", city: "Strasbourg", source: "Salon", stage: "perdu", plan: "atelier", value: 0,
-    history: [["2026-09-25", "Rencontré au salon"], ["2026-10-02", "Préfère vendre uniquement en galerie physique"]],
-    next: ["2027-03-01", "Reprendre contact au printemps"] },
-  { id: "c14", name: "Emma Rousseau", type: "acheteur", company: "", city: "Paris", source: "Pinterest", stage: "nouveau", value: 0,
-    history: [["2026-11-08", "Création de compte, 4 œuvres en favoris"]],
-    next: ["2026-11-12", "Notifier si une œuvre en favori baisse de prix"] },
-  { id: "c15", name: "Léo Barbier", type: "artiste", company: "Graveur", city: "Dijon", source: "Partenaire", stage: "contacte", plan: "atelier", value: 0,
-    history: [["2026-10-28", "Contact via l'association d'artistes partenaire"], ["2026-11-02", "Premier échange par e-mail"]],
-    next: ["2026-11-16", "Visio pour l'aider à photographier ses gravures"] },
-  { id: "c16", name: "Chloé Lefèvre", type: "acheteur", company: "Agence Lumen (RH)", city: "Lyon", source: "Bouche-à-oreille", stage: "proposition", value: 900,
-    history: [["2026-10-15", "Cherche des cadeaux de fin d'année pour 12 salariés"], ["2026-10-30", "Proposition : 12 tirages signés, 900 € TTC"]],
-    next: ["2026-11-13", "Relance et envoi des visuels"] },
-  { id: "c17", name: "Mathis Colin", type: "artiste", company: "Peintre", city: "Bordeaux", source: "Instagram", stage: "nouveau", plan: "atelier", value: 0,
-    history: [["2026-11-07", "A suivi le compte et liké 6 posts"]],
-    next: ["2026-11-14", "Lui écrire un message personnalisé"] },
-  { id: "c18", name: "Sarah Benoît", type: "acheteur", company: "", city: "Tours", source: "TikTok", stage: "gagne", value: 320,
-    history: [["2026-10-12", "Découvre ATYPIIK via une vidéo « dans l'atelier »"], ["2026-10-13", "Commande : vase + bol (320 €)"]],
-    next: ["2026-11-21", "Lui présenter le drop céramique"] },
-  { id: "c19", name: "Adrien Perrin", type: "acheteur", company: "", city: "Angers", source: "Instagram", stage: "contacte", value: 0,
-    history: [["2026-11-01", "Question en commentaire sur les délais de livraison"], ["2026-11-01", "Réponse avec le lien vers la FAQ"]],
-    next: ["2026-11-15", "Vérifier s'il a créé un compte"] },
-  { id: "c20", name: "Zoé Martin", type: "artiste", company: "Couturière upcycling", city: "Lille", source: "Partenaire", stage: "gagne", plan: "pro", value: 154.8,
-    history: [["2026-09-10", "Présentée par un concept store partenaire"], ["2026-09-18", "Abonnement Atelier Pro activé"]],
-    next: ["2026-11-22", "Shooting de sa collection d'hiver"] },
-  { id: "c21", name: "Karim Aït", type: "acheteur", company: "", city: "Marseille", source: "Salon", stage: "perdu", value: 0,
-    history: [["2026-09-26", "Intéressé par un grand format au salon"], ["2026-10-06", "A acheté ailleurs"]],
-    next: ["2027-01-10", "Envoyer les nouveautés grand format"] },
-  { id: "c22", name: "Lina Dubois", type: "artiste", company: "Illustratrice", city: "Rennes", source: "Pinterest", stage: "proposition", plan: "pro", value: 154.8,
-    history: [["2026-10-29", "Candidature reçue via le formulaire « Vendre »"], ["2026-11-03", "Portfolio validé, proposition Atelier Pro envoyée"]],
-    next: ["2026-11-12", "Appel pour finaliser"] },
-];
+const CRM_SEED = []; // site réel : vide
 CRM_SEED.forEach((c, i) => {
   const [first, ...rest] = c.name.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().split(" ");
   c.email = `${first}.${rest.join("-")}@example.com`;
@@ -163,60 +96,11 @@ const CHANNELS = [
 ];
 
 // visuel : œuvre utilisée comme fond (id du catalogue), titre incrusté
-const POSTS = [
-  { n: 1, network: "Instagram", format: "Carrousel 5 images (1080 × 1350)", date: "2026-11-16", goal: "Notoriété : présenter le concept",
-    work: "a4", overlay: "L'art qui sort du rang",
-    text: "ATYPIIK ouvre au public 🎨\nAprès deux mois de test avec nos premiers artistes, la boutique est ouverte à tous. Une boutique en ligne où chaque artiste est choisi à la main, et où jusqu'à 90 % du prix va directement à l'artiste.\n\nPeinture, céramique, bijoux, crochet, photo : des pièces uniques, au prix fixé par chaque artiste.\n\nSwipe pour rencontrer nos 8 premiers artistes 👉\n\n#art #artisteemergent #faitmain #artfrancais #decointerieure" },
-  { n: 2, network: "TikTok", format: "Vidéo verticale 14 s (9:16)", video: "assets/com/post-2.mp4", poster: "assets/com/post-2.jpg", date: "2026-11-17", goal: "Notoriété : faire connaître un artiste",
-    work: "a6", overlay: "Dans l'atelier de Margaux",
-    text: "POV : tu entres dans l'atelier d'une céramiste à Nantes ✨\nDe la boule de faïence au vase rayé peint à la main, en 14 secondes.\nSes pièces sont sur ATYPIIK, lien en bio.\n\n#ceramique #pottery #artisan #atelier #tiktokart" },
-  { n: 3, network: "Pinterest", format: "Épingle verticale (1000 × 1500)", date: "2026-11-18", goal: "Trafic vers la galerie",
-    work: "a3", overlay: "Idées déco murale faites main",
-    text: "Idées déco murale faites main : tirages photo signés, toiles et céramiques d'artistes émergents. Pièces uniques ou en édition limitée, livrées chez toi.\nLien : la galerie ATYPIIK." },
-  { n: 4, network: "Instagram", format: "Reel 15 s (9:16)", video: "assets/com/post-4.mp4", poster: "assets/com/post-4.jpg", date: "2026-11-23", goal: "Recruter des artistes",
-    work: "a1", overlay: "Artiste ? Garde jusqu'à 90 %",
-    text: "Tu crées et tu veux vendre sans laisser la moitié du prix en commission ?\nSur ATYPIIK, tu gardes 85 % de chaque vente sans abonnement, et 90 % avec l'offre Pro.\n\nOn sélectionne nos artistes à la main : envoie ton portfolio via le lien en bio.\n\n#artistefrancais #vendresonart #illustration #creatrice" },
-  { n: 5, network: "TikTok", format: "Vidéo verticale 16 s (9:16), texte animé", video: "assets/com/post-5.mp4", poster: "assets/com/post-5.jpg", date: "2026-11-25", goal: "Confiance : expliquer la sélection",
-    work: "a7", overlay: "Comment on choisit nos artistes",
-    text: "On reçoit des dizaines de candidatures, voilà comment on choisit 👇\n1. Des pièces faites main, pas revendues\n2. Une vraie patte, qu'on reconnaît\n3. Des photos honnêtes\nEt toi, tu postulerais ?\n\n#artiste #selection #faitmain #petitecreatrice" },
-  { n: 6, network: "Pinterest", format: "Épingle idée (5 pages)", date: "2026-11-27", goal: "Trafic : cadeaux de Noël",
-    work: "a29", overlay: "10 cadeaux faits main pour Noël",
-    text: "10 idées de cadeaux faits main pour Noël : bijoux, crochet, céramique, tirages. Chaque pièce est faite par un artiste indépendant en France." },
-  { n: 7, network: "Instagram", format: "Story vidéo 13 s (9:16) + sticker compte à rebours", video: "assets/com/post-7.mp4", poster: "assets/com/post-7.jpg", date: "2026-12-01", goal: "Conversion : annoncer le drop",
-    work: "a14", overlay: "Drop céramique · 18 h",
-    text: "DROP ce vendredi 18 h ⏰\nLes céramiques d'hiver de Margaux : 24 pièces, pas une de plus.\nActive le rappel pour être prévenu à l'ouverture 🔔" },
-  { n: 8, network: "TikTok", format: "Vidéo verticale 12 s (9:16)", video: "assets/com/post-8.mp4", poster: "assets/com/post-8.jpg", date: "2026-12-04", goal: "Conversion : montrer la livraison",
-    work: "a18", overlay: "Unboxing d'une pièce unique",
-    text: "Unboxing d'une pièce unique 📦\nEmballée à la main par l'artiste, avec un petit mot.\nC'est ça, acheter à un artiste plutôt qu'à une usine.\n\n#unboxing #faitmain #cadeaudenoel #art" },
-  { n: 9, network: "Instagram", format: "Post image (1080 × 1350)", date: "2026-12-07", goal: "Fidélisation : artiste de la semaine",
-    work: "a20", overlay: "Artiste de la semaine",
-    text: "Artiste de la semaine : Zia Okafor 🧶\nÀ Lille, elle crochète chaque pièce à la main, une par une : pulls, sacs, housses de coussin.\nSon record ? Un pull en 40 heures.\n\nSa boutique est sur ATYPIIK, lien en bio.\n\n#crochet #faitmain #tricot #artistedelasemaine" },
-];
+const POSTS = []; // site réel : vide
 
-const CALENDAR = [
-  ["Semaine 1 · 16-22 nov.", "Ouverture au public", ["Lun. 16 : post 1, carrousel d'ouverture (Instagram)", "Mar. 17 : post 2, dans l'atelier (TikTok)", "Mer. 18 : post 3, déco murale (Pinterest)", "Jeu. 19 : newsletter n° 1, « ATYPIIK ouvre au public »", "Sam. 21 : stand au marché de créateurs local"]],
-  ["Semaine 2 · 23-29 nov.", "Recrutement d'artistes", ["Lun. 23 : post 4, l'artiste garde jusqu'à 90 % (Instagram)", "Mer. 25 : post 5, notre sélection (TikTok)", "Mer. 25 : visite d'une école d'art (piste de partenariat)", "Jeu. 26 : newsletter n° 2, coups de cœur", "Ven. 27 : post 6, cadeaux de Noël (Pinterest)"]],
-  ["Semaine 3 · 30 nov.-6 déc.", "Drop de Noël", ["Mar. 1er : post 7, story du drop (Instagram)", "Jeu. 3 : newsletter n° 3, rappel du drop", "Ven. 4 : post 8, unboxing (TikTok)", "Ven. 4 à 18 h : ouverture du drop céramique", "Sam. 5 : live Instagram avec l'artiste du drop"]],
-  ["Semaine 4 · 7-13 déc.", "Derniers cadeaux", ["Lun. 7 : post 9, artiste de la semaine (Instagram)", "Mer. 9 : rappel « commande avant le 15 pour Noël » (stories)", "Jeu. 10 : newsletter n° 4, idées cadeaux de dernière minute", "Ven. 11 : bilan des indicateurs et choix des posts à reconduire"]],
-];
+const CALENDAR = []; // site réel : vide
 
-const PARTNERS = [
-  { name: "Une école d'art (ex. : les Beaux-Arts de la ville)", kind: "École",
-    offer: "Six mois d'Atelier Pro offerts aux diplômés et une vitrine « Jeunes diplômés » sur la page d'accueil.",
-    gain: "Un débouché concret pour ses étudiants, valorisé dans son taux d'insertion professionnelle." },
-  { name: "Ateliers d'Art de France", kind: "Organisation professionnelle",
-    offer: "Une réduction sur l'offre Pro pour ses membres et un atelier en ligne « vendre ses créations sur internet ».",
-    gain: "Un service numérique supplémentaire pour ses adhérents, sans développement à financer." },
-  { name: "Un concept store de créateurs", kind: "Lieu",
-    offer: "Une exposition éphémère d'artistes ATYPIIK un week-end par mois, avec QR codes vers les boutiques en ligne.",
-    gain: "Des animations gratuites qui attirent du monde en boutique, et une commission sur les ventes faites sur place." },
-  { name: "Une créatrice de contenu déco (20 000 à 80 000 abonnés)", kind: "Créatrice de contenu",
-    offer: "Une pièce offerte, un code promo de 10 % pour sa communauté et 5 % des ventes générées par son code.",
-    gain: "Un contenu original pour sa communauté et une rémunération liée aux ventes." },
-  { name: "Un magazine ou média art et déco en ligne", kind: "Média",
-    offer: "Une rubrique mensuelle « l'artiste à suivre » écrite avec nous, et un jeu-concours pour gagner une œuvre.",
-    gain: "Du contenu exclusif et un jeu-concours qui fait grandir son audience." },
-];
+const PARTNERS = []; // site réel : vide
 
 const ACQUISITION = [
   ["Les 5 premiers artistes payants", [
@@ -271,18 +155,7 @@ const PROBLEM = {
   cost: "Estimation : pour une œuvre vendue 200 €, l'artiste perd 80 € sur Saatchi Art (40 %) et 100 € sur Singulart (50 %), contre 30 € sur ATYPIIK (15 %), et 20 € avec l'offre Atelier Pro (10 %).",
 };
 
-const PERSONAS = [
-  { name: "Clara", age: 27, job: "Chargée de communication à Lyon", side: "Acheteuse", photo: "a19",
-    budget: "40 à 150 € par achat, environ 400 € par an pour la déco et les cadeaux",
-    info: "Instagram, Pinterest, TikTok, newsletters de concept stores",
-    need: "Une pièce unique qui raconte une histoire, pour son appartement ou pour offrir, sans mettre le prix d'une galerie.",
-    pain: "Sur les grandes plateformes, elle ne sait pas si l'objet est vraiment fait main ou revendu." },
-  { name: "Hugo", age: 31, job: "Illustrateur et céramiste à Marseille", side: "Artiste", photo: "a12",
-    budget: "0 à 20 € par mois pour ses outils de vente",
-    info: "Instagram, YouTube, groupes Facebook d'artistes, salons et marchés de créateurs",
-    need: "Vendre en ligne entre deux marchés, être payé vite et garder l'essentiel du prix.",
-    pain: "Il vend surtout en direct sur Instagram : paiements à la main, pas de suivi, et il ne veut pas laisser 40 à 50 % à une galerie en ligne." },
-];
+const PERSONAS = []; // site réel : vide
 
 const MARKET = [
   { figure: "59,6 Md$", label: "Ventes mondiales d'art en 2025, en hausse de 4 % sur un an", src: ["artbasel"] },
@@ -330,10 +203,4 @@ const MODEL = {
 /* ---------- Vue 3D des œuvres plates ----------
    Texture = la photo redressée et recadrée sur l'œuvre (assets/3d/).
    ratio = largeur ÷ hauteur, depth = épaisseur ÷ grand côté, edge = couleur de la tranche. */
-const VIEW3D = {
-  a1: { tex: "assets/3d/a1.jpg", ratio: 680 / 900, depth: 0.05, edge: "#b89466", kind: "Toile en caisse américaine" },
-  a2: { tex: "assets/3d/a2.jpg", ratio: 900 / 675, depth: 0.045, edge: "#9fb0d4", kind: "Toile sur châssis" },
-  a3: { tex: "assets/3d/a3.jpg", ratio: 900 / 853, depth: 0.07, edge: "#ead9a6", kind: "Mini-toile" },
-  a4: { tex: "assets/3d/a4.jpg", ratio: 678 / 900, depth: 0.045, edge: "#4a2b1c", kind: "Tirage encadré noyer" },
-  a5: { tex: "assets/3d/a5.jpg", ratio: 900 / 652, depth: 0.05, edge: "#f1f0ec", kind: "Tirage en caisse blanche" },
-};
+const VIEW3D = {}; // site réel : vues 3D ajoutées œuvre par œuvre

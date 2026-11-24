@@ -1,7 +1,8 @@
 /* =========================================================
    ATYPIIK — application front (vanilla JS)
-   Toutes les données sont simulées et stockées dans le
-   navigateur (localStorage) en attendant le vrai back-end.
+   Site réel (avant mise en ligne) : les données sont encore
+   stockées dans le navigateur en attendant le back-end
+   (comptes, paiements Stripe, e-mails). Voir LANCEMENT.md.
    ========================================================= */
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -34,7 +35,7 @@ const DATA_VERSION = 12;
 const store = {
   get(key, fallback) {
     try {
-      const v = localStorage.getItem("atypiik:" + key);
+      const v = localStorage.getItem("atypiik-reel:" + key);
       return v ? JSON.parse(v) : fallback;
     } catch {
       return fallback;
@@ -42,7 +43,7 @@ const store = {
   },
   set(key, value) {
     try {
-      localStorage.setItem("atypiik:" + key, JSON.stringify(value));
+      localStorage.setItem("atypiik-reel:" + key, JSON.stringify(value));
       return true;
     } catch {
       return false;
@@ -52,7 +53,7 @@ const store = {
 if (store.get("version", 0) !== DATA_VERSION) {
   try {
     Object.keys(localStorage)
-      .filter((k) => k.startsWith("atypiik:"))
+      .filter((k) => k.startsWith("atypiik-reel:"))
       .forEach((k) => localStorage.removeItem(k));
   } catch {}
   store.set("version", DATA_VERSION);
@@ -64,28 +65,15 @@ const PERSISTED = [
 ];
 const state = {
   user: store.get("user", null),
-  favs: store.get("favs", ["a22"]),
+  favs: store.get("favs", []),
   cart: store.get("cart", []),
   views: store.get("views", []),
-  follows: store.get("follows", ["ines"]),
-  orders: store.get("orders", [
-    {
-      id: "CMD-2026-0944", date: "2026-10-03", status: 2, buyer: "Camille Roux",
-      address: "12 rue des Arts, 13001 Marseille",
-      lines: [{ id: "a19", variant: 1, qty: 1, price: 95 }], total: 95,
-    },
-  ]),
+  follows: store.get("follows", []),
+  orders: store.get("orders", []),
   threads: store.get("threads", {
-    nova: [
-      { from: "artist", text: "Bonjour ! Merci pour votre intérêt pour « Deux nageurs ». Une question sur l'œuvre ?" },
-    ],
     support: [{ from: "artist", text: "Bonjour, l'équipe ATYPIIK vous répond ici du lundi au vendredi, de 9 h à 18 h." }],
   }),
-  notifs: store.get("notifs", [
-    { id: 1, date: "2026-10-11", text: "Inès Vale, que vous suivez, a publié une nouvelle œuvre : « Café de la Poste ».", link: "#/oeuvre/a4", read: false },
-    { id: 2, date: "2026-10-09", text: "Week-end photo : −15 % sur une sélection de tirages jusqu'à dimanche.", link: "#/galerie", read: false },
-    { id: 3, date: "2026-10-05", text: "Votre commande CMD-2026-0944 a été livrée.", link: "#/profil", read: true },
-  ]),
+  notifs: store.get("notifs", []),
   works: store.get("works", clone(ARTWORKS)),
   artists: store.get("artists", clone(ARTISTS)),
   pending: store.get("pending", clone(SEED_PENDING_SELLERS)),
@@ -149,7 +137,7 @@ function shuffleByDay(list, seed = dayIndex()) {
   const h = (str) => [...str].reduce((x, c) => Math.imul(x ^ c.charCodeAt(0), 2654435761) >>> 0, seed * 7919 + 1);
   return [...list].sort((a, b) => h(a.id) - h(b.id));
 }
-// « Nouveau » pendant 30 jours après la publication (les œuvres de démo gardent leur marque d'origine).
+// « Nouveau » pendant 30 jours après la publication.
 const isNewWork = (w) => !w.sold && (w.addedAt ? Date.now() - new Date(w.addedAt) < 30 * DAY : !!w.isNew);
 // Nouvelles pièces : les dernières publiées d'abord, puis le reste du catalogue qui tourne chaque jour.
 function freshWorks() {
@@ -345,7 +333,7 @@ function reviewList(list, showWork = false) {
   return list
     .map(
       (r) => `<article class="review">
-        <div class="review-top">${stars(r.rating, false)}<span class="mono muted">${esc(r.author)} · ${frDate(r.date)} · avis fictif (démo)</span></div>
+        <div class="review-top">${stars(r.rating, false)}<span class="mono muted">${esc(r.author)} · ${frDate(r.date)}</span></div>
         ${showWork && byId(r.work) ? `<a class="review-work" href="#/oeuvre/${r.work}">${esc(byId(r.work).title)}</a>` : ""}
         <p>${esc(maskContacts(r.text))}</p>
       </article>`,
@@ -393,10 +381,16 @@ function viewHome() {
   const disciplines = ["Nouveautés", "Peinture", "Photographie", "Céramique", "Mode", "Crochet", "Bijoux", "Maison & déco"];
   return `
     <section class="hero">
-      <div class="hero-wall">
+      ${
+        hero
+          ? `<div class="hero-wall">
         <a class="hero-photo" href="#/oeuvre/${hero.id}" aria-label="${esc(hero.title)}">${visual(hero)}</a>
         <div class="hero-plate"><span><b>${esc(artistOf(hero).name)}</b>, <i>${esc(hero.title)}</i>, ${esc(hero.technique.toLowerCase())}</span><span>${euro(hero.price)}</span></div>
-      </div>
+      </div>`
+          : `<div class="hero-wall hero-soon">
+        <div class="hero-soon-inner"><span class="ref">Bientôt</span><b>Les premières œuvres arrivent.</b><span>Les artistes sélectionnés préparent leurs boutiques.</span></div>
+      </div>`
+      }
       <div class="hero-panel">
         <div>
           <h1>L'art des<br />artistes<br />émergents, <span class="accent">sélectionnés un par un.</span></h1>
@@ -415,7 +409,11 @@ function viewHome() {
 
     <section class="section">
       <div class="section-head"><div><h2>Nouvelles <span class="fun">pièces</span></h2></div><a href="#/galerie">Tout voir</a></div>
-      <div class="grid">${freshWorks().slice(0, 8).map((w) => card(w)).join("")}</div>
+      ${
+        freshWorks().length
+          ? `<div class="grid">${freshWorks().slice(0, 8).map((w) => card(w)).join("")}</div>`
+          : emptyBox("Les premières pièces arrivent", "Les artistes sélectionnés ouvrent leurs boutiques. Vous créez ? Rejoignez-les dès maintenant.", '<a class="btn" href="#/devenir-artiste">Devenir artiste</a>')
+      }
     </section>
 
     ${featuredSection()}
@@ -439,15 +437,19 @@ function viewHome() {
 
     <section class="section trust">
       <div><b>Artistes sélectionnés</b><span>Chaque créateur est vérifié avant de vendre.</span></div>
-      <div><b>Paiement sécurisé</b><span>Paiement simulé dans cette démo. L'artiste est payé après la livraison.</span></div>
+      <div><b>Paiement sécurisé</b><span>Paiement par carte via Stripe. L'artiste est payé après la livraison.</span></div>
       <div><b>Retours sous 14 jours</b><span>Et un vrai suivi si le colis arrive abîmé.</span></div>
       <a class="text-link" href="#/aide">Comment ça marche</a>
     </section>
 
-    <section class="section tone tone-ink">
+    ${
+      state.artists.filter((a) => !a.suspended).length
+        ? `<section class="section tone tone-ink">
       <div class="section-head"><div><h2>Les <span class="fun">artistes</span></h2></div><a href="#/artistes">Tous les artistes</a></div>
-      <div class="grid">${state.artists.slice(0, 4).map(artistCard).join("")}</div>
-    </section>`;
+      <div class="grid">${state.artists.filter((a) => !a.suspended).slice(0, 4).map(artistCard).join("")}</div>
+    </section>`
+        : ""
+    }`;
 }
 
 function artistCard(a) {
@@ -518,7 +520,7 @@ function viewGallery() {
   const chip = (group, v, label = v) =>
     `<button class="chip ${g[group].includes(v) ? "on" : ""}" data-act="filter" data-group="${group}" data-value="${v}">${label}</button>`;
   return `
-    <div class="page-head"><h1>La <span class="fun">galerie</span></h1><p>${g.q ? `Résultats pour « ${esc(g.q)} »` : "Toutes les œuvres disponibles, filtrées en direct."}</p><p class="demo-note">Œuvres, artistes et prix fictifs (démo) : les photos servent d'illustration.</p></div>
+    <div class="page-head"><h1>La <span class="fun">galerie</span></h1><p>${g.q ? `Résultats pour « ${esc(g.q)} »` : "Toutes les œuvres disponibles, filtrées en direct."}</p></div>
     <div class="gallery-layout">
       <aside class="filters" aria-label="Filtres">
         <details open><summary>Type d'art</summary><div class="opts">${types.map((t) => chip("type", t)).join("")}</div></details>
@@ -640,7 +642,6 @@ function viewProduct(id) {
         ${workReviews.length ? `<a class="rating-link" href="#avis" data-act="to-reviews">${stars(ratingOf(workReviews))} <span class="muted">(${plural(workReviews.length, "avis")})</span></a>` : ""}
         <div class="product-price"><span id="product-price">${euro(priceOf(w, first))}</span> <small>TTC</small></div>
         <p class="ship-line ship-line-big">${shipLabel(w)}</p>
-        <p class="demo-note">Œuvre, artiste et prix fictifs (démo) : la photo sert d'illustration.</p>
         <ul class="facts">
           <li><b>${esc(editionOf(w))}</b></li>
           <li>Expédié sous ${esc(LEAD_TIME[w.type] || "3 à 5 jours")} · livraison suivie</li>
@@ -678,7 +679,6 @@ function viewProduct(id) {
 
     <section class="section reviews" id="avis">
       <div class="section-head"><div><h2>Les <span class="fun">avis</span></h2></div>${artistReviews.length ? `<span>${stars(ratingOf(artistReviews))} <span class="muted">${plural(artistReviews.length, "avis")} sur ${esc(a.name)}</span></span>` : ""}</div>
-      <p class="demo-note">Avis fictifs, rédigés pour la démo : aucun client réel.</p>
       ${shown.length ? `${workReviews.length ? "" : `<p class="hint">Pas encore d'avis sur cette pièce. Voici ce que disent les clients de ${esc(a.name)} :</p>`}<div class="review-grid">${reviewList(shown, !workReviews.length)}</div>` : '<p class="hint">Pas encore d\'avis.</p>'}
       ${
         canReview
@@ -774,7 +774,7 @@ function artistFeature({ a, reason }) {
 function viewArtists() {
   const sugg = suggestedArtists().slice(0, 3);
   return `
-    <div class="page-head"><h1>Les <span class="fun">artistes</span></h1><p>Découvrez les créateurs et créatrices d'ATYPIIK, leurs œuvres et leurs coulisses. Suivez vos préférés pour ne manquer aucune nouveauté.</p><p class="demo-note">Tous les artistes présentés sont fictifs (démo) : leurs profils sont inventés et leurs photos servent d'illustration.</p></div>
+    <div class="page-head"><h1>Les <span class="fun">artistes</span></h1><p>Découvrez les créateurs et créatrices d'ATYPIIK, leurs œuvres et leurs coulisses. Suivez vos préférés pour ne manquer aucune nouveauté.</p></div>
     ${sugg.length ? `<section><div class="section-head"><div><h2>Suggestions <span class="fun">d'artistes</span></h2></div></div><div class="features">${sugg.map(artistFeature).join("")}</div></section>` : ""}
     <section class="section"><div class="section-head"><div><h2>Tous les <span class="fun">artistes</span></h2></div><span class="mono muted">${plural(state.artists.filter((x) => !x.suspended).length, "artiste")}</span></div>
       <div class="grid">${state.artists.filter((x) => !x.suspended).map(artistCard).join("")}</div></section>`;
@@ -803,7 +803,7 @@ function viewArtist(id) {
   }
   if (tab === "avis") {
     const list = reviewsOf((r) => r.artist === id);
-    body = list.length ? `<p class="demo-note">Avis fictifs, rédigés pour la démo : aucun client réel.</p><div class="review-grid">${reviewList(list, true)}</div>` : emptyBox("Pas encore d'avis", "Les avis des clients apparaîtront ici après leurs commandes.");
+    body = list.length ? `<div class="review-grid">${reviewList(list, true)}</div>` : emptyBox("Pas encore d'avis", "Les avis des clients apparaîtront ici après leurs commandes.");
   }
   if (tab === "oeuvres") body = works.length ? `<div class="grid">${works.map((w) => card(w)).join("")}</div>` : emptyBox("Bientôt", "Cet artiste n'a pas encore publié d'œuvre.");
   if (tab === "posts") body = posts.length ? `<div class="posts">${posts.map((p) => postCard(p)).join("")}</div>` : emptyBox("Pas encore de post", "Les nouvelles de l'atelier apparaîtront ici.");
@@ -821,7 +821,6 @@ function viewArtist(id) {
         <h1>${esc(a.name)}</h1>
         ${selectedBadge()}
         <p>${esc(maskContacts(a.bio))}</p>
-        <p class="demo-note">Profil d'artiste fictif (démo) : nom, biographie, œuvres et posts sont inventés, les photos servent d'illustration.</p>
         <div class="artist-stats">${reviewsOf((r) => r.artist === id).length ? `<span>${stars(ratingOf(reviewsOf((r) => r.artist === id)))} ${plural(reviewsOf((r) => r.artist === id).length, "avis")}</span>` : ""}<span><b>${(a.followers + (state.follows.includes(id) ? 1 : 0)).toLocaleString("fr-FR")}</b> abonnés</span><span><b>${works.length}</b> œuvres</span><span><b>${posts.length}</b> posts</span></div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">${followBtn(id)}<a class="btn" href="#/commande-perso/${id}">Demander une pièce sur mesure</a><a class="btn btn-outline" href="#/messages/${id}">Contacter</a></div>
@@ -879,14 +878,13 @@ function viewSell() {
       </div>
     </section>
 
-    <section class="section tone tone-ink">
+    ${ARTIST_QUOTES.length ? `<section class="section tone tone-ink">
       <div class="section-head"><div><h2>Ils <span class="fun">vendent</span> déjà</h2></div></div>
       <div class="quotes">${ARTIST_QUOTES.map((q) => {
         const a = artistById(q.artist);
         return a ? `<figure>${avatar(a, true)}<blockquote>« ${esc(q.text)} »</blockquote><figcaption><a href="#/artiste/${a.id}">${esc(a.name)}</a> · ${esc(disciplineOf(a.id))}</figcaption></figure>` : "";
       }).join("")}</div>
-      <p class="demo-note">Artistes et témoignages fictifs (démo).</p>
-    </section>
+    </section>` : ""}
 
     <section class="section sell-cta">
       <h2>Envie de <span class="fun">vous lancer</span> ?</h2>
@@ -899,7 +897,7 @@ function viewSell() {
 function viewHelp() {
   const steps = [
     ["Découvrez", "Parcourez la galerie, suivez vos artistes préférés, ou demandez une pièce sur mesure."],
-    ["Commandez", "Paiement sécurisé (simulé dans cette démo). Les frais de port, calculés selon la taille du colis, sont à la charge de l'acheteur."],
+    ["Commandez", "Paiement sécurisé par carte. Les frais de livraison, fixés par chaque artiste, sont à la charge de l'acheteur."],
     ["Recevez", "L'artiste prépare et expédie votre pièce. Vous suivez chaque étape depuis votre compte."],
     ["Profitez", "14 jours pour changer d'avis, et un dossier de suivi si quelque chose ne va pas."],
   ];
@@ -930,7 +928,6 @@ function featuredSection() {
         <h2>L'artiste de la <span class="fun">semaine</span></h2>
         <div class="featured-id">${avatar(a)}<div><h3><a href="#/artiste/${a.id}">${esc(a.name)}</a></h3>${selectedBadge(true)}<span class="mono muted">${esc(disciplineOf(a.id))} · ${esc(a.city)}</span></div></div>
         <blockquote>« ${esc(f.quote)} »</blockquote>
-        <p class="demo-note">Artiste et témoignage fictifs (démo).</p>
         <div class="card-actions"><a class="btn" href="#/artiste/${a.id}">Découvrir son univers</a>${followBtn(a.id)}</div>
       </div>
       <div class="featured-works">${works.map((w) => `<a href="#/oeuvre/${w.id}" class="featured-item">${visual(w)}<span>${esc(w.title)} · ${euro(w.price)}</span></a>`).join("")}</div>
@@ -953,7 +950,6 @@ function dropSection() {
         <p class="mono">${esc(a?.name || "")} · ${DROP.pieces} pièces · ${esc(when)}</p>
         <div class="countdown" data-countdown="${DROP.date}" aria-live="polite">${countdownHtml(DROP.date)}</div>
         <p>${esc(DROP.text)}</p>
-        <p class="demo-note">Drop fictif (démo) : aucune vente n'aura lieu.</p>
         ${
           live
             ? `<a class="btn btn-light" href="#/artiste/${DROP.artist}">Voir les pièces</a>`
@@ -1041,7 +1037,6 @@ function viewPost(id) {
       <a class="post-author" href="#/artiste/${a.id}">${avatar(a, true)}<span><strong>${esc(a.name)}</strong><span class="mono muted">${esc(disciplineOf(a.id))} · ${esc(a.city)}</span></span></a>
       <div class="post-hero">${postMedia(p)}</div>
       <span class="ref">${frDate(p.date)}${p.media?.video ? " · Vidéo coulisses" : ""}</span>
-      <p class="demo-note">Post fictif (démo), publié par un artiste fictif.</p>
       <h1>${esc(p.title)}</h1>
       <p class="post-text">${esc(maskContacts(p.text))}</p>
       <div class="card-actions">${followBtn(a.id)}<a class="btn btn-outline" href="#/artiste/${a.id}">Voir le profil</a></div>
@@ -1207,7 +1202,7 @@ function summaryBox(lines, cta = "", split = false) {
           : ""
       }
       ${cta}
-      <p class="secure">🔒 Paiement simulé : aucune carte n'est débitée</p>
+      <p class="secure">🔒 Paiement sécurisé par Stripe</p>
     </aside>`;
 }
 
@@ -1241,12 +1236,12 @@ function viewCheckout() {
       : `<form class="panel" id="pay-form">
           <h2>Paiement</h2>
           <p class="hint">Livraison : ${esc(a.name)}, ${esc(a.street)}, ${esc(a.zip)} ${esc(a.city)} · <button type="button" class="link-btn" data-act="checkout-step" data-id="1">Modifier</button></p>
-          <div class="field"><label for="cc-num">Numéro de carte</label><input id="cc-num" required inputmode="numeric" placeholder="4242 4242 4242 4242" autocomplete="cc-number" /></div>
+          <div class="field"><label for="cc-num">Numéro de carte</label><input id="cc-num" required inputmode="numeric" placeholder="1234 5678 9012 3456" autocomplete="cc-number" /></div>
           <div class="field-row">
             <div class="field"><label for="cc-exp">Expiration</label><input id="cc-exp" required placeholder="MM/AA" autocomplete="cc-exp" /></div>
             <div class="field"><label for="cc-cvc">CVC</label><input id="cc-cvc" required inputmode="numeric" placeholder="123" autocomplete="cc-csc" /></div>
           </div>
-          <p class="hint">Démo : aucun paiement réel n'est effectué, n'entrez pas une vraie carte. Utilisez par exemple 4242 4242 4242 4242.</p>
+          <p class="hint">Paiement sécurisé par Stripe : vos coordonnées bancaires ne sont jamais stockées par ATYPIIK.</p>
           <button class="btn btn-block">Payer ${euro(cartTotals(lines).total)}</button>
         </form>`;
   return `
@@ -1318,7 +1313,7 @@ function viewOrderDone(id) {
       <p>Commande <strong>${o.id}</strong> · ${euro(o.total)}${o.shipping ? `, dont ${euro(o.shipping)} de livraison` : ""}. Un e-mail de confirmation vient de vous être envoyé.<br />Vous suivrez chaque étape depuis votre profil et vos notifications.</p>
       ${o.parcels && o.parcels.length > 1 ? `<p class="hint">Vous recevrez ${o.parcels.length} colis, un par artiste : ${o.parcels.map((p) => esc((artistById(p.artist) || {}).name || "")).join(", ")}.</p>` : ""}
       <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><a class="btn" href="#/profil">Suivre ma commande</a><a class="btn btn-outline" href="#/galerie">Continuer mes découvertes</a></div>
-      ${o.crm && isAdmin() ? `<p class="hint" style="margin-top:18px">Démo · côté entreprise, cette commande vient d'arriver dans le CRM. <a class="text-link" href="#/crm/${o.crm}">Voir la fiche client dans le CRM →</a></p>` : ""}
+      ${o.crm && isAdmin() ? `<p class="hint" style="margin-top:18px">Cette commande est arrivée dans le CRM. <a class="text-link" href="#/crm/${o.crm}">Voir la fiche client dans le CRM →</a></p>` : ""}
     </div>`;
 }
 
@@ -1421,13 +1416,6 @@ function loginForms() {
         <div class="field"><label for="li-email">E-mail</label><input id="li-email" type="email" required autocomplete="email" placeholder="vous@example.com" /></div>
         <div class="field"><label for="li-pass">Mot de passe</label><input id="li-pass" type="password" required autocomplete="current-password" /></div>
         <button class="btn btn-block">Se connecter</button>
-        <div class="demo-box">
-          <strong>Mode démo</strong> — entrez directement dans un espace :
-          <div class="btns">
-            <button type="button" class="btn btn-small" data-act="demo-login" data-id="acheteur">Acheteur</button>
-            <button type="button" class="btn btn-small btn-chrome" data-act="demo-login" data-id="vendeur">Artiste</button>
-          </div>
-        </div>
       </form>
       <form class="panel" id="signup-form">
         <h2>Créer un compte</h2>
@@ -2134,7 +2122,7 @@ function photoInner(p, big = false) {
   return visual(byId(p.work), style) + (big ? "" : "");
 }
 function photoTile(d, p, i) {
-  return `<button class="photo" data-act="zoom-photo" data-id="${d.id}" data-i="${i}" aria-label="Agrandir ${esc(p.caption || "la photo")}">${photoInner(p)}<span class="mono">${esc(p.caption || "Photo " + (i + 1))}${p.src ? "" : " · démo"}</span></button>`;
+  return `<button class="photo" data-act="zoom-photo" data-id="${d.id}" data-i="${i}" aria-label="Agrandir ${esc(p.caption || "la photo")}">${photoInner(p)}<span class="mono">${esc(p.caption || "Photo " + (i + 1))}</span></button>`;
 }
 function photoInput(id, label, hint = "Jusqu'à 4 photos. Montrez l'œuvre, le défaut de près et l'emballage.") {
   return `<div class="field"><label for="${id}">${label}</label><input id="${id}" type="file" accept="image/*" multiple /><span class="hint">${hint}</span></div>`;
@@ -2266,8 +2254,8 @@ function bindReport() {
 /* ---------- Pages légales ---------- */
 function viewLegal(key) {
   const pages = {
-    mentions: ["Mentions légales", "<p>Éditeur : projet étudiant réalisé par Lilou Capanni dans le cadre d'une épreuve de l'INSEEC Grande École. ATYPIIK n'est pas une société immatriculée et ne vend rien : ce site est une démonstration.</p><p>Directrice de la publication : Lilou Capanni.</p><p>Hébergement : Vercel Inc. (États-Unis).</p><p>Contact : via la page Contact du site.</p>"],
-    cgu: ["CGU / CGV", "<p class='hint'>Version de démonstration : à faire relire par un juriste avant le lancement.</p><p><strong>Rôle d'ATYPIIK :</strong> ATYPIIK est une place de marché. Elle met en relation des artistes vendeurs, sélectionnés à l'entrée, et des acheteurs, et sécurise le paiement. ATYPIIK n'est pas le vendeur des œuvres : chaque artiste vend en son nom, fixe ses prix et ses frais de livraison, prépare et expédie ses commandes, et en est responsable.</p><p><strong>Commission :</strong> ATYPIIK prélève 15 % du prix de vente TTC de chaque transaction (10 % avec l'offre Atelier Pro). L'artiste perçoit 85 % (90 % avec l'offre Atelier Pro), versés sous 7 jours après la livraison. Avec l'offre Atelier, un artiste peut avoir 10 œuvres en vente en même temps ; avec Atelier Pro, sans limite.</p><p><strong>Livraison :</strong> les frais de livraison sont fixés par l'artiste pour chaque œuvre, ou inclus dans son prix. Ils sont payés par l'acheteur et reversés à l'artiste ; ils n'entrent pas dans le calcul de la commission. Une commande passée chez plusieurs artistes donne lieu à un colis par artiste.</p><p><strong>Sur mesure :</strong> l'artiste répond à une demande par un devis (prix, délai, livraison, retouches). Le devis est accepté et payé sur ATYPIIK. Les pièces sur mesure ne bénéficient pas du droit de rétractation.</p><p><strong>Ventes et échanges sur le site uniquement :</strong> toute commande, tout paiement et tout devis passent par ATYPIIK. Il est interdit d'échanger des coordonnées personnelles ou de conclure en dehors du site une vente issue d'une mise en relation par ATYPIIK. Les coordonnées sont masquées automatiquement dans les échanges. Un manquement peut entraîner la suspension du compte.</p><p><strong>Litiges :</strong> un litige se règle entre l'acheteur et l'artiste, depuis le dossier ouvert sur la commande. ATYPIIK n'arbitre pas les litiges, mais peut les consulter pour veiller à la qualité du site, et peut suspendre ou retirer un artiste en cas de litiges répétés ou de non-respect des présentes conditions.</p><p><strong>Rétractation :</strong> 14 jours à compter de la réception, hors œuvres réalisées sur commande personnalisée.</p>"],
+    mentions: ["Mentions légales", "<p>Éditeur : ATYPIIK, [forme juridique et capital à compléter], immatriculée sous le numéro [SIREN à compléter], siège social : [adresse à compléter].</p><p>Directrice de la publication : Lilou Capanni.</p><p>Hébergement : OVH SAS, 2 rue Kellermann, 59100 Roubaix, France.</p><p>Contact : via la page Contact du site.</p>"],
+    cgu: ["CGU / CGV", "<p class='hint'>À faire relire par un juriste avant l'ouverture du site.</p><p><strong>Rôle d'ATYPIIK :</strong> ATYPIIK est une place de marché. Elle met en relation des artistes vendeurs, sélectionnés à l'entrée, et des acheteurs, et sécurise le paiement. ATYPIIK n'est pas le vendeur des œuvres : chaque artiste vend en son nom, fixe ses prix et ses frais de livraison, prépare et expédie ses commandes, et en est responsable.</p><p><strong>Commission :</strong> ATYPIIK prélève 15 % du prix de vente TTC de chaque transaction (10 % avec l'offre Atelier Pro). L'artiste perçoit 85 % (90 % avec l'offre Atelier Pro), versés sous 7 jours après la livraison. Avec l'offre Atelier, un artiste peut avoir 10 œuvres en vente en même temps ; avec Atelier Pro, sans limite.</p><p><strong>Livraison :</strong> les frais de livraison sont fixés par l'artiste pour chaque œuvre, ou inclus dans son prix. Ils sont payés par l'acheteur et reversés à l'artiste ; ils n'entrent pas dans le calcul de la commission. Une commande passée chez plusieurs artistes donne lieu à un colis par artiste.</p><p><strong>Sur mesure :</strong> l'artiste répond à une demande par un devis (prix, délai, livraison, retouches). Le devis est accepté et payé sur ATYPIIK. Les pièces sur mesure ne bénéficient pas du droit de rétractation.</p><p><strong>Ventes et échanges sur le site uniquement :</strong> toute commande, tout paiement et tout devis passent par ATYPIIK. Il est interdit d'échanger des coordonnées personnelles ou de conclure en dehors du site une vente issue d'une mise en relation par ATYPIIK. Les coordonnées sont masquées automatiquement dans les échanges. Un manquement peut entraîner la suspension du compte.</p><p><strong>Litiges :</strong> un litige se règle entre l'acheteur et l'artiste, depuis le dossier ouvert sur la commande. ATYPIIK n'arbitre pas les litiges, mais peut les consulter pour veiller à la qualité du site, et peut suspendre ou retirer un artiste en cas de litiges répétés ou de non-respect des présentes conditions.</p><p><strong>Rétractation :</strong> 14 jours à compter de la réception, hors œuvres réalisées sur commande personnalisée.</p>"],
   };
   if (key === "rgpd")
     return `
@@ -2378,7 +2366,7 @@ const actions = {
     (state.threads[r.artist] = state.threads[r.artist] || []).push({ from: "artist", text: `Devis pour « ${r.type} » : ${euro(amount)}, livraison sous 4 semaines. Vous pouvez l'accepter depuis votre espace, onglet « Sur mesure ».` });
     notify(`${artistById(r.artist).name} vous a envoyé un devis de ${euro(amount)} pour votre commande sur mesure.`, "#/profil");
     save();
-    toast("Devis envoyé (démo : 420 €)");
+    toast("Devis envoyé");
     render(true);
   },
   "req-decline"(el) {
@@ -2391,7 +2379,7 @@ const actions = {
     r.status = "acceptée";
     (state.threads[r.artist] = state.threads[r.artist] || []).push({ from: "buyer", text: `J'accepte le devis de ${euro(r.quote)}, merci !` });
     save();
-    toast("Devis accepté — le paiement sera demandé au moment de l'expédition (démo).");
+    toast("Devis accepté");
     render(true);
   },
   "go-back"() {
@@ -2637,10 +2625,10 @@ const actions = {
     toast("Vos choix de cookies sont enregistrés.");
   },
   play() {
-    toast("Lecture vidéo (démo) — hébergée sur Cloudinary en production.");
+    toast("La lecture des vidéos sera disponible à la mise en ligne.");
   },
   download() {
-    toast("Ouverture du PDF (démo) — hébergé sur AWS S3 en production.");
+    toast("L'ouverture des PDF sera disponible à la mise en ligne.");
   },
 };
 

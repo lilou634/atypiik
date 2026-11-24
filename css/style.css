@@ -5293,3 +5293,8 @@ fieldset.field { border: 0; padding: 0; margin: 0; min-width: 0; }
   .drawer { right: auto; width: min(420px, 90vw); }
   .drawer.open { box-shadow: 8px 0 30px rgba(0, 0, 0, 0.25); }
 }
+
+/* Accueil sans œuvre (site réel au lancement) */
+.hero-soon { display: grid; place-items: center; background: var(--paper-2); }
+.hero-soon-inner { display: grid; gap: 10px; max-width: 360px; padding: 32px; text-align: center; }
+.hero-soon-inner b { font-size: 1.6rem; line-height: 1.2; }
