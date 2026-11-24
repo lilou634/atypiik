@@ -63,6 +63,7 @@
       </div>
     </header>
 
+    <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
     <div class="drawer" id="drawer">
       <button class="icon-link close" id="drawer-close" aria-label="Fermer le menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18" /></svg>
@@ -74,6 +75,17 @@
         <a href="#/artistes">Artistes</a>
         <a href="#/selection">Notre sélection</a>
         <a href="#/histoire">Notre histoire</a>
+      </details>
+      <details class="drawer-group" open>
+        <summary>Catégories</summary>
+        <a href="#/galerie" data-act="reset-gallery">Nouveautés</a>
+        <a href="#/galerie" data-act="cat" data-type="Peinture">Peinture</a>
+        <a href="#/galerie" data-act="cat" data-type="Photographie">Photographie</a>
+        <a href="#/galerie" data-act="cat" data-type="Céramique">Céramique</a>
+        <a href="#/galerie" data-act="cat" data-type="Mode">Mode</a>
+        <a href="#/galerie" data-act="cat" data-type="Crochet">Crochet</a>
+        <a href="#/galerie" data-act="cat" data-type="Bijoux">Bijoux</a>
+        <a href="#/galerie" data-act="cat" data-type="Maison &amp; déco">Maison &amp; déco</a>
       </details>
       <details class="drawer-group">
         <summary>Mon compte</summary>

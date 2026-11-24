@@ -5279,3 +5279,17 @@ fieldset.field { border: 0; padding: 0; margin: 0; min-width: 0; }
 .field .vgrid-bulk input { width: 110px; }
 .vgrid input[data-custom] { border-width: 2px; font-weight: 600; }
 .field .vgrid-bulk select { width: auto; flex: 0 1 220px; min-width: 0; }
+
+/* Menu aux trois tirets aussi sur grand écran : il ouvre le menu latéral avec toutes les catégories. */
+@media (min-width: 1181px) {
+  .header-inner > .burger { display: grid; grid-column: 1; grid-row: 1; justify-self: start; }
+  .header-inner > .nav { grid-column: 1; grid-row: 1; padding-left: 52px; }
+  .header-inner > .logo { grid-column: 2; grid-row: 1; }
+  .header-inner > .header-tools { grid-column: 3; grid-row: 1; }
+}
+/* Sur ordinateur, le menu est un panneau sur le côté gauche, avec un voile sur le reste de la page. */
+.drawer-backdrop { position: fixed; inset: 0; z-index: 79; background: rgba(17, 16, 16, 0.45); }
+@media (min-width: 761px) {
+  .drawer { right: auto; width: min(420px, 90vw); }
+  .drawer.open { box-shadow: 8px 0 30px rgba(0, 0, 0, 0.25); }
+}

@@ -5351,6 +5351,20 @@ fieldset.field { border: 0; padding: 0; margin: 0; min-width: 0; }
 .vgrid input[data-custom] { border-width: 2px; font-weight: 600; }
 .field .vgrid-bulk select { width: auto; flex: 0 1 220px; min-width: 0; }
 
+/* Menu aux trois tirets aussi sur grand écran : il ouvre le menu latéral avec toutes les catégories. */
+@media (min-width: 1181px) {
+  .header-inner > .burger { display: grid; grid-column: 1; grid-row: 1; justify-self: start; }
+  .header-inner > .nav { grid-column: 1; grid-row: 1; padding-left: 52px; }
+  .header-inner > .logo { grid-column: 2; grid-row: 1; }
+  .header-inner > .header-tools { grid-column: 3; grid-row: 1; }
+}
+/* Sur ordinateur, le menu est un panneau sur le côté gauche, avec un voile sur le reste de la page. */
+.drawer-backdrop { position: fixed; inset: 0; z-index: 79; background: rgba(17, 16, 16, 0.45); }
+@media (min-width: 761px) {
+  .drawer { right: auto; width: min(420px, 90vw); }
+  .drawer.open { box-shadow: 8px 0 30px rgba(0, 0, 0, 0.25); }
+}
+
     </style>
   </head>
   <body>
@@ -5400,6 +5414,7 @@ fieldset.field { border: 0; padding: 0; margin: 0; min-width: 0; }
       </div>
     </header>
 
+    <div class="drawer-backdrop" id="drawer-backdrop" hidden></div>
     <div class="drawer" id="drawer">
       <button class="icon-link close" id="drawer-close" aria-label="Fermer le menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18" /></svg>
@@ -5411,6 +5426,17 @@ fieldset.field { border: 0; padding: 0; margin: 0; min-width: 0; }
         <a href="#/artistes">Artistes</a>
         <a href="#/selection">Notre sélection</a>
         <a href="#/histoire">Notre histoire</a>
+      </details>
+      <details class="drawer-group" open>
+        <summary>Catégories</summary>
+        <a href="#/galerie" data-act="reset-gallery">Nouveautés</a>
+        <a href="#/galerie" data-act="cat" data-type="Peinture">Peinture</a>
+        <a href="#/galerie" data-act="cat" data-type="Photographie">Photographie</a>
+        <a href="#/galerie" data-act="cat" data-type="Céramique">Céramique</a>
+        <a href="#/galerie" data-act="cat" data-type="Mode">Mode</a>
+        <a href="#/galerie" data-act="cat" data-type="Crochet">Crochet</a>
+        <a href="#/galerie" data-act="cat" data-type="Bijoux">Bijoux</a>
+        <a href="#/galerie" data-act="cat" data-type="Maison &amp; déco">Maison &amp; déco</a>
       </details>
       <details class="drawer-group">
         <summary>Mon compte</summary>
@@ -7508,7 +7534,7 @@ const state = {
   subDone: store.get("subDone", null),
   sub: null,
   crmFilter: null,
-  gallery: { type: [], color: [], size: [], artist: "", max: 2000, view: "grid", q: "", sort: "new" },
+  gallery: { type: [], color: [], size: [], wear: "", tint: "", artist: "", max: 2000, view: "grid", q: "", sort: "new" },
   tab: {},
   checkout: { step: 1, address: null },
 };
@@ -7886,12 +7912,38 @@ function filteredWorks() {
       (!g.type.length || g.type.includes(w.type)) &&
       (!g.color.length || g.color.includes(w.color)) &&
       (!g.size.length || g.size.includes(w.size)) &&
+      (!g.wear || wearSizes(w).includes(g.wear)) &&
+      (!g.tint || workColors(w).includes(g.tint)) &&
       (!g.artist || g.artist === w.artist) &&
       w.price <= g.max &&
       (!q || (w.title + " " + artistOf(w).name + " " + w.type + " " + w.technique).toLowerCase().includes(q)),
   ).sort(order);
 }
 
+// Tailles de vêtement encore en stock pour une œuvre : depuis ses options, ou lues dans le nom des déclinaisons (« S/M », « Pièce unique — M »).
+function wearSizes(w) {
+  const found = new Set();
+  w.variants
+    .filter((v) => v.stock > 0)
+    .forEach((v) => {
+      if (v.values && v.values.Taille) found.add(v.values.Taille);
+      else v.label.toUpperCase().split(/[\s/·—,()-]+/).forEach((t) => SIZES.includes(t) && found.add(t));
+    });
+  return [...found];
+}
+// Couleurs d'une œuvre : sa couleur dominante + les couleurs de ses déclinaisons encore en stock (« Rayé rouge », « Noir »…).
+const colorNames = () => [...new Set([...PRESET_COLORS, ...Object.keys(COLORS)].map((c) => c.toLowerCase()))];
+function workColors(w) {
+  const found = new Set([w.color]);
+  const names = colorNames();
+  w.variants
+    .filter((v) => v.stock > 0)
+    .forEach((v) => {
+      if (v.values && v.values.Couleur) found.add(v.values.Couleur.toLowerCase());
+      v.label.toLowerCase().split(/[^a-zà-ÿ]+/).forEach((t) => names.includes(t) && found.add(t));
+    });
+  return [...found];
+}
 function viewGallery() {
   const g = state.gallery;
   const types = [...new Set(state.works.map((w) => w.type))];
@@ -7904,8 +7956,23 @@ function viewGallery() {
         <details open><summary>Type d'art</summary><div class="opts">${types.map((t) => chip("type", t)).join("")}</div></details>
         <details open><summary>Couleur</summary><div class="opts">${Object.entries(COLORS)
           .map(([k, c]) => `<button class="swatch ${g.color.includes(k) ? "on" : ""}" style="background:${c}" data-act="filter" data-group="color" data-value="${k}" aria-label="${k}" title="${k}"></button>`)
-          .join("")}</div></details>
-        <details open><summary>Taille</summary><div class="opts">${chip("size", "S", "Petit")}${chip("size", "M", "Moyen")}${chip("size", "L", "Grand")}</div></details>
+          .join("")}</div>
+          <select class="select" id="tint-filter" aria-label="Toutes les couleurs" style="margin-top:10px">
+            <option value="">Toutes les couleurs</option>
+            ${(() => {
+              const present = new Set(visibleWorks().flatMap(workColors));
+              const all = colorNames();
+              const names = [...all.filter((c) => present.has(c)), ...[...present].filter((c) => !all.includes(c)).sort()];
+              return names.map((c) => `<option value="${esc(c)}" ${g.tint === c ? "selected" : ""}>${esc(c.charAt(0).toUpperCase() + c.slice(1))}</option>`).join("");
+            })()}
+          </select></details>
+        <details open><summary>Taille</summary>
+          <div class="opts"><select class="select" id="wear-filter" aria-label="Taille de vêtement">
+            <option value="">Toutes les tailles</option>
+            ${SIZES.map((v) => `<option value="${v}" ${g.wear === v ? "selected" : ""}>${v}</option>`).join("")}
+          </select></div>
+        </details>
+        <details open><summary>Format</summary><div class="opts">${chip("size", "S", "Petit")}${chip("size", "M", "Moyen")}${chip("size", "L", "Grand")}</div></details>
         <details open><summary>Prix</summary>
           <div class="opts" style="display:block">
             <input class="range" type="range" min="100" max="2000" step="50" value="${g.max}" id="price-max" aria-label="Prix maximum" />
@@ -7957,6 +8024,14 @@ function bindGallery() {
   });
   $("#artist-filter").addEventListener("change", (e) => {
     g.artist = e.target.value;
+    renderResults();
+  });
+  $("#tint-filter").addEventListener("change", (e) => {
+    g.tint = e.target.value;
+    renderResults();
+  });
+  $("#wear-filter").addEventListener("change", (e) => {
+    g.wear = e.target.value;
     renderResults();
   });
   $("#sort").addEventListener("change", (e) => {
@@ -9755,10 +9830,10 @@ const actions = {
     goBack();
   },
   "reset-gallery"() {
-    Object.assign(state.gallery, { type: [], color: [], size: [], artist: "", max: 2000, q: "" });
+    Object.assign(state.gallery, { type: [], color: [], size: [], wear: "", tint: "", artist: "", max: 2000, q: "" });
   },
   cat(el) {
-    Object.assign(state.gallery, { type: [el.dataset.type], color: [], size: [], artist: "", max: 2000, q: "" });
+    Object.assign(state.gallery, { type: [el.dataset.type], color: [], size: [], wear: "", tint: "", artist: "", max: 2000, q: "" });
   },
   filter(el) {
     const list = state.gallery[el.dataset.group];
@@ -9768,7 +9843,7 @@ const actions = {
     renderResults();
   },
   "reset-filters"() {
-    Object.assign(state.gallery, { type: [], color: [], size: [], artist: "", max: 2000, q: "" });
+    Object.assign(state.gallery, { type: [], color: [], size: [], wear: "", tint: "", artist: "", max: 2000, q: "" });
     $("#search").value = "";
     render(true);
   },
@@ -10232,6 +10307,7 @@ function render(keepScroll = false, restoring = false) {
 
   $$("[data-route]").forEach((a) => a.classList.toggle("active", a.dataset.route === route));
   $("#drawer").classList.remove("open");
+  $("#drawer-backdrop").hidden = true;
   if (route !== "galerie" && $("#search-sugg")) {
     $("#search-sugg").innerHTML = "";
     $("#search-bar").classList.remove("open");
@@ -10245,8 +10321,15 @@ function render(keepScroll = false, restoring = false) {
 
 /* ---------- Démarrage ---------- */
 $("#year").textContent = new Date().getFullYear();
-$("#burger").addEventListener("click", () => $("#drawer").classList.add("open"));
-$("#drawer-close").addEventListener("click", () => $("#drawer").classList.remove("open"));
+// Menu latéral : s'ouvre avec les trois tirets, se ferme avec la croix, Échap ou un clic à côté.
+const setDrawer = (open) => {
+  $("#drawer").classList.toggle("open", open);
+  $("#drawer-backdrop").hidden = !open;
+};
+$("#burger").addEventListener("click", () => setDrawer(true));
+$("#drawer-close").addEventListener("click", () => setDrawer(false));
+$("#drawer-backdrop").addEventListener("click", () => setDrawer(false));
+document.addEventListener("keydown", (e) => e.key === "Escape" && $("#drawer").classList.contains("open") && setDrawer(false));
 $("#search-toggle").addEventListener("click", () => {
   const bar = $("#search-bar");
   bar.classList.toggle("open");
