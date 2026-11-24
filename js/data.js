@@ -52,6 +52,10 @@ const ARTISTS = [
 ];
 
 /* Catalogue de démonstration, illustré par de vraies photos (assets/photos/). */
+// Toutes les combinaisons de plusieurs options : [{Taille:"S",Couleur:"Noir"}, …].
+function combine(options) {
+  return options.reduce((acc, o) => acc.flatMap((a) => o.values.map((v) => ({ ...a, [o.name]: v }))), [{}]);
+}
 const ARTWORKS = [
   {
     id: "a1", title: "Deux nageurs", artist: "nova", type: "Peinture", color: "vert", size: "L", price: 1450,
@@ -184,7 +188,15 @@ const ARTWORKS = [
     technique: "Crochet en trapilho", dims: "30 × 18 cm",
     description: "Un sac à main bombé, en fil de t-shirt recyclé.",
     img: "assets/photos/a19.jpg", art: "#a49c96",
-    variants: [{ label: "Noir", stock: 2 }, { label: "Camel", stock: 3 }, { label: "Crème", stock: 1 }],
+    options: [{ name: "Taille", values: ["Petit", "Grand"] }, { name: "Couleur", values: ["Noir", "Camel", "Crème"] }],
+    variants: [
+      { label: "Petit · Noir", values: { Taille: "Petit", Couleur: "Noir" }, stock: 2 },
+      { label: "Petit · Camel", values: { Taille: "Petit", Couleur: "Camel" }, stock: 3 },
+      { label: "Petit · Crème", values: { Taille: "Petit", Couleur: "Crème" }, stock: 1 },
+      { label: "Grand · Noir", values: { Taille: "Grand", Couleur: "Noir" }, stock: 1, price: 125 },
+      { label: "Grand · Camel", values: { Taille: "Grand", Couleur: "Camel" }, stock: 0, price: 125 },
+      { label: "Grand · Crème", values: { Taille: "Grand", Couleur: "Crème" }, stock: 2, price: 125 },
+    ],
   },
   {
     id: "a20", title: "Housse Popcorn", artist: "zia", type: "Crochet", color: "rouge", size: "S", price: 55,
@@ -198,7 +210,15 @@ const ARTWORKS = [
     technique: "Coton matelassé, biais crème", dims: "Tailles S à L",
     description: "Une veste matelassée légère, à porter ouverte.",
     img: "assets/photos/a21.jpg", art: "#9a7d5b",
-    variants: [{ label: "S", stock: 1 }, { label: "M", stock: 2 }, { label: "L", stock: 0 }],
+    options: [{ name: "Taille", values: ["S", "M", "L"] }, { name: "Couleur", values: ["Mimosa", "Ciel"] }],
+    variants: [
+      { label: "S · Mimosa", values: { Taille: "S", Couleur: "Mimosa" }, stock: 1 },
+      { label: "M · Mimosa", values: { Taille: "M", Couleur: "Mimosa" }, stock: 2 },
+      { label: "L · Mimosa", values: { Taille: "L", Couleur: "Mimosa" }, stock: 0 },
+      { label: "S · Ciel", values: { Taille: "S", Couleur: "Ciel" }, stock: 0 },
+      { label: "M · Ciel", values: { Taille: "M", Couleur: "Ciel" }, stock: 1 },
+      { label: "L · Ciel", values: { Taille: "L", Couleur: "Ciel" }, stock: 1 },
+    ],
   },
   {
     id: "a22", title: "Veste Voilier", artist: "rosa", type: "Mode", color: "bleu", size: "M", price: 340,

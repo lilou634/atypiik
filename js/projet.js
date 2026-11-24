@@ -707,6 +707,24 @@ const PROJECT_VIEWS = {
   [ADMIN_LOGIN_ROUTE]: [viewAdminLogin, bindAdminLogin],
 };
 
+/* ---------- Choix de l'offre à l'inscription artiste ---------- */
+const PLAN_KEY = {
+  atelier: ["Jusqu'à 10 œuvres en vente en même temps", "Boutique, messagerie et paiement sécurisé", "Sans abonnement, sans engagement"],
+  pro: ["Œuvres en vente illimitées", "Commission réduite à 10 %", "Priorité aux drops et à la Sélection", "Statistiques et conseil personnalisé"],
+};
+function planPicker(name, selected = "atelier") {
+  return `<div class="plan-pick" role="radiogroup" aria-label="Choisissez votre offre">${PLANS.map(
+    (p) => `
+      <label class="plan-opt${p.id === "pro" ? " plan-opt-pro" : ""}">
+        <input type="radio" name="${name}" value="${p.id}" ${p.id === selected ? "checked" : ""} />
+        <span class="plan-opt-head"><b>${esc(p.name)}</b><span>${p.price ? `${ht(p.price)} / mois` : "Gratuit"}</span></span>
+        <span class="plan-opt-com"><b>${p.commission} %</b> de commission · vous gardez ${100 - p.commission} %</span>
+        <ul>${(PLAN_KEY[p.id] || []).map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
+      </label>`,
+  ).join("")}</div>
+  <p class="hint">Atelier Pro n'est payé qu'une fois votre compte validé. Vous pourrez changer d'offre à tout moment. <a class="text-link" href="#/offre">Comparer en détail</a></p>`;
+}
+
 /* ---------- Devenir artiste depuis un compte acheteur ---------- */
 function becomeArtistBox() {
   const u = state.user;
@@ -740,9 +758,7 @@ function viewBecomeArtist() {
           <div class="field"><label for="ba-disc">Discipline</label><input id="ba-disc" required placeholder="Céramique, peinture, crochet…" /></div>
         </div>
         <div class="field"><label for="ba-link">Lien vers votre travail (Instagram, portfolio)</label><input id="ba-link" placeholder="instagram.com/votre-atelier" /></div>
-        <div class="field"><label>Formule</label>
-          ${PLANS.map((p, i) => `<label class="check"><input type="radio" name="ba-plan" value="${p.id}" ${i === 0 ? "checked" : ""} /> <b>${esc(p.name)}</b> · ${p.price ? ht(p.price) + " / mois, " : "gratuit, "}${p.commission} % de commission</label>`).join("")}
-        </div>
+        <fieldset class="field"><legend>Votre offre</legend>${planPicker("ba-plan")}</fieldset>
         <div class="seller-terms"><ul class="seller-rules">
               <li><b>Vous vendez en votre nom</b> : vous fixez vos prix et vos frais de livraison, et vous êtes responsable de vos commandes. ATYPIIK met en relation et sécurise le paiement.</li>
               <li><b>Tout passe par ATYPIIK</b> : commandes, devis et paiements. Les coordonnées sont masquées dans les échanges, et vendre en dehors du site après une mise en relation est interdit.</li>
@@ -758,7 +774,11 @@ function viewBecomeArtist() {
 }
 function bindBecomeArtist() {
   const f = $("#become-form");
-  if (!f) return bindLogin();
+  if (!f) {
+    // Pas encore de compte : on ouvre directement l'inscription artiste, offres comprises.
+    bindLogin();
+    return presetSignup("artiste");
+  }
   f.addEventListener("submit", (e) => {
     e.preventDefault();
     const u = state.user;

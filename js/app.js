@@ -30,7 +30,7 @@ const clone = (o) => JSON.parse(JSON.stringify(o));
 const initials = (name) => name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
 
 /* ---------- Persistance ---------- */
-const DATA_VERSION = 11;
+const DATA_VERSION = 12;
 const store = {
   get(key, fallback) {
     try {
@@ -131,6 +131,10 @@ const AVG_COMMISSION = 0.135; // 70 % des artistes en Atelier, 30 % en Pro (hypo
 const planOf = (artistId) => (artistById(artistId) || {}).plan || "atelier";
 const commissionOf = (artistId) => COMMISSION_RATES[planOf(artistId)];
 const pct = (r) => Math.round(r * 100) + " %";
+// Prix d'une déclinaison : le sien s'il est renseigné, sinon le prix de base de l'œuvre.
+const priceOf = (w, vi) => (w.variants[vi] && w.variants[vi].price) || w.price;
+const minPrice = (w) => Math.min(...w.variants.map((v) => v.price || w.price));
+const priceText = (w) => (w.variants.some((v) => v.price && v.price !== w.price) ? "dès " + euro(minPrice(w)) : euro(w.price));
 const netOf = (s) => s.price * s.qty * (1 - commissionOf(byId(s.work)?.artist));
 // Œuvres en vente (ni vendues ni masquées) : limitées à 10 avec l'offre Atelier.
 const activeCount = (artistId) => state.works.filter((w) => w.artist === artistId && !w.sold && !w.hidden).length;
@@ -208,7 +212,7 @@ function card(w, extra = "") {
         <span class="ref">${esc(w.type)}</span>
         <h3 class="card-title"><a href="#/oeuvre/${w.id}">${esc(w.title)}</a></h3>
         <div class="card-artist"><a href="#/artiste/${a.id}">${esc(a.name)}</a></div>
-        <span class="price">${euro(w.price)}</span>
+        <span class="price">${priceText(w)}</span>
         ${extra}
       </div>
     </article>`;
@@ -538,7 +542,7 @@ function viewProduct(id) {
         <span class="ref muted">${esc(w.type)}</span>
         <div class="by">par <a href="#/artiste/${a.id}">${esc(a.name)}</a> ${selectedBadge(true)} · ${esc(a.city)}</div>
         ${workReviews.length ? `<a class="rating-link" href="#avis" data-act="to-reviews">${stars(ratingOf(workReviews))} <span class="muted">(${plural(workReviews.length, "avis")})</span></a>` : ""}
-        <div class="product-price">${euro(w.price)} <small>TTC</small></div>
+        <div class="product-price"><span id="product-price">${euro(priceOf(w, first))}</span> <small>TTC</small></div>
         <p class="ship-line ship-line-big">${shipLabel(w)}</p>
         <p class="demo-note">Œuvre, artiste et prix fictifs (démo) : la photo sert d'illustration.</p>
         <ul class="facts">
@@ -546,10 +550,15 @@ function viewProduct(id) {
           <li>Expédié sous ${esc(LEAD_TIME[w.type] || "3 à 5 jours")} · livraison suivie</li>
           <li>Retours acceptés sous 14 jours</li>
         </ul>
-        <span class="variant-label label">Déclinaisons</span>
+        ${
+          w.options
+            ? w.options.map((o) => `<span class="variant-label label">${esc(o.name)} <b class="opt-picked" data-o="${esc(o.name)}"></b></span>
+        <div class="opts opt-group">${o.values.map((v) => `<button class="chip" data-act="opt-pick" data-o="${esc(o.name)}" data-v="${esc(v)}">${esc(v)}<span class="dot"></span></button>`).join("")}</div>`).join("")
+            : `<span class="variant-label label">Déclinaisons</span>
         <div class="opts" style="display:flex;flex-wrap:wrap;gap:6px" id="variants">
-          ${w.variants.map((v, i) => `<button class="chip ${i === first ? "on" : ""} ${v.stock ? "" : "na"}" data-act="variant" data-i="${i}">${esc(v.label)}<span class="dot"></span></button>`).join("")}
-        </div>
+          ${w.variants.map((v, i) => `<button class="chip ${i === first ? "on" : ""} ${v.stock ? "" : "na"}" data-act="variant" data-i="${i}">${esc(v.label)}${v.price && v.price !== w.price ? ` · ${euro(v.price)}` : ""}<span class="dot"></span></button>`).join("")}
+        </div>`
+        }
         <div class="availability" id="availability"></div>
         <div class="actions">
           <button class="btn" id="add-cart" data-act="add-cart" data-id="${w.id}">Ajouter au panier</button>
@@ -605,6 +614,17 @@ function bindProduct(id) {
 }
 function refreshAvailability(w) {
   const v = w.variants[currentVariant];
+  $("#product-price").textContent = euro(priceOf(w, currentVariant));
+  if (w.options) {
+    // Pour chaque valeur : sélectionnée ? disponible avec les autres choix actuels ?
+    $$('[data-act="opt-pick"]').forEach((b) => {
+      const want = { ...v.values, [b.dataset.o]: b.dataset.v };
+      const match = w.variants.find((x) => w.options.every((o) => x.values[o.name] === want[o.name]));
+      b.classList.toggle("on", v.values[b.dataset.o] === b.dataset.v);
+      b.classList.toggle("na", !match || !match.stock);
+    });
+    $$(".opt-picked").forEach((el) => (el.textContent = v.values[el.dataset.o] || ""));
+  }
   const ok = !w.sold && v.stock > 0;
   $("#availability").innerHTML = w.sold
     ? '<span class="ko">Cette œuvre a été vendue.</span>'
@@ -720,7 +740,7 @@ function viewSell() {
     ["Candidatez", "Présentez votre travail en quelques minutes : vos œuvres, votre discipline, votre ville."],
     ["On regarde votre travail", "Notre équipe étudie chaque candidature à la main et vous répond sous une semaine."],
     ["Ouvrez votre boutique", "Votre page artiste, vos œuvres et vos déclinaisons, vos coulisses : tout est prêt en une soirée."],
-    ["Vendez, on s'occupe du reste", "Vous expédiez la pièce. Sous 7 jours après la livraison, vous recevez 85 % du prix de vente (90 % avec Atelier Pro) et la totalité des frais de port."],
+    ["Vous vendez, on sécurise le paiement", "Vous expédiez la pièce, ATYPIIK garde le paiement jusqu'à la livraison. Sous 7 jours après la livraison, vous recevez 85 % du prix de vente (90 % avec Atelier Pro) et la totalité des frais de port."],
   ];
   return `
     <section class="sell-hero">
@@ -992,7 +1012,7 @@ function viewFavs() {
 
 /* ---------- Panier ---------- */
 function cartLines() {
-  return state.cart.map((l, idx) => ({ ...l, idx, w: byId(l.id) })).filter((l) => l.w);
+  return state.cart.map((l, idx) => ({ ...l, idx, w: byId(l.id) })).filter((l) => l.w && l.w.variants[l.variant]).map((l) => ({ ...l, price: priceOf(l.w, l.variant) }));
 }
 /* Livraison : fixée par l'artiste pour chaque œuvre, ou incluse dans le prix. */
 const shipOf = (w) => (w.shippingIncluded ? 0 : w.shipping || 0);
@@ -1006,7 +1026,7 @@ function cartGroups(lines) {
   });
   return [...groups.values()].map((g) => ({
     ...g,
-    subtotal: g.lines.reduce((t, l) => t + l.w.price * l.qty, 0),
+    subtotal: g.lines.reduce((t, l) => t + l.price * l.qty, 0),
     shipping: Math.max(0, ...g.lines.map((l) => shipOf(l.w))),
   }));
 }
@@ -1020,7 +1040,7 @@ function viewCart() {
   const lines = cartLines();
   if (!lines.length)
     return `<div class="page-head"><h1>Mon <span class="fun">panier</span></h1></div>${emptyBox("Panier vide", "Vos articles sont conservés même après fermeture du navigateur.", '<a class="btn" href="#/galerie">Découvrir des œuvres</a>')}`;
-  const total = lines.reduce((s, l) => s + l.w.price * l.qty, 0);
+  const total = lines.reduce((s, l) => s + l.price * l.qty, 0);
   const blocked = lines.some((l) => l.w.sold || l.w.variants[l.variant].stock < l.qty);
   return `
     <div class="page-head"><h1>Mon <span class="fun">panier</span></h1></div>
@@ -1039,7 +1059,7 @@ function viewCart() {
             <a class="thumb" href="#/oeuvre/${l.w.id}">${visual(l.w)}</a>
             <div>
               <div class="card-title">${esc(l.w.title)}</div>
-              <div class="card-artist">${esc(v.label)} · ${euro(l.w.price)}</div>
+              <div class="card-artist">${esc(v.label)} · ${euro(l.price)}</div>
               <div class="ship-line">${shipLabel(l.w)}</div>
               ${ko ? '<div class="alert">⚠ Cet article n\'est plus disponible.</div>' : v.stock < l.qty ? `<div class="alert">⚠ Plus que ${v.stock} en stock.</div>` : ""}
               <button class="link-btn" data-act="cart-remove" data-i="${i}">Supprimer</button>
@@ -1076,8 +1096,8 @@ function summaryBox(lines, cta = "", split = false) {
         split
           ? `<div class="split">
               <span class="mono">Où va votre argent</span>
-              <div class="summary-row sub"><span>Aux artistes (85 à 90 % des œuvres)</span><span>${euro(lines.reduce((t, l) => t + l.w.price * l.qty * (1 - commissionOf(l.w.artist)), 0))}</span></div>
-              <div class="summary-row sub"><span>ATYPIIK (commission de 15 % ou 10 %)</span><span>${euro(lines.reduce((t, l) => t + l.w.price * l.qty * commissionOf(l.w.artist), 0))}</span></div>
+              <div class="summary-row sub"><span>Aux artistes (85 à 90 % des œuvres)</span><span>${euro(lines.reduce((t, l) => t + l.price * l.qty * (1 - commissionOf(l.w.artist)), 0))}</span></div>
+              <div class="summary-row sub"><span>ATYPIIK (commission de 15 % ou 10 %)</span><span>${euro(lines.reduce((t, l) => t + l.price * l.qty * commissionOf(l.w.artist), 0))}</span></div>
               <div class="summary-row sub"><span>Livraison, reversée aux artistes</span><span>${euro(t.shipping)}</span></div>
             </div>`
           : ""
@@ -1092,7 +1112,7 @@ function viewCheckout() {
   if (!state.user) return needLogin("Connectez-vous pour finaliser votre commande.");
   const lines = cartLines();
   if (!lines.length) return viewCart();
-  const total = lines.reduce((s, l) => s + l.w.price * l.qty, 0);
+  const total = lines.reduce((s, l) => s + l.price * l.qty, 0);
   const c = state.checkout;
   const steps = ["Adresse", "Paiement", "Confirmation"]
     .map((s, i) => `<span class="${i + 1 === c.step ? "on" : i + 1 < c.step ? "done" : ""}">${i + 1}. ${s}</span>`)
@@ -1171,7 +1191,7 @@ function placeOrder() {
   state.orders.unshift({
     id, date: today(), status: 0, buyer: state.user.name,
     address: `${a.street}, ${a.zip} ${a.city}`,
-    lines: lines.map((l) => ({ id: l.id, variant: l.variant, qty: l.qty, price: l.w.price })), total,
+    lines: lines.map((l) => ({ id: l.id, variant: l.variant, qty: l.qty, price: l.price })), total,
     items: t.items, shipping: t.shipping,
     // Un colis par artiste, avec ses propres frais de port (reversés à l'artiste).
     parcels: t.groups.map((g) => ({ artist: g.artist.id, shipping: g.shipping, lines: g.lines.map((l) => l.id) })),
@@ -1316,6 +1336,7 @@ function loginForms() {
             <div class="field"><label for="su-city">Ville</label><input id="su-city" /></div>
             <div class="field"><label for="su-disc">Discipline</label><input id="su-disc" placeholder="Peinture, photo…" /></div>
           </div>
+          <fieldset class="field"><legend>Votre offre</legend>${planPicker("su-plan")}</fieldset>
           <div class="seller-terms">
             <strong>Comment se passe le paiement</strong>
             <p>Vous fixez votre prix. Sur chaque vente, ATYPIIK prélève une commission de <b>15 %</b> (10 % avec Atelier Pro) et vous recevez <b>85 %</b> (90 %), versés sous 7 jours après la livraison. Vous fixez aussi vos frais de livraison, payés par l'acheteur et reversés intégralement.</p>
@@ -1354,7 +1375,7 @@ function bindLogin() {
     const name = $("#su-name").value.trim();
     const email = $("#su-email").value.trim();
     if ($("#su-role").value === "vendeur") {
-      state.pending.push({ id: "p" + Date.now(), name, email, city: $("#su-city").value.trim() || "—", discipline: $("#su-disc").value.trim() || "—", status: "en attente" });
+      state.pending.push({ id: "p" + Date.now(), name, email, city: $("#su-city").value.trim() || "—", discipline: $("#su-disc").value.trim() || "—", status: "en attente", plan: ($('input[name="su-plan"]:checked') || {}).value || "atelier" });
       login({ name, email, role: "attente" });
       toast("Compte créé : votre profil artiste attend la validation d'un administrateur.");
     } else {
@@ -1695,17 +1716,37 @@ function addWorkForm() {
         <div class="field"><label for="wk-dims">Dimensions</label><input id="wk-dims" placeholder="60 × 80 cm" /></div>
       </div>
       <div class="field"><label for="wk-photo">Photos HD</label><input id="wk-photo" type="file" accept="image/*" multiple /></div>
-      <div class="field"><span>Déclinaisons et stock</span>
-        <div id="variant-rows">
-          <div class="vrow"><input placeholder="Original" aria-label="Nom de la déclinaison" value="Original" /><input type="number" min="0" value="1" aria-label="Stock" /><button type="button" class="btn btn-small btn-outline" data-act="vrow-del">✕</button></div>
+      <fieldset class="field vmode-box"><legend>Déclinaisons et stock</legend>
+        <div class="vmode">
+          <label class="check"><input type="radio" name="wk-vmode" value="simple" checked /> Pièce unique ou déclinaisons simples</label>
+          <label class="check"><input type="radio" name="wk-vmode" value="grid" /> Tailles et couleurs (vêtements, sacs, bijoux…)</label>
         </div>
-        <button type="button" class="link-btn" data-act="vrow-add" style="justify-self:start">+ Ajouter une déclinaison (taille, couleur, support…)</button>
-      </div>
+        <div id="vm-simple">
+          <div id="variant-rows">
+            <div class="vrow"><input placeholder="Original" aria-label="Nom de la déclinaison" value="Original" /><input type="number" min="0" value="1" aria-label="Stock" /><button type="button" class="btn btn-small btn-outline" data-act="vrow-del">✕</button></div>
+          </div>
+          <button type="button" class="link-btn" data-act="vrow-add" style="justify-self:start">+ Ajouter une déclinaison (format, support…)</button>
+        </div>
+        <div id="vm-grid" hidden>
+          <div class="opt-def">
+            <input id="wk-o1" value="Taille" aria-label="Nom de la 1re option" /><input id="wk-o1v" placeholder="S, M, L" aria-label="Valeurs de la 1re option" />
+            <input id="wk-o2" value="Couleur" aria-label="Nom de la 2e option" /><input id="wk-o2v" placeholder="Noir, Bordeaux" aria-label="Valeurs de la 2e option" />
+          </div>
+          <p class="hint">Séparez les valeurs par des virgules. Vous pouvez renommer les options (Pointure, Matière…) ou n'en remplir qu'une. Laissez le prix vide pour garder le prix de base.</p>
+          <div class="table-wrap"><table class="vgrid"><thead><tr><th>Combinaison</th><th>Stock</th><th>Prix TTC (€)</th></tr></thead><tbody id="vgrid-body"><tr><td colspan="3" class="muted">Saisissez des tailles ou des couleurs pour créer le tableau.</td></tr></tbody></table></div>
+        </div>
+      </fieldset>
       <button class="btn btn-chrome">Publier l'œuvre</button>
       <p class="hint">Les personnes qui vous suivent recevront une notification dès la publication.</p>
     </form>`;
 }
 
+// Options saisies dans le formulaire (nom + valeurs séparées par des virgules), sans les vides ni les doublons.
+function gridOptions() {
+  return [["#wk-o1", "#wk-o1v"], ["#wk-o2", "#wk-o2v"]]
+    .map(([n, v]) => ({ name: $(n).value.trim() || "Option", values: [...new Set($(v).value.split(",").map((x) => x.trim()).filter(Boolean))] }))
+    .filter((o) => o.values.length);
+}
 function payoutHtml(price) {
   if (!price) return `<span class="mono">Ce que vous recevez</span><p class="hint">Saisissez un prix pour voir le calcul.</p>`;
   const rate = commissionOf(state.user?.artistId);
@@ -1723,17 +1764,49 @@ function bindSeller() {
     const update = () => ($("#payout").innerHTML = payoutHtml(+$("#wk-price").value || 0));
     $("#wk-price").addEventListener("input", update);
     update();
+    $$('input[name="wk-vmode"]').forEach((r) =>
+      r.addEventListener("change", () => {
+        const grid = $('input[name="wk-vmode"]:checked').value === "grid";
+        $("#vm-simple").hidden = grid;
+        $("#vm-grid").hidden = !grid;
+      }),
+    );
+    // Le tableau des combinaisons se reconstruit à chaque saisie, en gardant stocks et prix déjà tapés.
+    const rebuild = () => {
+      const keep = {};
+      $$("#vgrid-body tr[data-label]").forEach((tr) => (keep[tr.dataset.label] = [$("input", tr).value, $$("input", tr)[1].value]));
+      const opts = gridOptions();
+      const combos = combine(opts);
+      $("#vgrid-body").innerHTML = opts.length
+        ? combos
+            .map((c) => {
+              const label = opts.map((o) => c[o.name]).join(" · ");
+              const [st, pr] = keep[label] || ["1", ""];
+              return `<tr data-label="${esc(label)}"><td>${esc(label)}</td><td><input type="number" min="0" value="${esc(st)}" aria-label="Stock ${esc(label)}" /></td><td><input type="number" min="1" step="1" value="${esc(pr)}" placeholder="${esc($("#wk-price").value || "prix de base")}" aria-label="Prix ${esc(label)}" /></td></tr>`;
+            })
+            .join("")
+        : '<tr><td colspan="3" class="muted">Saisissez des tailles ou des couleurs pour créer le tableau.</td></tr>';
+    };
+    ["#wk-o1", "#wk-o1v", "#wk-o2", "#wk-o2v"].forEach((sel) => $(sel).addEventListener("input", rebuild));
   }
   if (wf)
     wf.addEventListener("submit", (e) => {
       e.preventDefault();
       if (!canPublish(state.user.artistId)) return render();
-      const variants = $$("#variant-rows .vrow")
-        .map((r) => {
-          const [l, s] = $$("input", r);
-          return { label: l.value.trim() || "Original", stock: Math.max(0, +s.value || 0) };
-        })
-        .filter(Boolean);
+      const grid = $('input[name="wk-vmode"]:checked').value === "grid";
+      const options = grid ? gridOptions() : null;
+      if (grid && !options.length) return toast("Ajoutez au moins une taille ou une couleur, ou choisissez « Pièce unique ».");
+      const variants = grid
+        ? $$("#vgrid-body tr[data-label]").map((tr, i) => {
+            const [s, pr] = $$("input", tr);
+            const v = { label: tr.dataset.label, values: combine(options)[i], stock: Math.max(0, +s.value || 0) };
+            if (+pr.value > 0) v.price = +pr.value;
+            return v;
+          })
+        : $$("#variant-rows .vrow").map((r) => {
+            const [l, s] = $$("input", r);
+            return { label: l.value.trim() || "Original", stock: Math.max(0, +s.value || 0) };
+          });
       const palette = ["#6d1a2a", "#d9c9b0", "#141111", "#c9ccd3", "#efe8dc", "#ffffff"];
       const pick = () => palette[Math.floor(Math.random() * palette.length)];
       const w = {
@@ -1741,7 +1814,7 @@ function bindSeller() {
         color: $("#wk-color").value, size: $("#wk-size").value, price: +$("#wk-price").value,
         technique: $("#wk-tech").value.trim() || "—", dims: $("#wk-dims").value.trim() || "—", description: $("#wk-desc").value.trim(),
         art: `linear-gradient(${Math.floor(Math.random() * 360)}deg, ${pick()}, ${pick()} 55%, ${pick()})`,
-        variants: variants.length ? variants : [{ label: "Original", stock: 1 }], isNew: true,
+        variants: variants.length ? variants : [{ label: "Original", stock: 1 }], isNew: true, ...(options ? { options } : {}),
         shippingIncluded: $("#wk-ship-incl").checked, shipping: $("#wk-ship-incl").checked ? 0 : Math.max(0, +$("#wk-ship").value || 0),
       };
       state.works.unshift(w);
@@ -1782,9 +1855,9 @@ function adminSpace() {
   let body = "";
   if (tab === "vendeurs") {
     body = state.pending.length
-      ? `<div class="table-wrap"><table><thead><tr><th>Artiste</th><th>E-mail</th><th>Ville</th><th>Discipline</th><th>Statut</th><th></th></tr></thead><tbody>${state.pending
+      ? `<div class="table-wrap"><table><thead><tr><th>Artiste</th><th>E-mail</th><th>Ville</th><th>Discipline</th><th>Offre</th><th>Statut</th><th></th></tr></thead><tbody>${state.pending
           .map(
-            (p) => `<tr><td><strong>${esc(p.name)}</strong></td><td>${esc(p.email)}</td><td>${esc(p.city)}</td><td>${esc(p.discipline)}</td>
+            (p) => `<tr><td><strong>${esc(p.name)}</strong></td><td>${esc(p.email)}</td><td>${esc(p.city)}</td><td>${esc(p.discipline)}</td><td>${p.plan === "pro" ? "Atelier Pro" : "Atelier"}</td>
             <td><span class="tag ${p.status === "validé" ? "green" : p.status === "refusé" ? "grey" : "pink"}">${p.status}</span></td>
             <td class="num">${p.status === "en attente" ? `<button class="btn btn-small" data-act="seller-ok" data-id="${p.id}">Valider</button><button class="btn btn-small btn-outline" data-act="seller-ko" data-id="${p.id}">Refuser</button>` : ""}</td></tr>`,
           )
@@ -2159,6 +2232,14 @@ const actions = {
     $$('[data-act="view"]').forEach((x) => x.classList.toggle("on", x === el));
     renderResults();
   },
+  "opt-pick"(el) {
+    const w = byId(currentParam);
+    const want = { ...w.variants[currentVariant].values, [el.dataset.o]: el.dataset.v };
+    const i = w.variants.findIndex((x) => w.options.every((o) => x.values[o.name] === want[o.name]));
+    if (i < 0) return;
+    currentVariant = i;
+    refreshAvailability(w);
+  },
   variant(el) {
     currentVariant = +el.dataset.i;
     $$('[data-act="variant"]').forEach((x) => x.classList.toggle("on", x === el));
@@ -2206,6 +2287,8 @@ const actions = {
     save();
   },
   "demo-login"(el) {
+    // L'admin arrive directement sur son tableau de bord.
+    if (el.dataset.id === "admin") afterLogin = "#/profil";
     login({ ...DEMO_USERS[el.dataset.id] });
     toast(`Bienvenue dans votre espace ${el.textContent.trim().toLowerCase()}`);
   },

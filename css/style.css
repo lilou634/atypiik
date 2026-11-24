@@ -5217,3 +5217,27 @@ div.art::after {
 .admin-login .demo-box {
   margin-top: 16px;
 }
+
+/* ---------- Déclinaisons tailles × couleurs ---------- */
+.vmode-box { border: 0; padding: 0; margin: 0; min-width: 0; }
+.vmode-box legend, fieldset.field > legend { font-weight: 600; margin-bottom: 8px; padding: 0; }
+fieldset.field { border: 0; padding: 0; margin: 0; min-width: 0; }
+.vmode { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-bottom: 10px; }
+.opt-def { display: grid; grid-template-columns: minmax(90px, 1fr) 2fr; gap: 8px; }
+.opt-def input { padding: 8px; border: 1px solid var(--ink); min-width: 0; }
+.vgrid { width: 100%; }
+.vgrid input { width: 90px; padding: 4px; border: 1px solid var(--ink); }
+.opt-group { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.opt-picked { font-weight: 600; margin-left: 4px; text-transform: none; }
+
+/* ---------- Choix de l'offre à l'inscription ---------- */
+.plan-pick { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+.plan-opt { position: relative; display: grid; gap: 6px; padding: 14px 14px 14px 40px; border: 1px solid var(--ink); cursor: pointer; background: var(--paper, #fff); }
+.plan-opt input { position: absolute; left: 14px; top: 17px; accent-color: currentColor; }
+.plan-opt:has(input:checked) { box-shadow: inset 0 0 0 2px var(--ink); }
+.plan-opt-head { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.plan-opt-head b { font-size: 1.05rem; }
+.plan-opt-com { font-size: .9rem; }
+.plan-opt ul { margin: 0; padding-left: 18px; font-size: .85rem; }
+.plan-opt-pro .plan-opt-head b::after { content: " ★"; }
+@media (max-width: 520px) { .opt-def { grid-template-columns: 1fr; } }
