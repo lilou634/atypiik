@@ -5250,3 +5250,15 @@ fieldset.field { border: 0; padding: 0; margin: 0; min-width: 0; }
 .field .plan-opt input:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 .plan-opt-head span { font-size: 0.8rem; white-space: nowrap; }
 .plan-opt-pro .plan-opt-head b::after { content: ""; }
+
+/* Tailles et couleurs à cocher */
+.opt-def { display: grid; grid-template-columns: 1fr; gap: 8px; }
+.opt-def-title { font-family: var(--font-mono); font-size: 0.66rem; text-transform: uppercase; color: var(--ink-2); margin-top: 6px; }
+.opt-checks { display: flex; flex-wrap: wrap; gap: 6px; }
+.opt-check { position: relative; cursor: pointer; }
+.field .opt-check input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; padding: 0; border: 0; box-shadow: none; }
+.opt-check span { display: inline-block; padding: 6px 12px; border: 1px solid var(--ink); font-size: 0.85rem; text-transform: none; font-family: inherit; color: var(--ink); background: transparent; }
+.opt-check input:checked + span { background: var(--ink); color: var(--paper); }
+.opt-check input:focus-visible + span { outline: 2px solid var(--ink); outline-offset: 2px; }
+.opt-add { display: flex; flex-wrap: wrap; gap: 6px; align-items: stretch; }
+.field .opt-add input { flex: 1 1 180px; min-width: 0; padding: 6px 10px; }

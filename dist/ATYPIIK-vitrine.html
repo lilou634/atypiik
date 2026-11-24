@@ -5322,6 +5322,18 @@ fieldset.field { border: 0; padding: 0; margin: 0; min-width: 0; }
 .plan-opt-head span { font-size: 0.8rem; white-space: nowrap; }
 .plan-opt-pro .plan-opt-head b::after { content: ""; }
 
+/* Tailles et couleurs à cocher */
+.opt-def { display: grid; grid-template-columns: 1fr; gap: 8px; }
+.opt-def-title { font-family: var(--font-mono); font-size: 0.66rem; text-transform: uppercase; color: var(--ink-2); margin-top: 6px; }
+.opt-checks { display: flex; flex-wrap: wrap; gap: 6px; }
+.opt-check { position: relative; cursor: pointer; }
+.field .opt-check input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; padding: 0; border: 0; box-shadow: none; }
+.opt-check span { display: inline-block; padding: 6px 12px; border: 1px solid var(--ink); font-size: 0.85rem; text-transform: none; font-family: inherit; color: var(--ink); background: transparent; }
+.opt-check input:checked + span { background: var(--ink); color: var(--paper); }
+.opt-check input:focus-visible + span { outline: 2px solid var(--ink); outline-offset: 2px; }
+.opt-add { display: flex; flex-wrap: wrap; gap: 6px; align-items: stretch; }
+.field .opt-add input { flex: 1 1 180px; min-width: 0; padding: 6px 10px; }
+
     </style>
   </head>
   <body>
@@ -9085,12 +9097,15 @@ function addWorkForm() {
           <button type="button" class="link-btn" data-act="vrow-add" style="justify-self:start">+ Ajouter une déclinaison (format, support…)</button>
         </div>
         <div id="vm-grid" hidden>
-          <div class="opt-def">
-            <input id="wk-o1" value="Taille" aria-label="Nom de la 1re option" /><input id="wk-o1v" placeholder="S, M, L" aria-label="Valeurs de la 1re option" />
-            <input id="wk-o2" value="Couleur" aria-label="Nom de la 2e option" /><input id="wk-o2v" placeholder="Noir, Bordeaux" aria-label="Valeurs de la 2e option" />
+          <div class="opt-def" id="opt-def">
+            <span class="opt-def-title">Tailles</span>
+            <div class="opt-checks" data-opt="Taille">${SIZES.map((v) => `<label class="opt-check"><input type="checkbox" value="${v}" /><span>${v}</span></label>`).join("")}</div>
+            <span class="opt-def-title">Couleurs</span>
+            <div class="opt-checks" data-opt="Couleur" id="opt-colors">${PRESET_COLORS.map((v) => `<label class="opt-check"><input type="checkbox" value="${v}" /><span>${v}</span></label>`).join("")}</div>
+            <div class="opt-add"><input id="wk-newcolor" placeholder="Autre couleur (ex. Vert sapin)" aria-label="Nouvelle couleur" maxlength="30" /><button type="button" class="btn btn-small btn-outline" data-act="add-color">+ Ajouter une couleur</button></div>
           </div>
-          <p class="hint">Séparez les valeurs par des virgules. Vous pouvez renommer les options (Pointure, Matière…) ou n'en remplir qu'une. Laissez le prix vide pour garder le prix de base.</p>
-          <div class="table-wrap"><table class="vgrid"><thead><tr><th>Combinaison</th><th>Stock</th><th>Prix TTC (€)</th></tr></thead><tbody id="vgrid-body"><tr><td colspan="3" class="muted">Saisissez des tailles ou des couleurs pour créer le tableau.</td></tr></tbody></table></div>
+          <p class="hint">Cochez les tailles et les couleurs disponibles, ou seulement l'une des deux. Laissez le prix vide pour garder le prix de base.</p>
+          <div class="table-wrap"><table class="vgrid"><thead><tr><th>Combinaison</th><th>Stock</th><th>Prix TTC (€)</th></tr></thead><tbody id="vgrid-body"><tr><td colspan="3" class="muted">Cochez des tailles ou des couleurs pour créer le tableau.</td></tr></tbody></table></div>
         </div>
       </fieldset>
       <button class="btn btn-chrome">Publier l'œuvre</button>
@@ -9098,10 +9113,13 @@ function addWorkForm() {
     </form>`;
 }
 
-// Options saisies dans le formulaire (nom + valeurs séparées par des virgules), sans les vides ni les doublons.
+// Tailles et couleurs proposées à cocher dans le formulaire de publication.
+const SIZES = ["XXS", "XS", "S", "M", "L", "XL", "XXL"];
+const PRESET_COLORS = ["Noir", "Blanc", "Crème", "Beige", "Camel", "Marron", "Gris", "Bordeaux", "Rouge", "Rose", "Orange", "Jaune", "Vert", "Bleu", "Violet", "Multicolore"];
+// Options cochées dans le formulaire, dans l'ordre affiché.
 function gridOptions() {
-  return [["#wk-o1", "#wk-o1v"], ["#wk-o2", "#wk-o2v"]]
-    .map(([n, v]) => ({ name: $(n).value.trim() || "Option", values: [...new Set($(v).value.split(",").map((x) => x.trim()).filter(Boolean))] }))
+  return $$("#opt-def .opt-checks")
+    .map((box) => ({ name: box.dataset.opt, values: $$("input:checked", box).map((i) => i.value) }))
     .filter((o) => o.values.length);
 }
 function payoutHtml(price) {
@@ -9139,12 +9157,18 @@ function bindSeller() {
             .map((c) => {
               const label = opts.map((o) => c[o.name]).join(" · ");
               const [st, pr] = keep[label] || ["1", ""];
-              return `<tr data-label="${esc(label)}"><td>${esc(label)}</td><td><input type="number" min="0" value="${esc(st)}" aria-label="Stock ${esc(label)}" /></td><td><input type="number" min="1" step="1" value="${esc(pr)}" placeholder="${esc($("#wk-price").value || "prix de base")}" aria-label="Prix ${esc(label)}" /></td></tr>`;
+              return `<tr data-label="${esc(label)}"><td>${esc(label)}</td><td><input type="number" min="0" value="${esc(st)}" aria-label="Stock ${esc(label)}" /></td><td><input type="number" min="1" step="1" value="${esc(pr)}" placeholder="${esc($("#wk-price").value || "base")}" aria-label="Prix ${esc(label)}" /></td></tr>`;
             })
             .join("")
-        : '<tr><td colspan="3" class="muted">Saisissez des tailles ou des couleurs pour créer le tableau.</td></tr>';
+        : '<tr><td colspan="3" class="muted">Cochez des tailles ou des couleurs pour créer le tableau.</td></tr>';
     };
-    ["#wk-o1", "#wk-o1v", "#wk-o2", "#wk-o2v"].forEach((sel) => $(sel).addEventListener("input", rebuild));
+    $("#opt-def").addEventListener("change", (e) => e.target.type === "checkbox" && rebuild());
+    $("#opt-def").addEventListener("vgrid-rebuild", rebuild);
+    $("#wk-newcolor").addEventListener("keydown", (e) => {
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+      actions["add-color"]();
+    });
   }
   if (wf)
     wf.addEventListener("submit", (e) => {
@@ -9706,6 +9730,22 @@ const actions = {
     save();
     toast("Œuvre mise à jour");
     render(true);
+  },
+  "add-color"() {
+    const inp = $("#wk-newcolor");
+    const v = inp.value.trim().split(" ").filter(Boolean).join(" ");
+    if (!v) return inp.focus();
+    const name = v.charAt(0).toUpperCase() + v.slice(1);
+    const existing = $$("#opt-colors input").find((i) => i.value.toLowerCase() === name.toLowerCase());
+    if (existing) existing.checked = true;
+    else {
+      const l = document.createElement("label");
+      l.className = "opt-check";
+      l.innerHTML = `<input type="checkbox" value="${esc(name)}" checked /><span>${esc(name)}</span>`;
+      $("#opt-colors").appendChild(l);
+    }
+    inp.value = "";
+    $("#opt-def").dispatchEvent(new Event("vgrid-rebuild"));
   },
   "vrow-add"() {
     $("#variant-rows").insertAdjacentHTML(
