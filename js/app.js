@@ -1403,7 +1403,7 @@ function loginForms() {
           </div>
         </div>
         <div class="field"><label for="su-pass">Mot de passe</label><input id="su-pass" type="password" required minlength="8" autocomplete="new-password" /></div>
-        <label class="check"><input type="checkbox" required id="su-cgu" /> J'accepte les&nbsp;<a href="#/legal/cgu" style="text-decoration:underline">CGU / CGV</a></label>
+        <label class="check"><input type="checkbox" required id="su-cgu" /> <span>J'accepte les <a href="#/legal/cgu" style="text-decoration:underline">CGU / CGV</a></span></label>
         <button class="btn btn-block btn-chrome" id="su-submit" disabled>Créer mon compte</button>
         <p class="hint cgu-lock" id="su-lock">Cochez « J'accepte les CGU / CGV » pour continuer.</p>
         <p class="hint">Les comptes artistes sont validés par l'équipe ATYPIIK avant la mise en vente.</p>
@@ -1738,7 +1738,7 @@ function sellerSpace() {
       ? bought.map((o) => orderCard(o)).join("")
       : emptyBox("Aucun achat", "Vous pouvez acheter les œuvres des autres artistes avec ce même compte : elles apparaîtront ici.", '<a class="btn" href="#/galerie">Explorer la galerie</a>');
   return (
-    (a?.suspended ? `<div class="admin-readonly panel"><span class="label">Boutique suspendue</span><p>Vos œuvres ne sont plus visibles sur ATYPIIK, conformément aux conditions vendeurs (litiges répétés ou non-respect des règles). Contactez l'équipe pour en savoir plus.</p></div>` : "") +
+    (a?.suspended ? `<div class="admin-readonly panel"><span class="label">Boutique suspendue</span><p>Vos œuvres ne sont plus visibles sur ATYPIIK, conformément aux CGU / CGV (litiges répétés ou non-respect des règles). Contactez l'équipe pour en savoir plus.</p></div>` : "") +
     tabs(
       "seller",
       [
@@ -2024,7 +2024,7 @@ function adminSpace() {
   }
   if (tab === "litiges") {
     const byArtist = state.artists.map((ar) => [ar, disputesOfArtist(ar.id)]).filter(([, l]) => l.length);
-    body = `<div class="admin-readonly panel"><span class="label">Lecture seule</span><p>Les litiges se règlent entre l'acheteur et l'artiste. Vous les consultez pour repérer un artiste qui pose problème, et vous pouvez suspendre sa boutique, comme le prévoient les conditions vendeurs.</p></div>
+    body = `<div class="admin-readonly panel"><span class="label">Lecture seule</span><p>Les litiges se règlent entre l'acheteur et l'artiste. Vous les consultez pour repérer un artiste qui pose problème, et vous pouvez suspendre sa boutique, comme le prévoient les CGU / CGV.</p></div>
       ${byArtist.length ? `<h3 class="label" style="margin:18px 0 8px">Suivi par artiste</h3><div class="table-wrap"><table><thead><tr><th>Artiste</th><th class="num">Litiges</th><th class="num">En cours</th><th>Boutique</th><th></th></tr></thead><tbody>${byArtist
         .map(([ar, l]) => `<tr><td><strong>${esc(ar.name)}</strong></td><td class="num">${l.length}</td><td class="num">${l.filter(disputeOpen).length}</td><td>${ar.suspended ? '<span class="tag pink">Suspendue</span>' : '<span class="tag green">Active</span>'}</td>
           <td class="num"><button class="btn btn-small ${ar.suspended ? "" : "btn-outline"}" data-act="suspend-artist" data-id="${ar.id}">${ar.suspended ? "Réactiver" : "Suspendre"}</button></td></tr>`)

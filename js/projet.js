@@ -764,9 +764,9 @@ function viewBecomeArtist() {
               <li><b>Tout passe par ATYPIIK</b> : commandes, devis et paiements. Les coordonnées sont masquées dans les échanges, et vendre en dehors du site après une mise en relation est interdit.</li>
               <li><b>Les litiges</b> se règlent entre vous et l'acheteur. ATYPIIK peut les consulter et suspendre une boutique en cas de litiges répétés.</li>
             </ul></div>
-        <label class="check"><input type="checkbox" required id="ba-cgu" /> J'accepte ces règles et les&nbsp;<a href="#/legal/cgu" style="text-decoration:underline">conditions vendeurs</a></label>
+        <label class="check"><input type="checkbox" required id="ba-cgu" /> <span>J'accepte ces règles et les <a href="#/legal/cgu" style="text-decoration:underline">CGU / CGV</a></span></label>
         <button class="btn btn-block" id="ba-submit" disabled>Envoyer ma candidature</button>
-        <p class="hint cgu-lock" id="ba-lock">Cochez « J'accepte ces règles » pour envoyer votre candidature.</p>
+        <p class="hint cgu-lock" id="ba-lock">Cochez « J'accepte ces règles et les CGU / CGV » pour envoyer votre candidature.</p>
       </form>
       <aside class="summary"><h3>Comment ça se passe</h3>
         <ol class="facts"><li>Vous envoyez votre candidature.</li><li>L'équipe regarde votre travail, sous 48 h.</li><li>Une fois validé, votre espace artiste s'ouvre dans votre profil et vous publiez vos œuvres.</li></ol>
