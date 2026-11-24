@@ -5268,3 +5268,6 @@ fieldset.field { border: 0; padding: 0; margin: 0; min-width: 0; }
 .btn[disabled] { cursor: not-allowed; }
 .payout-plan { font-size: 0.85rem; margin: 6px 0 10px; }
 .vgrid-net { white-space: nowrap; font-weight: 600; }
+
+/* Galerie : un seul trait entre le titre et le premier filtre */
+.filters details:first-child { border-top: 0; padding-top: 0; }

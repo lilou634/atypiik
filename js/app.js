@@ -131,6 +131,54 @@ const AVG_COMMISSION = 0.135; // 70 % des artistes en Atelier, 30 % en Pro (hypo
 const planOf = (artistId) => (artistById(artistId) || {}).plan || "atelier";
 const commissionOf = (artistId) => COMMISSION_RATES[planOf(artistId)];
 const pct = (r) => Math.round(r * 100) + " %";
+/* ---------- Renouvellement automatique de l'accueil ---------- */
+const DAY = 864e5;
+// Numéro du jour et de la semaine (semaines du lundi au dimanche) : tout le monde voit la même chose le même jour.
+const dayIndex = () => Math.floor((Date.now() + 36e5) / DAY);
+function weekStart(d = new Date()) {
+  const m = new Date(d);
+  m.setHours(0, 0, 0, 0);
+  m.setDate(m.getDate() - ((m.getDay() + 6) % 7));
+  return m;
+}
+const weekIndex = () => Math.floor((weekStart() - new Date(2026, 0, 5)) / (7 * DAY));
+// Fait tourner une liste : un décalage différent chaque jour (ou chaque semaine).
+const rotate = (list, n) => (list.length ? [...list.slice(n % list.length), ...list.slice(0, n % list.length)] : list);
+// Mélange stable pour la journée : même ordre pour tout le monde aujourd'hui, nouvel ordre demain.
+function shuffleByDay(list, seed = dayIndex()) {
+  const h = (str) => [...str].reduce((x, c) => Math.imul(x ^ c.charCodeAt(0), 2654435761) >>> 0, seed * 7919 + 1);
+  return [...list].sort((a, b) => h(a.id) - h(b.id));
+}
+// « Nouveau » pendant 30 jours après la publication (les œuvres de démo gardent leur marque d'origine).
+const isNewWork = (w) => !w.sold && (w.addedAt ? Date.now() - new Date(w.addedAt) < 30 * DAY : !!w.isNew);
+// Nouvelles pièces : les dernières publiées d'abord, puis le reste du catalogue qui tourne chaque jour.
+function freshWorks() {
+  const avail = visibleWorks().filter((w) => !w.sold);
+  const dated = avail.filter((w) => w.addedAt).sort((a, b) => (b.addedAt > a.addedAt ? 1 : -1));
+  const recent = dated.filter(isNewWork);
+  const rest = avail.filter((w) => !recent.includes(w));
+  return [...recent, ...shuffleByDay(rest)];
+}
+// Œuvre de la grande photo d'accueil : change chaque jour, parmi les pièces disponibles avec une vraie photo.
+function heroWork() {
+  const pool = visibleWorks().filter((w) => !w.sold && ((typeof PHOTOS !== "undefined" && PHOTOS[w.id]) || w.img));
+  return rotate(pool.length ? pool : visibleWorks(), dayIndex())[0];
+}
+// Artiste de la semaine : change chaque lundi, parmi les boutiques actives qui ont au moins 2 œuvres disponibles.
+function weeklyArtist() {
+  const pool = state.artists.filter((a) => !a.suspended && visibleWorks().filter((w) => w.artist === a.id && !w.sold).length >= 2);
+  const a = rotate(pool, weekIndex())[0];
+  if (!a) return null;
+  const quote = a.id === FEATURED.artist ? FEATURED.quote : (ARTIST_QUOTES.find((q) => q.artist === a.id) || {}).text || a.bio;
+  const works = visibleWorks().filter((w) => w.artist === a.id && !w.sold).slice(0, 3);
+  const week = "Semaine du " + weekStart().toLocaleDateString("fr-FR", { day: "numeric", month: "long" });
+  return { artist: a, quote, works, week };
+}
+// Prochain drop : reste affiché 48 h après l'ouverture, puis laisse la place au suivant.
+function currentDrop() {
+  return DROPS.filter((d) => new Date(d.date).getTime() + 2 * DAY > Date.now()).sort((a, b) => (a.date > b.date ? 1 : -1))[0] || null;
+}
+
 // Prix d'une déclinaison : le sien s'il est renseigné, sinon le prix de base de l'œuvre.
 const priceOf = (w, vi) => (w.variants[vi] && w.variants[vi].price) || w.price;
 const minPrice = (w) => Math.min(...w.variants.map((v) => v.price || w.price));
@@ -196,7 +244,7 @@ function badgesFor(w) {
   if (w.sold) b.push('<span class="badge badge-sold">Vendu</span>');
   else if (totalStock(w) === 0) b.push('<span class="badge badge-out">Rupture de stock</span>');
   if (w.variants.length > 1) b.push('<span class="badge badge-variants">Plusieurs versions</span>');
-  if (w.isNew) b.push('<span class="badge badge-new">Nouveau</span>');
+  if (isNewWork(w)) b.push('<span class="badge badge-new">Nouveau</span>');
   return b.join("");
 }
 
@@ -335,8 +383,7 @@ function emptyBox(title, text, cta = "") {
    ========================================================= */
 
 function viewHome() {
-  const works = visibleWorks();
-  const hero = byId("a1");
+  const hero = heroWork();
   const cats = [
     ["Peinture", "a2"],
     ["Céramique", "a6"],
@@ -368,7 +415,7 @@ function viewHome() {
 
     <section class="section">
       <div class="section-head"><div><h2>Nouvelles <span class="fun">pièces</span></h2></div><a href="#/galerie">Tout voir</a></div>
-      <div class="grid">${works.slice(0, 8).map((w) => card(w)).join("")}</div>
+      <div class="grid">${freshWorks().slice(0, 8).map((w) => card(w)).join("")}</div>
     </section>
 
     ${featuredSection()}
@@ -423,7 +470,7 @@ function filteredWorks() {
   const g = state.gallery;
   const q = g.q.trim().toLowerCase();
   const order = {
-    new: (a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0) || +b.id.slice(1) - +a.id.slice(1),
+    new: (a, b) => (b.addedAt || "").localeCompare(a.addedAt || "") || (isNewWork(b) ? 1 : 0) - (isNewWork(a) ? 1 : 0) || +b.id.replace(/\D/g, "") - +a.id.replace(/\D/g, ""),
     asc: (a, b) => a.price - b.price,
     desc: (a, b) => b.price - a.price,
     rating: (a, b) => ratingOf(reviewsOf((r) => r.artist === b.artist)) - ratingOf(reviewsOf((r) => r.artist === a.artist)),
@@ -823,16 +870,17 @@ function viewHelp() {
 
 /* ---------- Mises en avant ---------- */
 function featuredSection() {
-  const a = artistById(FEATURED.artist);
-  if (!a) return "";
-  const works = FEATURED.works.map(byId).filter(Boolean);
+  const f = weeklyArtist();
+  if (!f) return "";
+  const a = f.artist;
+  const works = f.works;
   return `
     <section class="section featured">
       <div class="featured-text">
-        <span class="ref">${esc(FEATURED.week)}</span>
+        <span class="ref">${esc(f.week)}</span>
         <h2>L'artiste de la <span class="fun">semaine</span></h2>
         <div class="featured-id">${avatar(a)}<div><h3><a href="#/artiste/${a.id}">${esc(a.name)}</a></h3>${selectedBadge(true)}<span class="mono muted">${esc(disciplineOf(a.id))} · ${esc(a.city)}</span></div></div>
-        <blockquote>« ${esc(FEATURED.quote)} »</blockquote>
+        <blockquote>« ${esc(f.quote)} »</blockquote>
         <p class="demo-note">Artiste et témoignage fictifs (démo).</p>
         <div class="card-actions"><a class="btn" href="#/artiste/${a.id}">Découvrir son univers</a>${followBtn(a.id)}</div>
       </div>
@@ -841,6 +889,9 @@ function featuredSection() {
 }
 
 function dropSection() {
+  const DROP = currentDrop();
+  if (!DROP) return "";
+  const live = new Date(DROP.date) <= Date.now();
   const a = artistById(DROP.artist);
   const at = new Date(DROP.date);
   const when = at.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", timeZone: "Europe/Paris" }) + " à " + at.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Paris" });
@@ -848,13 +899,17 @@ function dropSection() {
     <section class="section drop">
       <div class="drop-visuals">${DROP.works.map(byId).filter(Boolean).map((w) => `<div class="drop-item">${visual(w)}</div>`).join("")}</div>
       <div class="drop-text">
-        <span class="ref">Prochain drop · édition limitée</span>
+        <span class="ref">${live ? "Drop en cours · édition limitée" : "Prochain drop · édition limitée"}</span>
         <h2>${esc(DROP.title)}</h2>
         <p class="mono">${esc(a?.name || "")} · ${DROP.pieces} pièces · ${esc(when)}</p>
         <div class="countdown" data-countdown="${DROP.date}" aria-live="polite">${countdownHtml(DROP.date)}</div>
         <p>${esc(DROP.text)}</p>
         <p class="demo-note">Drop fictif (démo) : aucune vente n'aura lieu.</p>
-        <button class="btn ${state.dropAlert ? "btn-outline" : "btn-light"}" data-act="drop-alert">${state.dropAlert ? "✓ Rappel activé" : "Me prévenir au lancement"}</button>
+        ${
+          live
+            ? `<a class="btn btn-light" href="#/artiste/${DROP.artist}">Voir les pièces</a>`
+            : `<button class="btn ${state.dropAlert === DROP.id ? "btn-outline" : "btn-light"}" data-act="drop-alert">${state.dropAlert === DROP.id ? "✓ Rappel activé" : "Me prévenir au lancement"}</button>`
+        }
       </div>
     </section>`;
 }
@@ -1853,7 +1908,7 @@ function bindSeller() {
         color: $("#wk-color").value, size: $("#wk-size").value, price: +$("#wk-price").value,
         technique: $("#wk-tech").value.trim() || "—", dims: $("#wk-dims").value.trim() || "—", description: $("#wk-desc").value.trim(),
         art: `linear-gradient(${Math.floor(Math.random() * 360)}deg, ${pick()}, ${pick()} 55%, ${pick()})`,
-        variants: variants.length ? variants : [{ label: "Original", stock: 1 }], isNew: true, ...(options ? { options } : {}),
+        variants: variants.length ? variants : [{ label: "Original", stock: 1 }], addedAt: new Date().toISOString(), ...(options ? { options } : {}),
         shippingIncluded: $("#wk-ship-incl").checked, shipping: $("#wk-ship-incl").checked ? 0 : Math.max(0, +$("#wk-ship").value || 0),
       };
       state.works.unshift(w);
@@ -2215,7 +2270,9 @@ const actions = {
   },
   "drop-alert"() {
     if (!requireUser("Connectez-vous pour recevoir un rappel au lancement.")) return;
-    state.dropAlert = !state.dropAlert;
+    const DROP = currentDrop();
+    if (!DROP) return;
+    state.dropAlert = state.dropAlert === DROP.id ? null : DROP.id;
     if (state.dropAlert) notify(`Rappel activé : « ${DROP.title} » arrive bientôt. On vous prévient dès la mise en ligne.`, "#/");
     save();
     toast(state.dropAlert ? "C'est noté, on vous prévient au lancement." : "Rappel retiré");

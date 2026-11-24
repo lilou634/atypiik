@@ -413,14 +413,29 @@ const FEATURED = {
   quote: "Je chine des canevas et des tapisseries oubliés, et je leur donne une deuxième vie sur des vestes qu'on a envie de porter tous les jours.",
   works: ["a22", "a23", "a25"],
 };
-const DROP = {
-  title: "Céramiques d'hiver",
-  artist: "margaux",
-  date: "2026-12-04T18:00:00+01:00",
-  pieces: 24,
-  text: "24 pièces uniques — vases, bougeoirs et tasses — mises en ligne en même temps. Quand c'est parti, c'est parti.",
-  works: ["a6", "a14", "a7"],
-};
+// Drops programmés : le site affiche tout seul le prochain, puis passe au suivant une fois la vente terminée.
+const DROPS = [
+  {
+    id: "d1", title: "Céramiques d'hiver", artist: "margaux", date: "2026-12-04T18:00:00+01:00", pieces: 24,
+    text: "24 pièces uniques — vases, bougeoirs et tasses — mises en ligne en même temps. Quand c'est parti, c'est parti.",
+    works: ["a6", "a14", "a7"],
+  },
+  {
+    id: "d2", title: "Vestes de fêtes", artist: "rosa", date: "2026-12-18T18:00:00+01:00", pieces: 8,
+    text: "8 vestes brodées à partir de tapisseries chinées, pour les fêtes. Chaque pièce n'existe qu'une fois.",
+    works: ["a23", "a25", "a24"],
+  },
+  {
+    id: "d3", title: "Crochet d'hiver", artist: "zia", date: "2027-01-15T18:00:00+01:00", pieces: 15,
+    text: "15 sacs et housses crochetés main, dans les couleurs de l'hiver.",
+    works: ["a18", "a19", "a20"],
+  },
+  {
+    id: "d4", title: "Bijoux de printemps", artist: "leonie", date: "2027-03-05T18:00:00+01:00", pieces: 20,
+    text: "20 colliers et boucles d'oreilles en perles anciennes, assemblés à la main.",
+    works: ["a28", "a29"],
+  },
+];
 
 /* Demandes de commande personnalisée (démo). */
 const SEED_REQUESTS = [
