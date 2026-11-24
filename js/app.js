@@ -1801,7 +1801,16 @@ function addWorkForm() {
             <div class="opt-checks" data-opt="Couleur" id="opt-colors">${PRESET_COLORS.map((v) => `<label class="opt-check"><input type="checkbox" value="${v}" /><span>${v}</span></label>`).join("")}</div>
             <div class="opt-add"><input id="wk-newcolor" placeholder="Autre couleur (ex. Vert sapin)" aria-label="Nouvelle couleur" maxlength="30" /><button type="button" class="btn btn-small btn-outline" data-act="add-color">+ Ajouter une couleur</button></div>
           </div>
-          <p class="hint">Cochez les tailles et les couleurs disponibles, ou seulement l'une des deux. Laissez le prix vide pour garder le prix de base.</p>
+          <p class="hint">Cochez les tailles et les couleurs disponibles, ou seulement l'une des deux.</p>
+          <div class="vgrid-price" id="vgrid-price" hidden>
+            <p class="hint">Toutes les déclinaisons sont au <b>prix de vente</b> saisi plus haut. Changez une case seulement si une taille ou une couleur coûte plus cher.</p>
+            <div class="vgrid-bulk">
+              <select id="vb-target" aria-label="Déclinaisons à modifier"></select>
+              <input id="vb-price" type="number" min="1" step="1" placeholder="Prix (€)" aria-label="Prix à appliquer" />
+              <button type="button" class="btn btn-small btn-outline" data-act="vb-apply">Appliquer</button>
+              <button type="button" class="link-btn" data-act="vb-reset">Tout remettre au prix de vente</button>
+            </div>
+          </div>
           <div class="table-wrap"><table class="vgrid"><thead><tr><th>Combinaison</th><th>Stock</th><th>Prix TTC (€)</th><th>Vous recevez</th></tr></thead><tbody id="vgrid-body"><tr><td colspan="4" class="muted">Cochez des tailles ou des couleurs pour créer le tableau.</td></tr></tbody></table></div>
         </div>
       </fieldset>
@@ -1851,7 +1860,10 @@ function bindSeller() {
     // Le tableau des combinaisons se reconstruit à chaque saisie, en gardant stocks et prix déjà tapés.
     const rebuild = () => {
       const keep = {};
-      $$("#vgrid-body tr[data-label]").forEach((tr) => (keep[tr.dataset.label] = [$("input", tr).value, $$("input", tr)[1].value]));
+      $$("#vgrid-body tr[data-label]").forEach((tr) => {
+        const pi = $$("input", tr)[1];
+        keep[tr.dataset.label] = [$("input", tr).value, pi.dataset.custom ? pi.value : ""];
+      });
       const opts = gridOptions();
       const combos = combine(opts);
       $("#vgrid-body").innerHTML = opts.length
@@ -1859,12 +1871,43 @@ function bindSeller() {
             .map((c) => {
               const label = opts.map((o) => c[o.name]).join(" · ");
               const [st, pr] = keep[label] || ["1", ""];
-              return `<tr data-label="${esc(label)}"><td>${esc(label)}</td><td><input type="number" min="0" value="${esc(st)}" aria-label="Stock ${esc(label)}" /></td><td><input type="number" min="1" step="1" value="${esc(pr)}" placeholder="${esc($("#wk-price").value || "base")}" aria-label="Prix ${esc(label)}" /></td><td class="num vgrid-net"></td></tr>`;
+              const vals = opts.map((o) => c[o.name]).join("|");
+              return `<tr data-label="${esc(label)}" data-vals="${esc(vals)}"><td>${esc(label)}</td><td><input type="number" min="0" value="${esc(st)}" aria-label="Stock ${esc(label)}" /></td><td><input type="number" min="1" step="1" value="${esc(pr || $("#wk-price").value)}" ${pr ? 'data-custom="1"' : ""} aria-label="Prix ${esc(label)}" /></td><td class="num vgrid-net"></td></tr>`;
             })
             .join("")
         : '<tr><td colspan="4" class="muted">Cochez des tailles ou des couleurs pour créer le tableau.</td></tr>';
+      $("#vgrid-price").hidden = !opts.length;
+      // Raccourci : un prix pour toutes les déclinaisons d'une même taille ou d'une même couleur.
+      $("#vb-target").innerHTML = opts
+        .map((o) => `<optgroup label="${esc(o.name)}">${o.values.map((v) => `<option value="${esc(v)}">Toutes les « ${esc(v)} »</option>`).join("")}</optgroup>`)
+        .join("");
       updateNets();
     };
+    // Le prix de vente se recopie dans toutes les cases que l'artiste n'a pas modifiées.
+    const syncBase = () => {
+      $$("#vgrid-body tr[data-label]").forEach((tr) => {
+        const pi = $$("input", tr)[1];
+        if (!pi.dataset.custom) pi.value = $("#wk-price").value;
+      });
+      updateNets();
+    };
+    $("#wk-price").addEventListener("input", syncBase);
+    $("#vgrid-body").addEventListener("input", (e) => {
+      const pi = e.target.closest("td:nth-child(3) input");
+      if (pi) {
+        if (pi.value && pi.value !== $("#wk-price").value) pi.dataset.custom = "1";
+        else delete pi.dataset.custom;
+      }
+    });
+    // Case de prix vidée : elle reprend le prix de vente.
+    $("#vgrid-body").addEventListener("focusout", (e) => {
+      const pi = e.target.closest("td:nth-child(3) input");
+      if (pi && !pi.value) {
+        delete pi.dataset.custom;
+        pi.value = $("#wk-price").value;
+        updateNets();
+      }
+    });
     // Net de chaque combinaison, calculé avec la commission de l'offre de l'artiste.
     const updateNets = () => {
       const rate = commissionOf(state.user.artistId);
@@ -1894,7 +1937,7 @@ function bindSeller() {
         ? $$("#vgrid-body tr[data-label]").map((tr, i) => {
             const [s, pr] = $$("input", tr);
             const v = { label: tr.dataset.label, values: combine(options)[i], stock: Math.max(0, +s.value || 0) };
-            if (+pr.value > 0) v.price = +pr.value;
+            if (+pr.value > 0 && +pr.value !== +$("#wk-price").value) v.price = +pr.value;
             return v;
           })
         : $$("#variant-rows .vrow").map((r) => {
@@ -2445,6 +2488,29 @@ const actions = {
     save();
     toast("Œuvre mise à jour");
     render(true);
+  },
+  "vb-apply"() {
+    const v = $("#vb-target").value;
+    const price = +$("#vb-price").value;
+    if (!v || !(price > 0)) return toast("Choisissez une taille ou une couleur et saisissez un prix.");
+    $$("#vgrid-body tr[data-label]")
+      .filter((tr) => tr.dataset.vals.split("|").includes(v))
+      .forEach((tr) => {
+        const pi = $$("input", tr)[1];
+        pi.value = price;
+        if (price !== +$("#wk-price").value) pi.dataset.custom = "1";
+        else delete pi.dataset.custom;
+      });
+    $("#vgrid-body").dispatchEvent(new Event("input"));
+    toast(`Prix de ${euro(price)} appliqué à toutes les « ${v} »`);
+  },
+  "vb-reset"() {
+    $$("#vgrid-body tr[data-label]").forEach((tr) => {
+      const pi = $$("input", tr)[1];
+      delete pi.dataset.custom;
+      pi.value = $("#wk-price").value;
+    });
+    $("#vgrid-body").dispatchEvent(new Event("input"));
   },
   "add-color"() {
     const inp = $("#wk-newcolor");

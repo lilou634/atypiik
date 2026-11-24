@@ -5271,3 +5271,11 @@ fieldset.field { border: 0; padding: 0; margin: 0; min-width: 0; }
 
 /* Galerie : un seul trait entre le titre et le premier filtre */
 .filters details:first-child { border-top: 0; padding-top: 0; }
+
+/* Prix des déclinaisons : un prix pour tout, ajustable par taille ou couleur */
+.vgrid-price { margin: 4px 0 10px; }
+.vgrid-bulk { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.vgrid-bulk select, .field .vgrid-bulk input { padding: 6px 8px; border: 1px solid var(--ink); background: transparent; font: inherit; font-size: 0.85rem; }
+.field .vgrid-bulk input { width: 110px; }
+.vgrid input[data-custom] { border-width: 2px; font-weight: 600; }
+.field .vgrid-bulk select { width: auto; flex: 0 1 220px; min-width: 0; }
